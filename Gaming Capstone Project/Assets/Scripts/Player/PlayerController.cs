@@ -29,12 +29,13 @@ public class PlayerController : MonoBehaviour
         pitch -= speedV * Input.GetAxis("Mouse Y");
 
         transform.eulerAngles = new Vector3(pitch, yaw, 0);
-        rgd.linearVelocity = transform.forward * x * velocity;
+        rgd.linearVelocity = transform.forward * z * velocity + transform.right * x * velocity;
     }
 
     public void MovePlayer(InputAction.CallbackContext context)
     {
-        x = context.ReadValue<Vector2>().y;
+        x = context.ReadValue<Vector2>().x;
+        z = context.ReadValue<Vector2>().y;
     }
 
 }
