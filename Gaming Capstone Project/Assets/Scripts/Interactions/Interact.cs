@@ -62,7 +62,7 @@ public class Interact : MonoBehaviour
     }
     void Press() 
     { 
-        if (highlightedObject.tag == "Button")
+        if (highlightedObject != null && highlightedObject.tag == "Button")
         {
             // access object and perform action
             highlightedObject.GetComponent<Animator>().SetTrigger("isPressed");
