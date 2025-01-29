@@ -132,7 +132,7 @@ Material:
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _Surface: 0
-    - _Vertex_Snapping: 32
+    - _Vertex_Snapping: 28
     - _WorkflowMode: 1
     - _ZTest: 4
     - _ZWrite: 1
