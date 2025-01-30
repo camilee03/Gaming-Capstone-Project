@@ -60,13 +60,21 @@ public class Interact : MonoBehaviour
             canPickup = true;
         }
     }
-    void Press() 
-    { 
+    void Press()
+    {
         if (highlightedObject != null && highlightedObject.tag == "Button")
         {
             // access object and perform action
             highlightedObject.GetComponent<Animator>().SetTrigger("isPressed");
-        }     
+        }
+    }
+    void FocusDOS()
+    {
+        if (highlightedObject != null && highlightedObject.tag == "DOS Terminal")
+        {
+            // access object and perform action
+            highlightedObject.GetComponent<DOSInteraction>().StartInteraction();
+        }
     }
     void HitScan()
     {
