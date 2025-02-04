@@ -28,7 +28,7 @@ public class Interact : MonoBehaviour
         HitScan();
         if (Input.GetMouseButtonDown(0))
         {
-            if (canPickup && highlightedObject != null) { Pickup(); Press(); }
+            if (canPickup && highlightedObject != null) { Pickup(); Press(); FocusDOS(); }
             else { Place(); }
         }
 
@@ -73,6 +73,7 @@ public class Interact : MonoBehaviour
         if (highlightedObject != null && highlightedObject.tag == "DOS Terminal")
         {
             // access object and perform action
+            highlightedObject.GetComponent<DOSInteraction>().SetInteract(gameObject.GetComponent<Interact>());
             highlightedObject.GetComponent<DOSInteraction>().StartInteraction();
         }
     }
@@ -83,7 +84,7 @@ public class Interact : MonoBehaviour
         RaycastHit hit;
 
         //-- Highlights objects to be picked up -- //
-        if (Physics.Raycast(ray, out hit) && (hit.collider.tag == "Selectable" | hit.collider.tag == "Button") && hit.distance < 3)
+        if (Physics.Raycast(ray, out hit) && (hit.collider.tag == "Selectable" | hit.collider.tag == "Button" | hit.collider.tag == "DOS Terminal") && hit.distance < 3)
         {
             Debug.Log("hit scanned something" + hit.collider.gameObject);
             ToggleHighlight(hit.collider.gameObject);
