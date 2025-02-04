@@ -1,8 +1,19 @@
+using System.Collections.Generic;
 using System.Xml.Serialization;
+using UnityEditor.Search;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class RoomObjectType : MonoBehaviour
 {
+    List<Vector2> tiles; // tiles in the room that are untaken (maybe sort by constraints?)
+    char[,] descripterTiles; // what each tile has on it
+    RoomGeneration roomGenerator;
+    Vector2 startTile;
+
+    public bool spawnObjects;
+    [SerializeField] GameObject tempObject;
+
     enum ItemType { Box, Button, Lever, Light, Table, Chair, 
         Doors, BulletinBoard, Radio, Terminal, Fan, Wires, 
         Furnace, Coal, Vent, Food, WashingMachine, Clothes, Cabinet, 
@@ -14,33 +25,66 @@ public class RoomObjectType : MonoBehaviour
 
     enum Constraints { None, Orientation, Wall, Ceiling, }
 
-    private void SpawnObject(Constraints con, char tileCode) // a generic function for spawning objects randomly
+    private void Start()
     {
-
+        roomGenerator = GetComponent<RoomGeneration>();   
     }
 
-    private void DecorateRoom() // fills a room with appropriate objects
+    private void Update()
     {
-        //-- Doors (d) --//
-        int n = 4; // number of walls
-        int num = Random.Range(1, n); // constraints: one door per wall
-        for (int i = 0; i < num; i++) { SpawnObject(Constraints.Wall, 'd'); }
+        tiles = roomGenerator.finalRoomTiles;
+        descripterTiles = roomGenerator.room;
+        startTile = roomGenerator.startTile;
 
-        //-- Board (b) --//
-        SpawnObject(Constraints.Wall, 'b');
+        if (spawnObjects)
+        {
+            BacktrackingSearchTest();
+        }
+    }
 
-        //-- DOS (t) --//
-        SpawnObject(Constraints.None, 't');
+    private bool SpawnObject(char newTileCode, char oldTileCode, Vector2 location) // determines if objects can be spawned according to constraints
+    {
+        switch (newTileCode)
+        {
+            case 'd':
+                if (oldTileCode == 'w') { return true; } break;
+            case 'b':
+                if (oldTileCode == 'w') { return true; } break;
+            case 't':
+                if (oldTileCode == 'f') { return true; } break;
+            case 'l':
+                if (oldTileCode != 'w') { return true; } break;
+            case 'F':
+                if (oldTileCode == 'f') { return true; } break;
+            default:
+                break;
 
-        //-- Lights (l) --//
-        n = 4; // number of floors
-        num = Random.Range(1, n);
-        for (int i = 0; i < num; i++) { SpawnObject(Constraints.Ceiling, 'l'); }
+        }
+        return false;
+    }
 
-        //-- Fan (f) --//
+    private void BacktrackingSearchTest()
+    {
+        char[] objectList = new char[5] { 'd', 'b', 't', 'l', 'f'};
+        int index = 0;
+        int scale = 10;
 
-        //-- Other (o) --//
-        
+        //while (index < objectList.Length) // EDIT: currently runs in an infinite loop
+        //{
+            int randomTile = Random.Range(0, tiles.Count);
+            if (SpawnObject(objectList[index], descripterTiles[(int)tiles[randomTile].x, (int)tiles[randomTile].y], tiles[randomTile]))
+            {
+                tiles.RemoveAt(randomTile); // remove tile from potential tile list
+                descripterTiles[(int)tiles[randomTile].x, (int)tiles[randomTile].y] = objectList[index]; // set new tile
+
+                GameObject.Instantiate(tempObject,
+                    new Vector3((tiles[randomTile].x - startTile.x) * scale - 5, 2.5f, (tiles[randomTile].y - startTile.y) * scale), 
+                    Quaternion.identity);
+
+                index++;
+            }
+            else { Debug.Log("Didn't work"); }
+        //}
     }
 
     private void DetermineTheme() // determine task type and theme based on GPT
@@ -57,4 +101,17 @@ public class RoomObjectType : MonoBehaviour
     { 
 
     }
+
+
+
+
+    // Each object has a value x,y that determines where it is on the graph
+    // For every x,y certain functions must be applied to make each scenario true
+    // Trim borders to make it easier?
+
+    // Step 1: Choose random point inside room that hasn't been assigned yet (maybe keep a list for simplicity?)
+    // Step 2: Choose an object to place in point that fufills constraints (decide on ordering --> maybe place big items first?)
+    // Step 3: Repeat until no objects are left
+
+    // Some global constraints: objects must be inside room / on wall, objects cannot be assigned to same place as another
 }
