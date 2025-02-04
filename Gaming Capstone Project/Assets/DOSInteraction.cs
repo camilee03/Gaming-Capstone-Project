@@ -1,5 +1,8 @@
 using UnityEngine;
 using System.Collections;
+using TMPro;
+using UnityEngine.UI;
+using System;
 
 public class DOSInteraction : MonoBehaviour
 {
@@ -13,22 +16,51 @@ public class DOSInteraction : MonoBehaviour
 
     private Coroutine interactionCoroutine;
 
+    public TMP_Text[] PreviousLines;
+    public TMP_InputField WritingLine;
+    public int maxCharacters = 9;
+
     void Start()
     {
         camera = Camera.main.gameObject;
         CameraMovementScript = camera.GetComponent<CameraMovement>();
+        
+
     }
 
-  
+    private void Update()
+    {
+        if(InInteraction)
+        {
+            if (Input.GetKeyDown(KeyCode.Return))
+            {
+                //send current line to seperate method
+                UpdatePreviousLines();
+            }
+        }
+    }
+
+    private void UpdatePreviousLines()
+    {
+        for(int i = PreviousLines.Length-1; i > 1 ; i--)
+        {
+            Debug.Log(i + " " + (i - 1));
+            PreviousLines[i].text = PreviousLines[i-1].text;
+        }
+        PreviousLines[0].text = WritingLine.text;
+    }
+
+
+
+    #region Entering and Exiting Interaction
     public void ToggleInteraction()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
+
             if (!InInteraction)
                 StartInteraction();
             else
                 EndInteraction();
-        }
+        
     }
     public void SetInteract(Interact input)
     {
@@ -45,6 +77,8 @@ public class DOSInteraction : MonoBehaviour
 
 
         interactionCoroutine = StartCoroutine(LerpCamera(cameraMovementPoint.position, cameraMovementPoint.rotation, 1f, false));
+        WritingLine.ActivateInputField();
+        WritingLine.Select();
     }
 
     public void EndInteraction()
@@ -76,4 +110,5 @@ public class DOSInteraction : MonoBehaviour
 
         CameraMovementScript.enabled = enableCameraMovement;
     }
+    #endregion
 }

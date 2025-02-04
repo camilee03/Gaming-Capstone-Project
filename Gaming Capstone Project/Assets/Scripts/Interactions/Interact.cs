@@ -74,7 +74,9 @@ public class Interact : MonoBehaviour
         {
             // access object and perform action
             highlightedObject.GetComponent<DOSInteraction>().SetInteract(gameObject.GetComponent<Interact>());
-            highlightedObject.GetComponent<DOSInteraction>().StartInteraction();
+            highlightedObject.GetComponent<DOSInteraction>().ToggleInteraction();
+
+            Debug.Log("DOS Opened!");
         }
     }
     void HitScan()
