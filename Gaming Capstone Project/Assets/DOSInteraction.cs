@@ -36,18 +36,22 @@ public class DOSInteraction : MonoBehaviour
             {
                 //send current line to seperate method
                 UpdatePreviousLines();
+
             }
+            WritingLine.ActivateInputField();
+            WritingLine.Select();
         }
     }
 
     private void UpdatePreviousLines()
     {
-        for(int i = PreviousLines.Length-1; i > 1 ; i--)
+        for(int i = PreviousLines.Length-1; i > 0 ; i--)
         {
             Debug.Log(i + " " + (i - 1));
             PreviousLines[i].text = PreviousLines[i-1].text;
         }
         PreviousLines[0].text = WritingLine.text;
+        WritingLine.text = "";
     }
 
 
@@ -77,8 +81,7 @@ public class DOSInteraction : MonoBehaviour
 
 
         interactionCoroutine = StartCoroutine(LerpCamera(cameraMovementPoint.position, cameraMovementPoint.rotation, 1f, false));
-        WritingLine.ActivateInputField();
-        WritingLine.Select();
+
     }
 
     public void EndInteraction()
