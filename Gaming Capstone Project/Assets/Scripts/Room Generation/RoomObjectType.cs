@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Xml.Serialization;
+using Unity.VisualScripting;
 using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -9,12 +10,14 @@ public class RoomObjectType : MonoBehaviour
     List<Vector2> tiles; // tiles in the room that are untaken (maybe sort by constraints?)
     List<Vector2> preTiles;
     char[,] descripterTiles; // what each tile has on it
+    char[,] preDescripterTiles;
+
     RoomGeneration roomGenerator;
     Vector2 startTile;
     List<GameObject> spawnedObjects = new List<GameObject>();
 
     public bool spawnObjects;
-    [SerializeField] GameObject tempObject;
+    [SerializeField] GameObject[] objects;
 
     enum ItemType { Box, Button, Lever, Light, Table, Chair, 
         Doors, BulletinBoard, Radio, Terminal, Fan, Wires, 
@@ -35,7 +38,8 @@ public class RoomObjectType : MonoBehaviour
     private void Update()
     {
         preTiles = roomGenerator.finalRoomTiles;
-        descripterTiles = roomGenerator.room;
+        preDescripterTiles = roomGenerator.room;
+
         startTile = roomGenerator.startTile;
 
         if (spawnObjects)
@@ -46,13 +50,22 @@ public class RoomObjectType : MonoBehaviour
 
     private bool SpawnObject(char newTileCode, char oldTileCode, Vector2 location) // determines if objects can be spawned according to constraints
     {
+        char leftTile = descripterTiles[(int)location.x - 1, (int)location.y];
+        char rightTile = descripterTiles[(int)location.x + 1, (int)location.y];
+        char upTile = descripterTiles[(int)location.x, (int)location.y - 1];
+        char downTile = descripterTiles[(int)location.x, (int)location.y + 1];
+
         switch (newTileCode)
         {
             case 'd': // door
                 if (oldTileCode == 'w') { return true; } break;
+            case 't': // table
+                if (oldTileCode == 'f' && leftTile == 'f' && rightTile == 'f' && upTile == 'f' && downTile == 'f') 
+                    { return true; } break;
             case 'b': // bulletin board
                 if (oldTileCode == 'w') { return true; } break;
-            case 't': // DOS terminal
+            case 'T': // DOS terminal
+                Debug.Log(oldTileCode);
                 if (oldTileCode == 'f') { return true; } break;
             case 'l': // light
                 if (oldTileCode != 'f' && oldTileCode != 'w') { return true; } break;
@@ -67,48 +80,48 @@ public class RoomObjectType : MonoBehaviour
 
     private void BacktrackingSearchTest()
     {
-        CleanRoom(); // get rid of old objects
+        CleanRoom(); // get rid of old objects and reset room
 
-        char[] objectList = new char[5] { 't', 't', 't', 't', 't'};
+        char[] objectList = new char[5] { 't', 'T', 'T', 'b', 'T'};
         int scale = 10;
         int randomTile = 0; char oldCode;
 
         spawnObjects = false;
-        for (int i = 0; i < objectList.Length - 1; i++)
+        for (int i = 0; i < objectList.Length; i++)
         {
             bool canSpawn = false;
-            randomTile = Random.Range(0, tiles.Count-2); // find new unassigned tile
-            int iterations = 1;
+            randomTile = Random.Range(0, tiles.Count-1); // find new unassigned tile
+            int iterations = 1; // if iterations goes through, no acceptable tile
 
             //-- Genreation Start --//
-            while (!canSpawn || iterations == tiles.Count)
+            while (!canSpawn && iterations != tiles.Count)
             {
                 if (randomTile < tiles.Count - 1) { randomTile++; } else { randomTile = 0; }
 
                 if (tiles[randomTile] != null)
                 {
                     oldCode = descripterTiles[(int)tiles[randomTile].x, (int)tiles[randomTile].y]; // char code of current tile
-                    canSpawn = SpawnObject(objectList[i], oldCode, tiles[randomTile]); 
-                }
-                else { canSpawn = false; }
+                    canSpawn = SpawnObject(objectList[i], oldCode, tiles[randomTile]); // check spawn conditions
 
-                iterations++;
+                    iterations++;
+                }
             }
             //-- Generation Done --//
 
-            tiles.Remove(tiles[randomTile]); // remove changed tile from potential tile list
-            descripterTiles[(int)tiles[randomTile].x, (int)tiles[randomTile].y] = objectList[i]; // set new tile
-            
-            GameObject newObject = GameObject.Instantiate(tempObject,
-                new Vector3((tiles[randomTile].x - startTile.x) * scale, 2.5f, (tiles[randomTile].y - startTile.y) * scale),
-                Quaternion.identity);
-            spawnedObjects.Add(newObject);
+            if (canSpawn)
+            {
+                tiles.Remove(tiles[randomTile]); // remove changed tile from potential tile list
+                descripterTiles[(int)tiles[randomTile].x, (int)tiles[randomTile].y] = objectList[i]; // set new tile
+
+                PlaceObjects(objectList[i], randomTile, scale);
+            }
         }
     }
 
     private void CleanRoom()
     {
-        tiles = preTiles; // reset what tiles are taken
+        tiles = new List<Vector2>(preTiles); // reset what tiles are taken
+        descripterTiles = (char[,])preDescripterTiles.Clone();
 
         foreach (GameObject obj in spawnedObjects)
         {
@@ -116,6 +129,7 @@ public class RoomObjectType : MonoBehaviour
         }
         spawnedObjects = new List<GameObject>();
     }
+    
     private void DetermineTheme() // determine task type and theme based on GPT
     {
 
@@ -131,7 +145,56 @@ public class RoomObjectType : MonoBehaviour
 
     }
 
+    private void PlaceObjects(char type, int tilePos, int scale)
+    {
+        GameObject newObject = new GameObject();
 
+        switch (type)
+        {
+            case 'd': // door
+                newObject = GameObject.Instantiate(objects[0],
+                    new Vector3((tiles[tilePos].x - startTile.x) * scale, 2.5f, 
+                        (tiles[tilePos].y - (startTile.y + 1)) * scale),
+                    Quaternion.identity);
+                break;
+            case 'b': // bulletin board
+                newObject = GameObject.Instantiate(objects[0],
+                    new Vector3((tiles[tilePos].x - startTile.x) * scale, 2.5f, 
+                        (tiles[tilePos].y - (startTile.y + 1)) * scale),
+                    Quaternion.identity);
+                break;
+            case 'T': // Table
+                newObject = GameObject.Instantiate(objects[1],
+                    new Vector3((tiles[tilePos].x - startTile.x) * scale, 2.5f,
+                        (tiles[tilePos].y - (startTile.y + 1)) * scale),
+                    Quaternion.identity);
+                newObject.transform.localScale *= 2;
+                break;
+            case 't': // DOS terminal
+                newObject = GameObject.Instantiate(objects[1],
+                    new Vector3((tiles[tilePos].x - startTile.x) * scale, 2.5f, 
+                        (tiles[tilePos].y - (startTile.y + 1)) * scale),
+                    Quaternion.identity);
+                break;
+            case 'l': // light
+                newObject = GameObject.Instantiate(objects[1],
+                    new Vector3((tiles[tilePos].x - startTile.x) * scale, 2.5f, 
+                        (tiles[tilePos].y - (startTile.y + 1)) * scale),
+                    Quaternion.identity);
+                break;
+            case 'F': // fan
+                newObject = GameObject.Instantiate(objects[1],
+                    new Vector3((tiles[tilePos].x - startTile.x) * scale, 2.5f, 
+                        (tiles[tilePos].y - (startTile.y + 1)) * scale),
+                    Quaternion.identity);
+                break;
+            default:
+                break;
+
+        }
+
+        spawnedObjects.Add(newObject);
+    }
 
 
     // Each object has a value x,y that determines where it is on the graph

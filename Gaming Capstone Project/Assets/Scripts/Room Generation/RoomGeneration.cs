@@ -121,6 +121,7 @@ public class RoomGeneration : MonoBehaviour
     {
         size = Random.Range(10, 20);
         room = new char[size, size]; // set random room size
+        Debug.Log(size + " " + room.Length);
         finalRoomTiles = new List<Vector2>(); // reset filled room tiles
 
         int numSquares = Random.Range(1, 5); // determine how many squares will be generated
