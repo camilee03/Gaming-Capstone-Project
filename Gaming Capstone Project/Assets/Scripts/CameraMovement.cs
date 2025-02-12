@@ -12,6 +12,7 @@ public class CameraMovement : MonoBehaviour
     void Start()
     {
         //player = GameObject.Find("Player");
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     // Update is called once per frame
@@ -23,5 +24,9 @@ public class CameraMovement : MonoBehaviour
         pitch -= VerticalSensitivity * Input.GetAxis("Mouse Y");
 
         Anchor.transform.eulerAngles = new Vector3(pitch, yaw, 0);
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            Cursor.lockState = CursorLockMode.None;
+        }
     }
 }

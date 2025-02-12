@@ -20,6 +20,7 @@ public class Interact : MonoBehaviour
     [Header("Interactable Variables")]
     [SerializeField] TextMeshProUGUI popupText;
     [SerializeField] GameObject popupMenu;
+    [SerializeField] private bool DebugMode = false;
 
 
     bool canChange = true;
@@ -75,8 +76,6 @@ public class Interact : MonoBehaviour
             // access object and perform action
             highlightedObject.GetComponent<DOSInteraction>().SetInteract(gameObject.GetComponent<Interact>());
             highlightedObject.GetComponent<DOSInteraction>().ToggleInteraction();
-
-            Debug.Log("DOS Opened!");
         }
     }
     void HitScan()
@@ -88,7 +87,10 @@ public class Interact : MonoBehaviour
         //-- Highlights objects to be picked up -- //
         if (Physics.Raycast(ray, out hit) && (hit.collider.tag == "Selectable" | hit.collider.tag == "Button" | hit.collider.tag == "DOS Terminal") && hit.distance < 3)
         {
-            Debug.Log("hit scanned something" + hit.collider.gameObject);
+            if (DebugMode)
+            {
+                Debug.Log("hit scanned something" + hit.collider.gameObject);
+            }
             ToggleHighlight(hit.collider.gameObject);
 
             popupText.text = "Left click";
