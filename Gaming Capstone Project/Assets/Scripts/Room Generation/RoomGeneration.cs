@@ -295,6 +295,5 @@ public class RoomGeneration : MonoBehaviour
 
     void CreatePathBetweenDoors(Vector3 door1, Vector2 door2)
     {
-        PriorityQueue queu;
     }
 }

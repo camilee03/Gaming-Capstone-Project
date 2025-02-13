@@ -9,6 +9,7 @@ using static UnityEngine.EventSystems.EventTrigger;
 
 public class DataStructures : MonoBehaviour
 {
+    /*
     class PriorityQueue {
         SortedList<HeapKey, HeapKey> heap;
         int count;
@@ -87,4 +88,5 @@ public class DataStructures : MonoBehaviour
             return result == 0 ? Id.CompareTo(other.Id) : result;
         }
     }
+    */
 }

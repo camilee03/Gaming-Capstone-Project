@@ -233,8 +233,8 @@ MonoBehaviour:
   dontDestroyOnLoad: 1
   contextSize: 512
   batchSize: 512
-  model: llama-3.2-1b-instruct-q4_k_m.gguf
-  chatTemplate: llama3 chat
+  model: qwen2-0_5b-instruct-q4_k_m.gguf
+  chatTemplate: chatml
   lora: 
   loraWeights: 
   flashAttention: 0
@@ -244,9 +244,9 @@ MonoBehaviour:
   SSLKey: 
   SSLKeyPath: 
   minContextLength: 0
-  maxContextLength: 131072
+  maxContextLength: 32768
   embeddingsOnly: 0
-  embeddingLength: 2048
+  embeddingLength: 896
 --- !u!4 &98419386
 Transform:
   m_ObjectHideFlags: 0
@@ -1148,10 +1148,10 @@ MonoBehaviour:
   debug: 0
   parallelPrompts: -1
   dontDestroyOnLoad: 1
-  contextSize: 512
+  contextSize: 100
   batchSize: 512
-  model: bge-base-en-v1.5-q4_k_m.gguf
-  chatTemplate: llama3 chat
+  model: bge-small-en-v1.5-q4_k_m.gguf
+  chatTemplate: chatml
   lora: 
   loraWeights: 
   flashAttention: 0
@@ -1163,7 +1163,7 @@ MonoBehaviour:
   minContextLength: 0
   maxContextLength: 512
   embeddingsOnly: 1
-  embeddingLength: 768
+  embeddingLength: 384
 --- !u!4 &914730263
 Transform:
   m_ObjectHideFlags: 0
