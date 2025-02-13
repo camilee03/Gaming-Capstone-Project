@@ -231,9 +231,9 @@ MonoBehaviour:
   debug: 0
   parallelPrompts: -1
   dontDestroyOnLoad: 1
-  contextSize: 8192
+  contextSize: 512
   batchSize: 512
-  model: Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf
+  model: llama-3.2-1b-instruct-q4_k_m.gguf
   chatTemplate: llama3 chat
   lora: 
   loraWeights: 
@@ -246,7 +246,7 @@ MonoBehaviour:
   minContextLength: 0
   maxContextLength: 131072
   embeddingsOnly: 0
-  embeddingLength: 4096
+  embeddingLength: 2048
 --- !u!4 &98419386
 Transform:
   m_ObjectHideFlags: 0
@@ -1148,9 +1148,9 @@ MonoBehaviour:
   debug: 0
   parallelPrompts: -1
   dontDestroyOnLoad: 1
-  contextSize: 8192
+  contextSize: 512
   batchSize: 512
-  model: Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf
+  model: bge-base-en-v1.5-q4_k_m.gguf
   chatTemplate: llama3 chat
   lora: 
   loraWeights: 
@@ -1161,9 +1161,9 @@ MonoBehaviour:
   SSLKey: 
   SSLKeyPath: 
   minContextLength: 0
-  maxContextLength: 131072
-  embeddingsOnly: 0
-  embeddingLength: 4096
+  maxContextLength: 512
+  embeddingsOnly: 1
+  embeddingLength: 768
 --- !u!4 &914730263
 Transform:
   m_ObjectHideFlags: 0
