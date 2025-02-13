@@ -17,6 +17,7 @@ public class RoomObjectType : MonoBehaviour
     List<GameObject> spawnedObjects = new List<GameObject>();
 
     public bool spawnObjects;
+    [SerializeField] GameObject objectParent;
     [SerializeField] GameObject[] objects;
 
     enum ItemType { Box, Button, Lever, Light, Table, Chair, 
@@ -82,7 +83,7 @@ public class RoomObjectType : MonoBehaviour
     {
         CleanRoom(); // get rid of old objects and reset room
 
-        char[] objectList = new char[5] { 't', 'T', 'T', 'b', 'T'};
+        char[] objectList = new char[8] { 't', 'F', 'b', 'b', 'l', 'l', 'l', 'T'};
         int scale = 10;
         int randomTile = 0; char oldCode;
 
@@ -155,38 +156,38 @@ public class RoomObjectType : MonoBehaviour
                 newObject = GameObject.Instantiate(objects[0],
                     new Vector3((tiles[tilePos].x - startTile.x) * scale, 2.5f, 
                         (tiles[tilePos].y - (startTile.y + 1)) * scale),
-                    Quaternion.identity);
+                    Quaternion.identity, objectParent.transform);
                 break;
             case 'b': // bulletin board
                 newObject = GameObject.Instantiate(objects[0],
                     new Vector3((tiles[tilePos].x - startTile.x) * scale, 2.5f, 
                         (tiles[tilePos].y - (startTile.y + 1)) * scale),
-                    Quaternion.identity);
+                    Quaternion.identity, objectParent.transform);
                 break;
             case 'T': // Table
                 newObject = GameObject.Instantiate(objects[1],
-                    new Vector3((tiles[tilePos].x - startTile.x) * scale, 2.5f,
+                    new Vector3((tiles[tilePos].x - startTile.x) * scale, 2.5f * 1.5f,
                         (tiles[tilePos].y - (startTile.y + 1)) * scale),
-                    Quaternion.identity);
+                    Quaternion.identity, objectParent.transform);
                 newObject.transform.localScale *= 2;
                 break;
             case 't': // DOS terminal
-                newObject = GameObject.Instantiate(objects[1],
-                    new Vector3((tiles[tilePos].x - startTile.x) * scale, 2.5f, 
+                newObject = GameObject.Instantiate(objects[3],
+                    new Vector3((tiles[tilePos].x - startTile.x) * scale, 3f, 
                         (tiles[tilePos].y - (startTile.y + 1)) * scale),
-                    Quaternion.identity);
+                    new Quaternion(0, 1, 0, 1), objectParent.transform);
                 break;
             case 'l': // light
-                newObject = GameObject.Instantiate(objects[1],
-                    new Vector3((tiles[tilePos].x - startTile.x) * scale, 2.5f, 
+                newObject = GameObject.Instantiate(objects[4],
+                    new Vector3((tiles[tilePos].x - startTile.x) * scale, 5f, 
                         (tiles[tilePos].y - (startTile.y + 1)) * scale),
-                    Quaternion.identity);
+                    new Quaternion(1, 0, 0, 1), objectParent.transform);
                 break;
             case 'F': // fan
-                newObject = GameObject.Instantiate(objects[1],
-                    new Vector3((tiles[tilePos].x - startTile.x) * scale, 2.5f, 
+                newObject = GameObject.Instantiate(objects[2],
+                    new Vector3((tiles[tilePos].x - startTile.x) * scale, 5.5f, 
                         (tiles[tilePos].y - (startTile.y + 1)) * scale),
-                    Quaternion.identity);
+                    Quaternion.identity, objectParent.transform);
                 break;
             default:
                 break;

@@ -19,10 +19,10 @@ public class RoomGeneration : MonoBehaviour
     public Vector2 startTile;
 
     int size;
+    public float scale = 10; // how many tiles apart are different objects
     [SerializeField] GameObject tiles;
-    [SerializeField] GameObject lines;
-    [SerializeField] GameObject wallParent;
-    [SerializeField] GameObject tileParent;
+    [SerializeField] GameObject walls;
+    [SerializeField] GameObject doors;
     List<GameObject> spawnedTiles;
     List<GameObject> spawnedOutline;
 
@@ -30,22 +30,18 @@ public class RoomGeneration : MonoBehaviour
     {
         spawnedOutline = new List<GameObject>();
         spawnedTiles = new List<GameObject>();
-        RoomProcedure();
+        GenerateMultipleRooms();
     }
 
-    void Update()
+    /// <summary> Draws the generated room and returns the relevant room GameObject </summary>
+    GameObject DrawRoom()
     {
-        if (Input.GetKeyDown(KeyCode.Return))
-        {
-            ClearRoom(); // get rid of any remaining tiles
-            RoomProcedure();
-        }
-    }
-
-    /// <summary> Draws the generated room </summary>
-    void DrawRoom()
-    {
-        float scale = 10;
+        // Create parenting objects which will store room
+        GameObject newRoom = new GameObject("RoomTempName");
+        GameObject wallParent = new GameObject("WallParent");
+        wallParent.transform.SetParent(newRoom.transform, false);
+        GameObject tileParent = new GameObject("TileParent");
+        tileParent.transform.SetParent(newRoom.transform, false);
 
         for (int x = 0; x < size; x++)
         {
@@ -66,43 +62,39 @@ public class RoomGeneration : MonoBehaviour
                     // NOTE: try to make this less of a mess, but this
                     // may have to stay this way to prevent holes
 
-                    if (x+1<size && room[x+1, y] == 'f') // left
+                    bool[] locations = new bool[4] { 
+                        x+1<size && room[x+1, y] == 'f',
+                        y+1<size && room[x, y+1] == 'f', 
+                        x-1>0 && room[x-1, y] == 'f', 
+                        y-1>0 && room[x, y-1] == 'f' };
+
+                    Vector3 spawnLeft = new Vector3((x - startTile.x) * scale + 5, 2.5f, (y - startTile.y) * scale);
+                    Vector3 spawnRight = new Vector3((x - startTile.x) * scale - 5, 2.5f, (y - startTile.y) * scale);
+                    Vector3 spawnAbove = new Vector3((x - startTile.x) * scale, 2.5f, (y - startTile.y) * scale + 5);
+                    Vector3 spawnBelow = new Vector3((x - startTile.x) * scale, 2.5f, (y - startTile.y) * scale - 5);
+                    Vector3[] spawnPos = new Vector3[4] {spawnLeft, spawnAbove, spawnRight, spawnBelow };
+
+                    for (int i = 0; i<locations.Length; i++)
                     {
-                        GameObject newObject = Object.Instantiate(lines, wallParent.transform, true);
-                        newObject.transform.position = new Vector3((x - startTile.x) * scale + 5, 2.5f, (y - startTile.y) * scale);
-                        newObject.transform.rotation = new Quaternion(0, 1, 0, 1); ;
-                        spawnedOutline.Add(newObject);
-                    }
-                    if (x-1>0 && room[x-1, y] == 'f') // right
-                    {
-                        GameObject newObject = Object.Instantiate(lines, wallParent.transform, true);
-                        newObject.transform.position = new Vector3((x - startTile.x) * scale - 5, 2.5f, (y - startTile.y) * scale);
-                        newObject.transform.rotation = new Quaternion(0, 1, 0, 1);
-                        spawnedOutline.Add(newObject);
-                    }
-                    if (y+1<size && room[x,y+1] == 'f') // above
-                    {
-                        GameObject newObject = Object.Instantiate(lines, wallParent.transform, true);
-                        newObject.transform.position = new Vector3((x - startTile.x) * scale, 2.5f, (y - startTile.y) * scale + 5);
-                        newObject.transform.rotation = new Quaternion(0, 0, 0, 0);
-                        spawnedOutline.Add(newObject);
-                    }
-                    if (y-1>0 && room[x,y-1] == 'f') // below
-                    {
-                        GameObject newObject = Object.Instantiate(lines, wallParent.transform, true);
-                        newObject.transform.position = new Vector3((x - startTile.x) * scale, 2.5f, (y - startTile.y) * scale - 5);
-                        newObject.transform.rotation = new Quaternion(0, 0, 0, 0);
-                        spawnedOutline.Add(newObject);
+                        if (locations[i])
+                        {
+                            GameObject newObject = Object.Instantiate(walls, wallParent.transform, true);
+                            newObject.transform.position = spawnPos[i];
+                            newObject.transform.rotation = new Quaternion(0, (i+1) % 2, 0, (i+1) % 2);
+                            spawnedOutline.Add(newObject);
+                        }
                     }
 
                     finalRoomTiles.Add(new Vector2(x,y));
                 }
             }
         }
+
+        return newRoom;
     }
 
     /// <summary> Deletes old instances of room </summary>
-    void ClearRoom() { 
+    void ClearMap() { 
         foreach (GameObject tile in spawnedTiles)
         {
             Object.Destroy(tile);
@@ -150,11 +142,15 @@ public class RoomGeneration : MonoBehaviour
     }
 
     /// <summary> Determines where the outline will go </summary>
-    void OutlineRoom(int x, int y, int currLocation)
+    void OutlineRoom(int x, int y, int currLocation, int numDoors)
     {
         int down = 1;
         int up = -1;
         bool problem = false;
+
+        char tileCode = 'w';
+        int doorChance = Random.Range(0, 1);
+        //if (doorChance == 0) { tileCode = 'D'; }
 
         switch (currLocation)
         {
@@ -210,7 +206,7 @@ public class RoomGeneration : MonoBehaviour
 
         // Check to see if outline is done
         if (x >= size | y >= size | x < 0 | y < 0) { Debug.Log("Too big or small: " + x + ", " + y); }
-        else if (room[x, y] != 'w' && !problem) { room[x, y] = 'w'; OutlineRoom(x, y, currLocation); }
+        else if (room[x, y] != 'w' && room[x,y] != 'D' && !problem) { room[x, y] = tileCode; OutlineRoom(x, y, currLocation, numDoors); }
         else if (problem) { Debug.Log("PROBLEM"); }
 
     }
@@ -260,19 +256,45 @@ public class RoomGeneration : MonoBehaviour
     }
 
     /// <summary> Starts the room generation </summary>
-    void RoomProcedure()
+    GameObject RoomProcedure()
     {
+        GameObject newRoom = new GameObject();
         GenerateNewRoom(); // create the array for the new room
 
         int[] tile = FindFirstTile();
         if (tile != null)
         {
-            OutlineRoom(tile[0], tile[1], 0); // create the array for the outline
+            int numDoors = 2;
+            OutlineRoom(tile[0], tile[1], 0, numDoors); // create the array for the outline
             CleanRoom();
 
-            DrawRoom(); // draw room and outline
+            newRoom = DrawRoom(); // draw room and outline
             //wallParent.transform.position = Vector3.zero;
             //tileParent.transform.position = Vector3.zero;
         }
+
+        return newRoom;
+    }
+
+    /// <summary> Use the room procedure to create multiple rooms </summary>
+    void GenerateMultipleRooms()
+    {
+        ClearMap(); // only neccessary if regenerating the entire map
+
+        int numRooms = 3;
+        GameObject[] rooms = new GameObject[numRooms];
+        int previousRoomSize = 0;
+
+        for (int i = 0; i < numRooms; i++)
+        {
+            rooms[i] = RoomProcedure();
+            rooms[i].transform.position += previousRoomSize * Vector3.right * scale * i;
+            previousRoomSize = size;
+        }
+    }
+
+    void CreatePathBetweenDoors(Vector3 door1, Vector2 door2)
+    {
+        PriorityQueue queu;
     }
 }
