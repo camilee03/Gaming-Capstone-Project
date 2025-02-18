@@ -161,7 +161,7 @@ public class RoomObjectType : MonoBehaviour
                 newObject = GameObject.Instantiate(objects[1],
                     new Vector3((tiles[tilePos].x - startTile.x) * scale, 2.5f * 1.5f,
                         (tiles[tilePos].y - (startTile.y + 1)) * scale),
-                    Quaternion.identity, objectParent.transform);
+                    Quaternion.Euler(-90, 0, 0), objectParent.transform);
                 newObject.transform.localScale *= 2;
                 break;
             case 'c': // Chair
@@ -175,13 +175,13 @@ public class RoomObjectType : MonoBehaviour
                 newObject = GameObject.Instantiate(objects[3],
                     new Vector3((tiles[tilePos].x - startTile.x) * scale, 3f, 
                         (tiles[tilePos].y - (startTile.y + 1)) * scale),
-                    new Quaternion(0, 1, 0, 1), objectParent.transform);
+                     Quaternion.Euler(-90, 0, 0), objectParent.transform);
                 break;
             case 'l': // light
                 newObject = GameObject.Instantiate(objects[4],
-                    new Vector3((tiles[tilePos].x - startTile.x) * scale, 5f, 
+                    new Vector3((tiles[tilePos].x - startTile.x) * scale, 15f, 
                         (tiles[tilePos].y - (startTile.y + 1)) * scale),
-                    new Quaternion(1, 0, 0, 1), objectParent.transform);
+                     Quaternion.Euler(-90, 0, 0), objectParent.transform);
                 break;
             case 'F': // fan
                 newObject = GameObject.Instantiate(objects[2],
