@@ -1,8 +1,9 @@
+using Unity.Netcode;
 using UnityEditor.ShaderGraph;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour
 {
     PlayerInput playerInput;
     Animator animator;
@@ -10,7 +11,7 @@ public class PlayerController : MonoBehaviour
     float velocity = 10;
     float x;
     float z;
-    Camera cam;
+    public Camera cam;
 
     public float HorizontalSensitivity = 10;
     public float VerticalSensitivity = 10;
@@ -24,12 +25,14 @@ public class PlayerController : MonoBehaviour
         rgd = gameObject.GetComponent<Rigidbody>();
         playerInput = GetComponent<PlayerInput>();
         animator = GetComponent<Animator>();
-        cam = Camera.main;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(!IsOwner){
+            return;
+        }
         Vector3 linearVelocity = cam.gameObject.transform.forward * z * velocity + cam.gameObject.transform.right * x * velocity;
         linearVelocity = linearVelocity - rgd.linearVelocity;
 

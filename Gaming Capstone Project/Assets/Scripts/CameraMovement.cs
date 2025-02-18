@@ -1,7 +1,9 @@
+using Unity.Netcode;
 using UnityEngine;
 
-public class CameraMovement : MonoBehaviour
+public class CameraMovement : NetworkBehaviour
 {
+    public Camera camera;
     public Transform Anchor;
     public float HorizontalSensitivity = 10;
     public float VerticalSensitivity = 10;
@@ -12,6 +14,14 @@ public class CameraMovement : MonoBehaviour
     void Start()
     {
         //player = GameObject.Find("Player");
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        if(!IsOwner)
+        {
+            camera.gameObject.SetActive(false);
+        }
     }
 
     // Update is called once per frame
