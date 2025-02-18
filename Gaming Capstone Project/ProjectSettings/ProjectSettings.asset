@@ -947,11 +947,11 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 2
   windowsGamepadBackendHint: 0
-  cloudProjectId: 69efb160-048a-4bbd-90fb-a63d60905a22
+  cloudProjectId: 5e5cff19-19cd-446d-86fc-3745e32bf3e1
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
   projectName: Gaming Capstone Project
-  organizationId: camilee
+  organizationId: cheesekahuna
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}
