@@ -11,12 +11,12 @@ public class RoomObjectType : MonoBehaviour
     List<Vector2> preTiles;
     char[,] descripterTiles; // what each tile has on it
     char[,] preDescripterTiles;
+    bool spawnObjects = true;
 
     RoomGeneration roomGenerator;
     Vector2 startTile;
     List<GameObject> spawnedObjects = new List<GameObject>();
 
-    public bool spawnObjects;
     [SerializeField] GameObject objectParent;
     [SerializeField] GameObject[] objects;
 
@@ -38,14 +38,12 @@ public class RoomObjectType : MonoBehaviour
 
     private void Update()
     {
-        if (spawnObjects) {
-            foreach (var room in roomGenerator.roomsInfo)
-            {
-                preTiles = room.finalRoomTiles;
-                preDescripterTiles = room.room;
-                startTile = room.startTile;
-            }
+        var room = roomGenerator.roomsInfo[0];
+            preTiles = room.finalRoomTiles;
+            preDescripterTiles = room.room;
+            startTile = room.startTile;
 
+        if (roomGenerator.finishedProcedure && spawnObjects) {
             BacktrackingSearchTest();
         }
     }
@@ -161,6 +159,13 @@ public class RoomObjectType : MonoBehaviour
                 break;
             case 'T': // Table
                 newObject = GameObject.Instantiate(objects[1],
+                    new Vector3((tiles[tilePos].x - startTile.x) * scale, 2.5f * 1.5f,
+                        (tiles[tilePos].y - (startTile.y + 1)) * scale),
+                    Quaternion.identity, objectParent.transform);
+                newObject.transform.localScale *= 2;
+                break;
+            case 'c': // Chair
+                newObject = GameObject.Instantiate(objects[5],
                     new Vector3((tiles[tilePos].x - startTile.x) * scale, 2.5f * 1.5f,
                         (tiles[tilePos].y - (startTile.y + 1)) * scale),
                     Quaternion.identity, objectParent.transform);

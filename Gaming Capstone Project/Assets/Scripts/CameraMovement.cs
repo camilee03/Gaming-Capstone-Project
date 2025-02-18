@@ -7,7 +7,7 @@ public class CameraMovement : MonoBehaviour
     public float VerticalSensitivity = 10;
 
     private float yaw = 0.0f;
-    private float pitch = 0.0f;
+    private float pitch = -90.0f;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -22,6 +22,6 @@ public class CameraMovement : MonoBehaviour
         yaw += HorizontalSensitivity * Input.GetAxis("Mouse X");
         pitch -= VerticalSensitivity * Input.GetAxis("Mouse Y");
 
-        Anchor.transform.eulerAngles = new Vector3(pitch, yaw, 0);
+        Anchor.transform.eulerAngles = new Vector3(pitch, yaw, 180);
     }
 }

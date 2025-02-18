@@ -19,6 +19,7 @@ public class RoomGeneration : MonoBehaviour
     Vector2 startTile;
 
     public List<(char[,] room, List<Vector2> finalRoomTiles, Vector2 startTile, float scale)> roomsInfo;
+    public bool finishedProcedure;
 
     int size;
     float scale = 10; // how many tiles apart are different objects
@@ -296,7 +297,7 @@ public class RoomGeneration : MonoBehaviour
         roomsInfo = new List<(char[,] room, List<Vector2> finalRoomTiles, Vector2 startTile, float scale)>();
         ClearMap(); // only neccessary if regenerating the entire map
 
-        int numRooms = 2;
+        int numRooms = 1;
         GameObject[] rooms = new GameObject[numRooms];
 
         doorAndRoom = new List<(GameObject door, int pos, GameObject room)>();
@@ -307,7 +308,9 @@ public class RoomGeneration : MonoBehaviour
             ReplaceWallWithDoor(1, rooms[i].transform.GetChild(0).gameObject, rooms[i]);
         }
 
-        MoveAndPairDoors();
+        if (numRooms > 1) { MoveAndPairDoors(); }
+
+        finishedProcedure = true;
     }
 
     /// <summary> Chooses random walls to replace with a door </summary>

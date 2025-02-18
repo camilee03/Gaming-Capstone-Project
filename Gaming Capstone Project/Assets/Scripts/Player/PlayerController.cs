@@ -12,6 +12,12 @@ public class PlayerController : MonoBehaviour
     float z;
     Camera cam;
 
+    public float HorizontalSensitivity = 10;
+    public float VerticalSensitivity = 10;
+
+    private float yaw = 0.0f;
+    private float pitch = 0.0f;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -30,6 +36,12 @@ public class PlayerController : MonoBehaviour
         animator.SetBool("isWalking", linearVelocity.x > 0 || linearVelocity.z > 0); // start/stop walk cycle
 
         rgd.linearVelocity += new Vector3(linearVelocity.x, 0, linearVelocity.z);
+
+        // Move body based on mouse movement
+        yaw += HorizontalSensitivity * Input.GetAxis("Mouse X");
+        //pitch -= VerticalSensitivity * Input.GetAxis("Mouse Y");
+
+        gameObject.transform.eulerAngles = new Vector3(0, yaw, 0);
     }
 
     public void MovePlayer(InputAction.CallbackContext context)
