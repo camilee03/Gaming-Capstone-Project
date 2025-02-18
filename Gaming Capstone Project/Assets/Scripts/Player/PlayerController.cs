@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     PlayerInput playerInput;
+    Animator animator;
     Rigidbody rgd;
     float velocity = 10;
     float x;
@@ -16,15 +17,17 @@ public class PlayerController : MonoBehaviour
     {
         rgd = gameObject.GetComponent<Rigidbody>();
         playerInput = GetComponent<PlayerInput>();
+        animator = GetComponent<Animator>();
         cam = Camera.main;
     }
 
     // Update is called once per frame
     void Update()
     {
-
         Vector3 linearVelocity = cam.gameObject.transform.forward * z * velocity + cam.gameObject.transform.right * x * velocity;
         linearVelocity = linearVelocity - rgd.linearVelocity;
+
+        animator.SetBool("isWalking", linearVelocity.x > 0 || linearVelocity.z > 0); // start/stop walk cycle
 
         rgd.linearVelocity += new Vector3(linearVelocity.x, 0, linearVelocity.z);
     }

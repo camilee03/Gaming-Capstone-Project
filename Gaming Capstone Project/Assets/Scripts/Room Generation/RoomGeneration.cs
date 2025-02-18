@@ -14,23 +14,26 @@ public class RoomGeneration : MonoBehaviour
     bool[,] roomTiles;
     bool[,] outline;
 
-    public char[,] room;
-    public List<Vector2> finalRoomTiles;
-    public Vector2 startTile;
+    char[,] room;
+    List<Vector2> finalRoomTiles;
+    Vector2 startTile;
+
+    public List<(char[,] room, List<Vector2> finalRoomTiles, Vector2 startTile, float scale)> roomsInfo;
 
     int size;
-    public float scale = 10; // how many tiles apart are different objects
+    float scale = 10; // how many tiles apart are different objects
     [SerializeField] GameObject tiles;
     [SerializeField] GameObject walls;
     [SerializeField] GameObject doors;
     List<GameObject> spawnedTiles;
     List<GameObject> spawnedOutline;
-    List<int> outlineDirections = new List<int>();
+    List<int> outlineDirections;
     List<(GameObject door, int pos, GameObject room)> doorAndRoom;
 
     void Start()
     {
         spawnedOutline = new List<GameObject>();
+        outlineDirections = new List<int>();
         spawnedTiles = new List<GameObject>();
         GenerateMultipleRooms();
     }
@@ -96,7 +99,7 @@ public class RoomGeneration : MonoBehaviour
             {
                 newObject = GameObject.Instantiate(child, parent, true);
                 newObject.transform.position = spawnPos[i];
-                newObject.transform.rotation = new Quaternion(0, (i + 1) % 2, 0, (i + 1) % 2);
+                newObject.transform.localRotation = Quaternion.Euler(-90, ((i + 1) % 2) * 90, 0);
                 spawnedOutline.Add(newObject);
                 outlineDirections.Add(i);
             }
@@ -282,12 +285,15 @@ public class RoomGeneration : MonoBehaviour
             //tileParent.transform.position = Vector3.zero;
         }
 
+        roomsInfo.Add((room, finalRoomTiles, startTile, scale));
+
         return newRoom;
     }
 
     /// <summary> Use the room procedure to create multiple rooms </summary>
     void GenerateMultipleRooms()
     {
+        roomsInfo = new List<(char[,] room, List<Vector2> finalRoomTiles, Vector2 startTile, float scale)>();
         ClearMap(); // only neccessary if regenerating the entire map
 
         int numRooms = 2;
@@ -309,12 +315,13 @@ public class RoomGeneration : MonoBehaviour
     {
         for (int i = 0; i < numDoors; i++)
         {
-            int index = Random.Range(0, wallParent.transform.childCount);
+            int index = Random.Range(0, spawnedOutline.Count - 1);
 
-            Transform wallTransform = wallParent.transform.GetChild(index);
+            // set door rotation as same as wall
+            Transform wallTransform = spawnedOutline[index].transform;
             Vector3 wallPosition = wallTransform.position;
             Quaternion wallRotation = wallTransform.rotation;
-            Destroy(wallTransform.gameObject);
+            Destroy(spawnedOutline[index]);
 
             GameObject tempObject = GameObject.Instantiate(doors, wallPosition, wallRotation, wallParent.transform);
             doorAndRoom.Add((tempObject, outlineDirections[index], room));
@@ -345,7 +352,7 @@ public class RoomGeneration : MonoBehaviour
             {
                 if (dar.room != darNext.room)
                 {
-                    Debug.Log(darNext.door.name + " " + darNext.pos);
+                    Debug.Log("Aligned " + dar.pos + " " + darNext.pos);
                     if (darNext.pos + 2 == dar.pos || darNext.pos - 2 == dar.pos)
                     {
                         Vector3 doorDisplacement;
@@ -353,13 +360,17 @@ public class RoomGeneration : MonoBehaviour
                         switch (dar.pos)
                         {
                             case 1:
-                            case 3:
                                 doorDisplacement = new Vector3((dar.door.transform.position.x - darNext.door.transform.position.x), 0, roomDistance);
-                                direction = Vector3.right; break;
-                            case 0:
-                            case 2:
-                                doorDisplacement = new Vector3(roomDistance, 0, (dar.door.transform.position.z - darNext.door.transform.position.z));
                                 direction = Vector3.forward; break;
+                            case 3:
+                                doorDisplacement = new Vector3((-dar.door.transform.position.x + darNext.door.transform.position.x), 0, roomDistance);
+                                direction = Vector3.forward; break;
+                            case 0:
+                                doorDisplacement = new Vector3(roomDistance, 0, (dar.door.transform.position.z - darNext.door.transform.position.z));
+                                direction = Vector3.right; break;
+                            case 2:
+                                doorDisplacement = new Vector3(roomDistance, 0, (-dar.door.transform.position.z + darNext.door.transform.position.z));
+                                direction = Vector3.right; break;
                             default: doorDisplacement = Vector3.zero; direction = Vector3.zero; break;
                         }
 
@@ -375,30 +386,52 @@ public class RoomGeneration : MonoBehaviour
             // if there were no perfectly alligned rooms:
             if (!perfectlyAligned)
             {
+                Debug.Log("Not aligned");
                 foreach ((GameObject door, int pos, GameObject room) darNext in doorAndRoom)
                 {
                     if (dar.room != darNext.room)
                     {
-                        Debug.Log(darNext.door.name + " " + darNext.pos);
+                        Debug.Log(dar.pos + " " + darNext.pos);
                         if (darNext.pos != dar.pos)
                         {
-                            Vector3 doorDisplacement;
-                            Vector3 direction;
+                            Vector3 doorDisplacement = Vector3.zero; Vector3 direction = Vector3.zero;
+
                             switch (dar.pos)
                             {
                                 case 1:
                                 case 3:
-                                    doorDisplacement = new Vector3((dar.door.transform.position.x - darNext.door.transform.position.x), 0, roomDistance);
-                                    direction = Vector3.right; break;
+                                    int mult = 1;
+                                    if (dar.pos == 1) { mult = -1; }
+                                    if (darNext.pos == 2) // left
+                                    {
+                                        doorDisplacement = new Vector3((dar.door.transform.position.x - darNext.door.transform.position.x) - 2* scale, 0, mult* roomDistance);
+                                        direction = Vector3.forward;
+                                    }
+                                    else if (darNext.pos == 0) // right
+                                    {
+                                        doorDisplacement = new Vector3((dar.door.transform.position.x - darNext.door.transform.position.x) + 2*scale, 0, mult*roomDistance);
+                                        direction = Vector3.forward;
+                                    }
+                                    break;
                                 case 0:
                                 case 2:
-                                    doorDisplacement = new Vector3(roomDistance, 0, (dar.door.transform.position.z - darNext.door.transform.position.z));
-                                    direction = Vector3.forward; break;
-                                default: doorDisplacement = Vector3.zero; direction = Vector3.zero; break;
+                                    mult = 1;
+                                    if (dar.pos == 0) { mult = -1; }
+                                    if (darNext.pos == 1) // up
+                                    {
+                                        doorDisplacement = new Vector3(mult * roomDistance, 0, (dar.door.transform.position.z - darNext.door.transform.position.z) + 2*scale);
+                                        direction = Vector3.right;
+                                    }
+                                    else if (darNext.pos == 3) // down
+                                    {
+                                        doorDisplacement = new Vector3(mult* roomDistance, 0, (dar.door.transform.position.z - darNext.door.transform.position.z) - 2*scale);
+                                        direction = Vector3.right;
+                                    }
+                                    break;
                             }
 
                             darNext.room.transform.Translate(doorDisplacement); // move room based on door positions
-                            //CreatePathBetweenDoors(dar.door.transform.position, darNext.door.transform.position);
+                            CreatePathBetweenDoors(dar.door.transform.position, darNext.door.transform.position);
                             doorAndRoom.RemoveAt(0); doorAndRoom.Remove(darNext); // now that the doors are assigned, remove
                             perfectlyAligned = true;
                             break;
@@ -407,7 +440,48 @@ public class RoomGeneration : MonoBehaviour
                 }
             }
 
-            if (!perfectlyAligned) { Debug.Log("ERROR"); }
+            if (!perfectlyAligned) { 
+                Debug.Log("ERROR"); 
+                if (dar.pos > 3) { dar.pos -= 2; }
+                else { dar.pos += 2; }
+                dar.room.transform.Rotate(new Vector3(0, 180, 0));
+
+                foreach ((GameObject door, int pos, GameObject room) darNext in doorAndRoom)
+                {
+                    if (dar.room != darNext.room)
+                    {
+                        Debug.Log("newly aligned " + dar.pos + " " + darNext.pos);
+                        if (darNext.pos + 2 == dar.pos || darNext.pos - 2 == dar.pos)
+                        {
+                            Vector3 doorDisplacement;
+                            Vector3 direction;
+                            switch (dar.pos)
+                            {
+                                case 1:
+                                    doorDisplacement = new Vector3((dar.door.transform.position.x - darNext.door.transform.position.x), 0, roomDistance);
+                                    direction = Vector3.forward; break;
+                                case 3:
+                                    doorDisplacement = new Vector3((-dar.door.transform.position.x + darNext.door.transform.position.x), 0, roomDistance);
+                                    direction = Vector3.forward; break;
+                                case 0:
+                                    doorDisplacement = new Vector3(roomDistance, 0, (dar.door.transform.position.z - darNext.door.transform.position.z));
+                                    direction = Vector3.right; break;
+                                case 2:
+                                    doorDisplacement = new Vector3(roomDistance, 0, (-dar.door.transform.position.z + darNext.door.transform.position.z));
+                                    direction = Vector3.right; break;
+                                default: doorDisplacement = Vector3.zero; direction = Vector3.zero; break;
+                            }
+
+                            darNext.room.transform.Translate(doorDisplacement); // move room based on door positions
+                            CreatePathBetweenDoors(dar.door.transform.position + direction * scale / 2, darNext.door.transform.position + direction * scale / 2);
+                            doorAndRoom.RemoveAt(0); doorAndRoom.Remove(darNext); // now that the doors are assigned, remove
+                            perfectlyAligned = true;
+                            break;
+                        }
+                    }
+                }
+
+            }
         }
     }
 

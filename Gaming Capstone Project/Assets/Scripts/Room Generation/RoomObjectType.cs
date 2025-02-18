@@ -38,13 +38,14 @@ public class RoomObjectType : MonoBehaviour
 
     private void Update()
     {
-        preTiles = roomGenerator.finalRoomTiles;
-        preDescripterTiles = roomGenerator.room;
+        if (spawnObjects) {
+            foreach (var room in roomGenerator.roomsInfo)
+            {
+                preTiles = room.finalRoomTiles;
+                preDescripterTiles = room.room;
+                startTile = room.startTile;
+            }
 
-        startTile = roomGenerator.startTile;
-
-        if (spawnObjects)
-        {
             BacktrackingSearchTest();
         }
     }
@@ -152,12 +153,6 @@ public class RoomObjectType : MonoBehaviour
 
         switch (type)
         {
-            case 'd': // door
-                newObject = GameObject.Instantiate(objects[0],
-                    new Vector3((tiles[tilePos].x - startTile.x) * scale, 2.5f, 
-                        (tiles[tilePos].y - (startTile.y + 1)) * scale),
-                    Quaternion.identity, objectParent.transform);
-                break;
             case 'b': // bulletin board
                 newObject = GameObject.Instantiate(objects[0],
                     new Vector3((tiles[tilePos].x - startTile.x) * scale, 2.5f, 
