@@ -11,11 +11,11 @@ public class UIInteraction : MonoBehaviour
 
     private bool isInteracting = false;
     private CharacterController characterController;
-    private PlayerController fpsController; // Replace with your movement script
+    private FirstPersonMovement fpsController; // Replace with your movement script
 
     void Start()
     {
-        fpsController = GetComponent<PlayerController>();
+        fpsController = GetComponent<FirstPersonMovement>();
         characterController = GetComponent<CharacterController>();
         inputFieldUI.SetActive(false);
     }

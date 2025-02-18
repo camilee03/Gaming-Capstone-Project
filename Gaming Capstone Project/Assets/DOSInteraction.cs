@@ -3,13 +3,11 @@ using System.Collections;
 using TMPro;
 using UnityEngine.UI;
 using System;
-using UnityEngine.EventSystems;
 
 public class DOSInteraction : MonoBehaviour
 {
     public Transform cameraMovementPoint;
     public CameraMovement CameraMovementScript;
-    public PlayerController PlayerController;
     private GameObject camera;
     private Vector3 originalPosition;
     private Quaternion originalRotation;
@@ -22,15 +20,10 @@ public class DOSInteraction : MonoBehaviour
     public TMP_InputField WritingLine;
     public int maxCharacters = 9;
 
-    private DOSCommandController DOSController;
-
     void Start()
     {
         camera = Camera.main.gameObject;
         CameraMovementScript = camera.GetComponent<CameraMovement>();
-        DOSController = GetComponent<DOSCommandController>();
-
-        PlayerController = camera.transform.parent.parent.GetComponent<PlayerController>();
         
 
     }
@@ -42,11 +35,11 @@ public class DOSInteraction : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Return))
             {
                 //send current line to seperate method
-                DOSController.HandleCommand(WritingLine.text);
                 UpdatePreviousLines();
 
             }
-            
+            WritingLine.ActivateInputField();
+            WritingLine.Select();
         }
     }
 
@@ -54,6 +47,7 @@ public class DOSInteraction : MonoBehaviour
     {
         for(int i = PreviousLines.Length-1; i > 0 ; i--)
         {
+            Debug.Log(i + " " + (i - 1));
             PreviousLines[i].text = PreviousLines[i-1].text;
         }
         PreviousLines[0].text = WritingLine.text;
@@ -87,9 +81,7 @@ public class DOSInteraction : MonoBehaviour
 
 
         interactionCoroutine = StartCoroutine(LerpCamera(cameraMovementPoint.position, cameraMovementPoint.rotation, 1f, false));
-        WritingLine.interactable = true;
-        WritingLine.ActivateInputField();
-        WritingLine.Select();
+
     }
 
     public void EndInteraction()
@@ -100,11 +92,6 @@ public class DOSInteraction : MonoBehaviour
 
         InInteraction = false;
         interactionCoroutine = StartCoroutine(LerpCamera(originalPosition, originalRotation, 1f, true));
-        WritingLine.DeactivateInputField(false);
-        EventSystem.current.SetSelectedGameObject(null);
-        WritingLine.interactable = false;
-
-
     }
 
     private IEnumerator LerpCamera(Vector3 targetPosition, Quaternion targetRotation, float duration, bool enableCameraMovement)
@@ -112,8 +99,7 @@ public class DOSInteraction : MonoBehaviour
         float timeElapsed = 0f;
         Vector3 startPosition = camera.transform.position;
         Quaternion startRotation = camera.transform.rotation;
-        CameraMovementScript.enabled = enableCameraMovement;
-        PlayerController.enabled = enableCameraMovement;
+
         while (timeElapsed < duration)
         {
             camera.transform.position = Vector3.Lerp(startPosition, targetPosition, timeElapsed / duration);
@@ -125,8 +111,7 @@ public class DOSInteraction : MonoBehaviour
         camera.transform.position = targetPosition;
         camera.transform.rotation = targetRotation;
 
-
-
+        CameraMovementScript.enabled = enableCameraMovement;
     }
     #endregion
 }
