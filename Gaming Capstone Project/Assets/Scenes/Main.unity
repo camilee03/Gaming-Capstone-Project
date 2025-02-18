@@ -1071,7 +1071,7 @@ Transform:
   m_GameObject: {fileID: 395795038}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0.7071068, w: 0}
-  m_LocalPosition: {x: 0, y: 0.0019, z: 0}
+  m_LocalPosition: {x: 0, y: 0.0176, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2287,7 +2287,7 @@ GameObject:
   - component: {fileID: 865672612}
   - component: {fileID: 865672611}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: InteractText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2423,7 +2423,7 @@ GameObject:
   - component: {fileID: 923717320}
   - component: {fileID: 923717319}
   m_Layer: 5
-  m_Name: Image
+  m_Name: InteractImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2724,6 +2724,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d4dbc965b4fc02842af1fd954448f669, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1005151439}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d4dbc965b4fc02842af1fd954448f669, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1005151441}
     - targetCorrespondingSourceObject: {fileID: 3984137631858743321, guid: d4dbc965b4fc02842af1fd954448f669, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1005151431}
@@ -3251,6 +3254,20 @@ CapsuleCollider:
   m_Height: 4.88875
   m_Direction: 1
   m_Center: {x: -0.047358334, y: -0.7424922, z: 0}
+--- !u!114 &1005151441
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1005151430}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a12ee6ad38e6b647816b0e9a67b2a9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  popupText: {fileID: 865672611}
+  popupMenu: {fileID: 923717317}
 --- !u!1 &1034916792
 GameObject:
   m_ObjectHideFlags: 0

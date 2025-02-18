@@ -21,8 +21,16 @@ public class Interact : MonoBehaviour
     [SerializeField] TextMeshProUGUI popupText;
     [SerializeField] GameObject popupMenu;
 
+    PlayerController player;
+    public bool onInteract;
+
 
     bool canChange = true;
+    private void Start()
+    {
+        player = gameObject.GetComponent<PlayerController>();
+    }
+
     private void Update()
     {
         HitScan();
@@ -39,6 +47,8 @@ public class Interact : MonoBehaviour
             pickedupObject.transform.rotation = Camera.main.transform.rotation;
         }
 
+        if (onInteract) { player.enabled = false; }
+        else { player.enabled = true; }
     }
 
     private void Pickup()
@@ -73,7 +83,7 @@ public class Interact : MonoBehaviour
         if (highlightedObject != null && highlightedObject.tag == "DOS Terminal")
         {
             // access object and perform action
-            highlightedObject.GetComponent<DOSInteraction>().SetInteract(gameObject.GetComponent<Interact>());
+            highlightedObject.GetComponent<DOSInteraction>().SetInteract(gameObject.GetComponent<Interact>(), player);
             highlightedObject.GetComponent<DOSInteraction>().ToggleInteraction();
 
             Debug.Log("DOS Opened!");
