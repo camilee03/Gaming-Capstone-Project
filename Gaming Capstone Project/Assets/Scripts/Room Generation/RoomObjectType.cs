@@ -148,7 +148,7 @@ public class RoomObjectType : MonoBehaviour
 
     private void PlaceObjects(char type, int tilePos, int scale)
     {
-        GameObject newObject = new GameObject();
+        GameObject newObject = null;
 
         switch (type)
         {

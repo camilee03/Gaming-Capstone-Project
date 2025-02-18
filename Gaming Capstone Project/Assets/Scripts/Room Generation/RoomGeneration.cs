@@ -25,6 +25,8 @@ public class RoomGeneration : MonoBehaviour
     [SerializeField] GameObject doors;
     List<GameObject> spawnedTiles;
     List<GameObject> spawnedOutline;
+    List<int> outlineDirections = new List<int>();
+    List<(GameObject door, int pos, GameObject room)> doorAndRoom;
 
     void Start()
     {
@@ -58,39 +60,50 @@ public class RoomGeneration : MonoBehaviour
                 }
                 else if (room[x, y] == 'w') // spawn wall
                 {
-                    if (startTile.x == 0 && startTile.y == 0) { startTile.x = x; startTile.y = y; }
-                    // NOTE: try to make this less of a mess, but this
-                    // may have to stay this way to prevent holes
-
-                    bool[] locations = new bool[4] { 
-                        x+1<size && room[x+1, y] == 'f',
-                        y+1<size && room[x, y+1] == 'f', 
-                        x-1>0 && room[x-1, y] == 'f', 
-                        y-1>0 && room[x, y-1] == 'f' };
-
-                    Vector3 spawnLeft = new Vector3((x - startTile.x) * scale + 5, 2.5f, (y - startTile.y) * scale);
-                    Vector3 spawnRight = new Vector3((x - startTile.x) * scale - 5, 2.5f, (y - startTile.y) * scale);
-                    Vector3 spawnAbove = new Vector3((x - startTile.x) * scale, 2.5f, (y - startTile.y) * scale + 5);
-                    Vector3 spawnBelow = new Vector3((x - startTile.x) * scale, 2.5f, (y - startTile.y) * scale - 5);
-                    Vector3[] spawnPos = new Vector3[4] {spawnLeft, spawnAbove, spawnRight, spawnBelow };
-
-                    for (int i = 0; i<locations.Length; i++)
-                    {
-                        if (locations[i])
-                        {
-                            GameObject newObject = Object.Instantiate(walls, wallParent.transform, true);
-                            newObject.transform.position = spawnPos[i];
-                            newObject.transform.rotation = new Quaternion(0, (i+1) % 2, 0, (i+1) % 2);
-                            spawnedOutline.Add(newObject);
-                        }
-                    }
-
-                    finalRoomTiles.Add(new Vector2(x,y));
+                    SpawnObject(walls, x, y, wallParent.transform);
                 }
+
             }
         }
 
         return newRoom;
+    }
+
+    /// <summary> See where to spawn designated objects </summary>
+    void SpawnObject(GameObject child, int x, int y, Transform parent) 
+    {
+        GameObject newObject = null; 
+
+        if (startTile.x == 0 && startTile.y == 0) { startTile.x = x; startTile.y = y; } // set first tile if not already set
+
+        bool[] locations = new bool[4] { // conditions to spawn
+                        x+1<size && room[x+1, y] == 'f', // floor to right (place left)
+                        y+1<size && room[x, y+1] == 'f', // floor down (place up)
+                        x-1>0 && room[x-1, y] == 'f', // floor left (place right)
+                        y-1>0 && room[x, y-1] == 'f' }; // floor up (place down)
+
+        // Create spawn locations for each direction
+        Vector3 spawnLeft = new Vector3((x - startTile.x) * scale + scale/2, 2.5f, (y - startTile.y) * scale);
+        Vector3 spawnRight = new Vector3((x - startTile.x) * scale - scale/2, 2.5f, (y - startTile.y) * scale);
+        Vector3 spawnAbove = new Vector3((x - startTile.x) * scale, 2.5f, (y - startTile.y) * scale + scale / 2);
+        Vector3 spawnBelow = new Vector3((x - startTile.x) * scale, 2.5f, (y - startTile.y) * scale - scale / 2);
+        Vector3[] spawnPos = new Vector3[4] { spawnLeft, spawnAbove, spawnRight, spawnBelow };
+
+        // Check which walls need to be spawned in
+        for (int i = 0; i < locations.Length; i++)
+        {
+            if (locations[i]) // if can spawn
+            {
+                newObject = GameObject.Instantiate(child, parent, true);
+                newObject.transform.position = spawnPos[i];
+                newObject.transform.rotation = new Quaternion(0, (i + 1) % 2, 0, (i + 1) % 2);
+                spawnedOutline.Add(newObject);
+                outlineDirections.Add(i);
+            }
+        }
+
+        finalRoomTiles.Add(new Vector2(x, y));
+
     }
 
     /// <summary> Deletes old instances of room </summary>
@@ -113,7 +126,6 @@ public class RoomGeneration : MonoBehaviour
     {
         size = Random.Range(10, 20);
         room = new char[size, size]; // set random room size
-        Debug.Log(size + " " + room.Length);
         finalRoomTiles = new List<Vector2>(); // reset filled room tiles
 
         int numSquares = Random.Range(1, 5); // determine how many squares will be generated
@@ -149,8 +161,6 @@ public class RoomGeneration : MonoBehaviour
         bool problem = false;
 
         char tileCode = 'w';
-        int doorChance = Random.Range(0, 1);
-        //if (doorChance == 0) { tileCode = 'D'; }
 
         switch (currLocation)
         {
@@ -206,7 +216,7 @@ public class RoomGeneration : MonoBehaviour
 
         // Check to see if outline is done
         if (x >= size | y >= size | x < 0 | y < 0) { Debug.Log("Too big or small: " + x + ", " + y); }
-        else if (room[x, y] != 'w' && room[x,y] != 'D' && !problem) { room[x, y] = tileCode; OutlineRoom(x, y, currLocation, numDoors); }
+        else if (room[x, y] != 'w' && !problem) { room[x, y] = tileCode; OutlineRoom(x, y, currLocation, numDoors); }
         else if (problem) { Debug.Log("PROBLEM"); }
 
     }
@@ -258,14 +268,13 @@ public class RoomGeneration : MonoBehaviour
     /// <summary> Starts the room generation </summary>
     GameObject RoomProcedure()
     {
-        GameObject newRoom = new GameObject();
+        GameObject newRoom = null;
         GenerateNewRoom(); // create the array for the new room
 
         int[] tile = FindFirstTile();
         if (tile != null)
         {
-            int numDoors = 2;
-            OutlineRoom(tile[0], tile[1], 0, numDoors); // create the array for the outline
+            OutlineRoom(tile[0], tile[1], 0, 0); // create the array for the outline
             CleanRoom();
 
             newRoom = DrawRoom(); // draw room and outline
@@ -281,19 +290,192 @@ public class RoomGeneration : MonoBehaviour
     {
         ClearMap(); // only neccessary if regenerating the entire map
 
-        int numRooms = 3;
+        int numRooms = 2;
         GameObject[] rooms = new GameObject[numRooms];
-        int previousRoomSize = 0;
 
-        for (int i = 0; i < numRooms; i++)
+        doorAndRoom = new List<(GameObject door, int pos, GameObject room)>();
+
+        for (int i = 0; i < numRooms; i++) // spawn in each room and set doors
         {
             rooms[i] = RoomProcedure();
-            rooms[i].transform.position += previousRoomSize * Vector3.right * scale * i;
-            previousRoomSize = size;
+            ReplaceWallWithDoor(1, rooms[i].transform.GetChild(0).gameObject, rooms[i]);
+        }
+
+        MoveAndPairDoors();
+    }
+
+    /// <summary> Chooses random walls to replace with a door </summary>
+    void ReplaceWallWithDoor(int numDoors, GameObject wallParent, GameObject room)
+    {
+        for (int i = 0; i < numDoors; i++)
+        {
+            int index = Random.Range(0, wallParent.transform.childCount);
+
+            Transform wallTransform = wallParent.transform.GetChild(index);
+            Vector3 wallPosition = wallTransform.position;
+            Quaternion wallRotation = wallTransform.rotation;
+            Destroy(wallTransform.gameObject);
+
+            GameObject tempObject = GameObject.Instantiate(doors, wallPosition, wallRotation, wallParent.transform);
+            doorAndRoom.Add((tempObject, outlineDirections[index], room));
         }
     }
 
-    void CreatePathBetweenDoors(Vector3 door1, Vector2 door2)
+    /// <summary> Take spawned rooms and doors and connect together </summary>
+    void MoveAndPairDoors()
     {
+        // Ok so I'm thinking this is the first iteration with only one set of doors. Then run 
+        // replacewallwithdoors again and connect doors based on where the rooms' positions are
+
+        // 0 = left, 1 = up, 2 = right, 3 = down
+
+        int debugInt = 0;
+        float roomDistance = 10 * scale;
+        bool perfectlyAligned = true;
+
+        while (doorAndRoom.Count > 0 && debugInt < 100 && perfectlyAligned)
+        {
+            (GameObject door, int pos, GameObject room) dar = doorAndRoom[0]; // new door to pair
+
+            debugInt++;
+
+            // check to see if any doors perfectly allign
+            perfectlyAligned = false;
+            foreach ((GameObject door, int pos, GameObject room) darNext in doorAndRoom)
+            {
+                if (dar.room != darNext.room)
+                {
+                    Debug.Log(darNext.door.name + " " + darNext.pos);
+                    if (darNext.pos + 2 == dar.pos || darNext.pos - 2 == dar.pos)
+                    {
+                        Vector3 doorDisplacement;
+                        Vector3 direction;
+                        switch (dar.pos)
+                        {
+                            case 1:
+                            case 3:
+                                doorDisplacement = new Vector3((dar.door.transform.position.x - darNext.door.transform.position.x), 0, roomDistance);
+                                direction = Vector3.right; break;
+                            case 0:
+                            case 2:
+                                doorDisplacement = new Vector3(roomDistance, 0, (dar.door.transform.position.z - darNext.door.transform.position.z));
+                                direction = Vector3.forward; break;
+                            default: doorDisplacement = Vector3.zero; direction = Vector3.zero; break;
+                        }
+
+                        darNext.room.transform.Translate(doorDisplacement); // move room based on door positions
+                        CreatePathBetweenDoors(dar.door.transform.position+direction*scale/2, darNext.door.transform.position+direction*scale/2);
+                        doorAndRoom.RemoveAt(0); doorAndRoom.Remove(darNext); // now that the doors are assigned, remove
+                        perfectlyAligned = true;
+                        break;
+                    }
+                }
+            }
+
+            // if there were no perfectly alligned rooms:
+            if (!perfectlyAligned)
+            {
+                foreach ((GameObject door, int pos, GameObject room) darNext in doorAndRoom)
+                {
+                    if (dar.room != darNext.room)
+                    {
+                        Debug.Log(darNext.door.name + " " + darNext.pos);
+                        if (darNext.pos != dar.pos)
+                        {
+                            Vector3 doorDisplacement;
+                            Vector3 direction;
+                            switch (dar.pos)
+                            {
+                                case 1:
+                                case 3:
+                                    doorDisplacement = new Vector3((dar.door.transform.position.x - darNext.door.transform.position.x), 0, roomDistance);
+                                    direction = Vector3.right; break;
+                                case 0:
+                                case 2:
+                                    doorDisplacement = new Vector3(roomDistance, 0, (dar.door.transform.position.z - darNext.door.transform.position.z));
+                                    direction = Vector3.forward; break;
+                                default: doorDisplacement = Vector3.zero; direction = Vector3.zero; break;
+                            }
+
+                            darNext.room.transform.Translate(doorDisplacement); // move room based on door positions
+                            //CreatePathBetweenDoors(dar.door.transform.position, darNext.door.transform.position);
+                            doorAndRoom.RemoveAt(0); doorAndRoom.Remove(darNext); // now that the doors are assigned, remove
+                            perfectlyAligned = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (!perfectlyAligned) { Debug.Log("ERROR"); }
+        }
+    }
+
+    void CreatePathBetweenDoors(Vector3 door1, Vector3 door2)
+    {
+        DataStructures.PriorityQueue<(Vector3, List<Vector3>)> fringe = new DataStructures.PriorityQueue<(Vector3, List<Vector3>)>();
+
+        Vector3 currentState = door1; // start from position of door1
+
+        foreach (Vector3 successor in GetSuccessors(currentState))
+        {
+            List<Vector3> path = new List<Vector3>();
+            path.Add(successor);
+            fringe.Push((successor, path), (int)Vector3.Distance(successor, door2)); // change to heuristic later
+        }
+
+        List<Vector3> closed = new List<Vector3>();
+        closed.Add(currentState);
+        List<Vector3> solution = new List<Vector3>();
+        List<Vector3> currentPath = new List<Vector3>();
+        (Vector3 pos, List<Vector3> path) node;
+
+        //While fringe set is not empty
+        while (fringe.count > 0)
+        {
+            node = fringe.Pop();
+            currentState = node.pos;
+            currentPath = node.path;
+
+            // Move to this state and finish
+            if (Vector3.Distance(door2, currentState) < scale)
+            {
+                solution = currentPath;
+
+                GameObject hallwayParent = new GameObject("Hallway");
+
+                foreach (Vector3 sol in solution)
+                {
+                    GameObject newPath = GameObject.Instantiate(tiles, hallwayParent.transform);
+                    newPath.transform.position = sol;
+                }
+                break;
+            }
+
+            // Check if state is already expanded
+            if (!closed.Contains(currentState))
+            {
+                closed.Add(currentState);
+
+                foreach (Vector3 successor in GetSuccessors(currentState))
+                {
+                    List<Vector3> path = currentPath;
+                    path.Add(successor);
+                    fringe.Push((successor, path), (int)Vector3.Distance(successor, door2)); // change to heuristic later
+                }
+            }
+        }
+
+    }
+
+    List<Vector3> GetSuccessors(Vector3 parent)
+    {
+        List<Vector3> successors = new List<Vector3>();
+        successors.Add(parent + new Vector3(scale, 0, 0));
+        successors.Add(parent + new Vector3(-scale, 0, 0));
+        successors.Add(parent + new Vector3(0, 0, scale));
+        successors.Add(parent + new Vector3(0, 0, -scale));
+
+        return successors;
     }
 }

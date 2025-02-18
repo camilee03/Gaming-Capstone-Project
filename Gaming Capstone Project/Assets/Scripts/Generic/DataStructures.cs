@@ -1,92 +1,76 @@
+// C# code to implement the approach
 using System;
 using System.Collections.Generic;
-using System.Runtime;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
-using static UnityEditor.Progress;
-using static UnityEngine.EventSystems.EventTrigger;
 
-public class DataStructures : MonoBehaviour
+public class DataStructures : ScriptableObject
 {
-    /*
-    class PriorityQueue {
-        SortedList<HeapKey, HeapKey> heap;
-        int count;
-        PriorityQueue()
-        {
-            this.heap = new SortedList<HeapKey, HeapKey>();
-            this.count = 0;
-        }
-
-        void push(HeapKey item, int priority)
-        {
-            List<object> entry = new List<object> { priority, this.count, item };
-            // push the entry item onto the heap
-            this.count++;
-        }
-        HeapKey pop() 
-        {
-            //List<object> exit = pop from heap
-            // return exit[2]
-
-        }
-
-        bool isEmpty()
-        {
-            return this.heap.Count == 0;
-        }
-        void update(HeapKey item, int priority)
-        {
-            // If item already in priority queue with higher priority, update its priority and rebuild the heap.
-            // If item already in priority queue with equal or lower priority, do nothing.
-            // If item not in priority queue, do the same thing as self.push.
-            for (SortedList<HeapKey, HeapKey> list = this.heap; list.Count > 0;)
-            {
-                if (list[2] == item)
-                {
-                    if (list[0] < priority) { break; }
-
-                    // delete this.heap[index]
-                    // this.heap.append((priority, c, item))
-                    // heapq.heapify(self.heap)
-                    // break
-                }
-                else
-                {
-                    this.push(item, priority);
-                }
-            }
-        }
-    }
-
-    class HeapKey : IComparable<HeapKey>
+    class Pair<T>
     {
-        public HeapKey(Guid id, Int32 value)
+        public T First { get; private set; }
+        public T Second { get; private set; }
+
+        public Pair(T first, T second)
         {
-            Id = id;
-            Value = value;
+            First = first;
+            Second = second;
         }
 
-        public Guid Id { get; private set; }
-        public Int32 Value { get; private set; }
-
-        public int CompareTo(HeapKey other)
+        public override int GetHashCode()
         {
-            if (_enableCompareCount)
+            return First.GetHashCode() ^ Second.GetHashCode();
+        }
+
+        public override bool Equals(object other)
+        {
+            Pair<T> pair = other as Pair<T>;
+            if (pair == null)
             {
-                ++_compareCount;
+                return false;
             }
-
-            if (other == null)
-            {
-                throw new ArgumentNullException("other");
-            }
-
-            var result = Value.CompareTo(other.Value);
-
-            return result == 0 ? Id.CompareTo(other.Id) : result;
+            return (this.First.Equals(pair.First) && this.Second.Equals(pair.Second));
         }
     }
-    */
+    class PairComparer<T> : IComparer<Pair<T>> where T : IComparable
+    {
+        public int Compare(Pair<T> x, Pair<T> y)
+        {
+            if (x.First.CompareTo(y.First) < 0)
+            {
+                return -1;
+            }
+            else if (x.First.CompareTo(y.First) > 0)
+            {
+                return 1;
+            }
+            else
+            {
+                return x.Second.CompareTo(y.Second);
+            }
+        }
+    }
+    public class PriorityQueue<T>
+    {
+        SortedList<Pair<int>, T> _list;
+        public int count;
+
+        public PriorityQueue()
+        {
+            _list = new SortedList<Pair<int>, T>(new PairComparer<int>());
+        }
+
+        public void Push(T item, int priority)
+        {
+            _list.Add(new Pair<int>(priority, count), item);
+            count++;
+        }
+
+        public T Pop()
+        {
+            T item = _list[_list.Keys[0]];
+            _list.RemoveAt(0);
+            return item;
+        }
+    }
+
 }
