@@ -33,6 +33,7 @@ public class RoomGeneration : MonoBehaviour
 
     void Start()
     {
+        //Random.InitState(11);
         spawnedOutline = new List<GameObject>();
         outlineDirections = new List<int>();
         spawnedTiles = new List<GameObject>();

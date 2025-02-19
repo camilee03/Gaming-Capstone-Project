@@ -5,11 +5,13 @@ TagManager:
   serializedVersion: 3
   tags:
   - InteractableUI
+  - DOS Terminal
+  - Selectable
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Player
   - Water
   - UI
   - 
