@@ -33,7 +33,7 @@ public class RoomObjectType : MonoBehaviour
 
     private void Start()
     {
-        Random.InitState(115);
+        //Random.InitState(115);
         roomGenerator = GetComponent<RoomGeneration>();   
     }
 
