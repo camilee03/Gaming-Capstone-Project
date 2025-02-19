@@ -1,6 +1,8 @@
+using System.Globalization;
+using Unity.Netcode;
 using UnityEngine;
 
-public class CameraMovement : MonoBehaviour
+public class CameraMovement : NetworkBehaviour
 {
     public Transform Anchor;
     public float HorizontalSensitivity = 10;
@@ -20,6 +22,8 @@ public class CameraMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!IsOwner || !IsSpawned) return;
+
         if (canMove)
         {
             gameObject.transform.position = Anchor.transform.position;

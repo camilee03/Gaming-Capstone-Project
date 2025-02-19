@@ -11,7 +11,7 @@ public class PlayerController : NetworkBehaviour
     float velocity = 10;
     float x;
     float z;
-    Camera cam;
+    public Camera cam;
 
     CameraMovement camMovement;
 
@@ -28,7 +28,6 @@ public class PlayerController : NetworkBehaviour
         rgd = gameObject.GetComponent<Rigidbody>();
         playerInput = GetComponent<PlayerInput>();
         animator = GetComponent<Animator>();
-        cam = Camera.main;
         camMovement = cam.GetComponent<CameraMovement>();
         camMovement.SetPlayerController(this);
     }
@@ -36,10 +35,12 @@ public class PlayerController : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-                    //if (!IsOwner || !IsSpawned) return;
+                    if (!IsOwner || !IsSpawned) return;
 
         if (canMove)
         {
+            Debug.Log("MOVING");
+
             Vector3 linearVelocity = cam.gameObject.transform.forward * z * velocity + cam.gameObject.transform.right * x * velocity;
             linearVelocity = linearVelocity - rgd.linearVelocity;
 

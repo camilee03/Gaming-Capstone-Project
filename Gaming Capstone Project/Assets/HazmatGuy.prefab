@@ -396,10 +396,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74e3e15f734bca942aed00bb97508a42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   Anchor: {fileID: 3991990011750316167}
   HorizontalSensitivity: 5
   VerticalSensitivity: 5
-  playerController: {fileID: 0}
+  playerController: {fileID: 1469907842913153512}
   canMove: 1
 --- !u!114 &1888980506854677528
 MonoBehaviour:
@@ -1370,9 +1371,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d4dbc965b4fc02842af1fd954448f669, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5013231551609289343}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d4dbc965b4fc02842af1fd954448f669, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8562894816632131979}
     - targetCorrespondingSourceObject: {fileID: 3984137631858743321, guid: d4dbc965b4fc02842af1fd954448f669, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4120286116113935016}
@@ -1635,7 +1633,7 @@ MonoBehaviour:
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
-  AllowOwnerToParent: 0
+  AllowOwnerToParent: 1
 --- !u!114 &1469907842913153512
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1649,8 +1647,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  cam: {fileID: 6909898074491242324}
   HorizontalSensitivity: 5
   VerticalSensitivity: 5
+  canMove: 1
 --- !u!114 &2526506209443638112
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1776,7 +1776,7 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 9caa3d8a-6b2f-4e8e-8bad-6ede561bd9be
     m_ActionName: UI/TrackedDeviceOrientation
-  m_NeverAutoSwitchControlSchemes: 0
+  m_NeverAutoSwitchControlSchemes: 1
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
@@ -1845,7 +1845,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkTransformExpanded: 1
-  AuthorityMode: 0
+  AuthorityMode: 1
   TickSyncChildren: 0
   UseUnreliableDeltas: 0
   SyncPositionX: 1
@@ -1881,23 +1881,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   Speed: 5
---- !u!114 &8562894816632131979
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4202023726036059953}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  NetworkRigidbodyBaseExpanded: 0
-  UseRigidBodyForMotion: 0
-  AutoUpdateKinematicState: 1
-  AutoSetKinematicOnDespawn: 1
 --- !u!4 &4258554085819549565 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8248180118754050787, guid: d4dbc965b4fc02842af1fd954448f669, type: 3}
