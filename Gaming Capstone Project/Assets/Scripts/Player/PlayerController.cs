@@ -42,8 +42,11 @@ public class PlayerController : NetworkBehaviour
             Debug.Log("MOVING");
 
             Vector3 linearVelocity = cam.gameObject.transform.forward * z * velocity + cam.gameObject.transform.right * x * velocity;
+            Debug.Log(linearVelocity);
+
             linearVelocity = linearVelocity - rgd.linearVelocity;
 
+            Debug.Log(linearVelocity);
             animator.SetBool("isWalking", linearVelocity.x > 0 || linearVelocity.z > 0); // start/stop walk cycle
 
             rgd.linearVelocity += new Vector3(linearVelocity.x, 0, linearVelocity.z);
@@ -68,6 +71,7 @@ public class PlayerController : NetworkBehaviour
     {
         x = context.ReadValue<Vector2>().x;
         z = context.ReadValue<Vector2>().y;
+        Debug.Log(x + " " + z);
     }
 
     public void Jump(InputAction.CallbackContext context)
