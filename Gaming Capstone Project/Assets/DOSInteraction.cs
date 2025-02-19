@@ -111,7 +111,8 @@ public class DOSInteraction : MonoBehaviour
         camera.transform.position = targetPosition;
         camera.transform.rotation = targetRotation;
 
-        CameraMovementScript.enabled = enableCameraMovement;
+        CameraMovementScript.canMove = enableCameraMovement;
+        CameraMovementScript.playerController.ToggleMovement(enableCameraMovement);
     }
     #endregion
 }

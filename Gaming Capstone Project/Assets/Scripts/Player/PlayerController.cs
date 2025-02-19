@@ -1,8 +1,9 @@
+using Unity.Netcode;
 using UnityEditor.ShaderGraph;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour
 {
     PlayerInput playerInput;
     Animator animator;
@@ -12,12 +13,15 @@ public class PlayerController : MonoBehaviour
     float z;
     Camera cam;
 
+    CameraMovement camMovement;
+
     public float HorizontalSensitivity = 10;
     public float VerticalSensitivity = 10;
 
     private float yaw = 0.0f;
     private float pitch = 0.0f;
 
+    public bool canMove = true;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -25,25 +29,40 @@ public class PlayerController : MonoBehaviour
         playerInput = GetComponent<PlayerInput>();
         animator = GetComponent<Animator>();
         cam = Camera.main;
+        camMovement = cam.GetComponent<CameraMovement>();
+        camMovement.SetPlayerController(this);
     }
 
     // Update is called once per frame
     void Update()
     {
-        Vector3 linearVelocity = cam.gameObject.transform.forward * z * velocity + cam.gameObject.transform.right * x * velocity;
-        linearVelocity = linearVelocity - rgd.linearVelocity;
+                    //if (!IsOwner || !IsSpawned) return;
 
-        animator.SetBool("isWalking", linearVelocity.x > 0 || linearVelocity.z > 0); // start/stop walk cycle
+        if (canMove)
+        {
+            Vector3 linearVelocity = cam.gameObject.transform.forward * z * velocity + cam.gameObject.transform.right * x * velocity;
+            linearVelocity = linearVelocity - rgd.linearVelocity;
 
-        rgd.linearVelocity += new Vector3(linearVelocity.x, 0, linearVelocity.z);
+            animator.SetBool("isWalking", linearVelocity.x > 0 || linearVelocity.z > 0); // start/stop walk cycle
 
-        // Move body based on mouse movement
-        yaw += HorizontalSensitivity * Input.GetAxis("Mouse X");
-        //pitch -= VerticalSensitivity * Input.GetAxis("Mouse Y");
+            rgd.linearVelocity += new Vector3(linearVelocity.x, 0, linearVelocity.z);
 
-        gameObject.transform.eulerAngles = new Vector3(0, yaw, 0);
+            // Move body based on mouse movement
+            yaw += HorizontalSensitivity * Input.GetAxis("Mouse X");
+            //pitch -= VerticalSensitivity * Input.GetAxis("Mouse Y");
+
+            gameObject.transform.eulerAngles = new Vector3(0, yaw, 0);
+        }
+        else
+        {
+            rgd.linearVelocity = Vector3.zero;
+            rgd.angularVelocity = Vector3.zero;
+        }
     }
-
+    public void ToggleMovement(bool input)
+    {
+        canMove = input;
+    }
     public void MovePlayer(InputAction.CallbackContext context)
     {
         x = context.ReadValue<Vector2>().x;
