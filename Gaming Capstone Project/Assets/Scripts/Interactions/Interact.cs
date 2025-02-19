@@ -28,7 +28,7 @@ public class Interact : MonoBehaviour
     bool canChange = true;
     private void Start()
     {
-        player = gameObject.GetComponent<PlayerController>();
+        player = gameObject.GetComponentInParent<PlayerController>();
     }
 
     private void Update()
