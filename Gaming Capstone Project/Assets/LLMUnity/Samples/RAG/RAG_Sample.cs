@@ -31,7 +31,7 @@ namespace LLMUnitySamples
 
         public void LoadPhrases()
         {
-            phrases = RAGUtils.ReadGutenbergFile(HamletText.text)["HAMLET"];
+            phrases = RAGUtils.ReadGutenbergFile(HamletText.text)[""];
         }
 
         public async Task CreateEmbeddings()

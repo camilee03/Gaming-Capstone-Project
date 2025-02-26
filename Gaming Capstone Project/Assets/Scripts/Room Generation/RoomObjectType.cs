@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 using Unity.VisualScripting;
@@ -12,12 +13,11 @@ public class RoomObjectType : MonoBehaviour
     char[,] descripterTiles; // what each tile has on it
     char[,] preDescripterTiles;
     bool spawnObjects = true;
+    GameObject roomParent;
 
     RoomGeneration roomGenerator;
-    Vector2 startTile;
     List<GameObject> spawnedObjects = new List<GameObject>();
 
-    [SerializeField] GameObject objectParent;
     [SerializeField] GameObject[] objects;
 
     enum ItemType { Box, Button, Lever, Light, Table, Chair, 
@@ -33,18 +33,19 @@ public class RoomObjectType : MonoBehaviour
 
     private void Start()
     {
-        //Random.InitState(115);
-        roomGenerator = GetComponent<RoomGeneration>();   
-    }
+        roomGenerator = GetComponent<RoomGeneration>();
 
-    private void Update()
-    {
+        // NOTE: only does one room rn, change later
         var room = roomGenerator.roomsInfo[0];
-            preTiles = room.finalRoomTiles;
-            preDescripterTiles = room.room;
-            startTile = room.startTile;
+        preTiles = room.finalRoomTiles;
+        preDescripterTiles = room.room;
+        roomParent = room.roomParent;
 
-        if (roomGenerator.finishedProcedure && spawnObjects) {
+        // set random seed if there is one
+        if (roomGenerator.seed != -1) { Random.InitState(roomGenerator.seed); } 
+
+        if (roomGenerator.finishedProcedure && spawnObjects)
+        {
             BacktrackingSearchTest();
         }
     }
@@ -82,13 +83,16 @@ public class RoomObjectType : MonoBehaviour
     private void BacktrackingSearchTest()
     {
         CleanRoom(); // get rid of old objects and reset room
+        GameObject objectParent = new GameObject("ObjectParent");
+        objectParent.transform.position = roomParent.transform.position;
+        objectParent.transform.parent = roomParent.transform;
 
         char[] objectList = new char[8] { 't', 'F', 'b', 'b', 'l', 'l', 'l', 'T'};
         int scale = 10;
         int randomTile = 0; char oldCode;
 
         spawnObjects = false;
-        for (int i = 0; i < objectList.Length; i++)
+        for (int i = 0; i < objectList.Length - 1; i++)
         {
             bool canSpawn = false;
             randomTile = Random.Range(0, tiles.Count-1); // find new unassigned tile
@@ -97,15 +101,15 @@ public class RoomObjectType : MonoBehaviour
             //-- Genreation Start --//
             while (!canSpawn && iterations != tiles.Count)
             {
-                if (randomTile < tiles.Count - 1) { randomTile++; } else { randomTile = 0; }
+                if (randomTile < tiles.Count - 2) { randomTile++; } else { randomTile = 0; }
 
                 if (tiles[randomTile] != null)
                 {
                     oldCode = descripterTiles[(int)tiles[randomTile].x, (int)tiles[randomTile].y]; // char code of current tile
                     canSpawn = SpawnObject(objectList[i], oldCode, tiles[randomTile]); // check spawn conditions
-
-                    iterations++;
                 }
+
+                iterations++;
             }
             //-- Generation Done --//
 
@@ -114,7 +118,7 @@ public class RoomObjectType : MonoBehaviour
                 tiles.Remove(tiles[randomTile]); // remove changed tile from potential tile list
                 descripterTiles[(int)tiles[randomTile].x, (int)tiles[randomTile].y] = objectList[i]; // set new tile
 
-                PlaceObjects(objectList[i], randomTile, scale);
+                PlaceObjects(objectList[i], randomTile, scale, objectParent);
             }
         }
     }
@@ -141,54 +145,43 @@ public class RoomObjectType : MonoBehaviour
 
     }
 
-    private void AddScripts() // add scripts to objects for interaction and connection when needed
-    { 
-
-    }
-
-    private void PlaceObjects(char type, int tilePos, int scale)
+    private void PlaceObjects(char type, int tilePos, int scale, GameObject parent)
     {
         GameObject newObject = null;
 
         switch (type)
         {
             case 'b': // bulletin board
-                newObject = GameObject.Instantiate(objects[0],
-                    new Vector3((tiles[tilePos].x - startTile.x) * scale, 2.5f, 
-                        (tiles[tilePos].y - (startTile.y + 1)) * scale),
-                    Quaternion.identity, objectParent.transform);
+                newObject = GameObject.Instantiate(objects[0], parent.transform);
+                newObject.transform.localPosition = new Vector3(tiles[tilePos].x * scale, 2.5f, (tiles[tilePos].y - 1) * scale);
+                newObject.transform.localRotation = Quaternion.identity;
                 break;
             case 'T': // Table
-                newObject = GameObject.Instantiate(objects[1],
-                    new Vector3((tiles[tilePos].x - startTile.x) * scale, 2.5f * 1.5f,
-                        (tiles[tilePos].y - (startTile.y + 1)) * scale),
-                    Quaternion.Euler(-90, 0, 0), objectParent.transform);
+                newObject = GameObject.Instantiate(objects[1], parent.transform);
                 newObject.transform.localScale *= 2;
+                newObject.transform.localPosition = new Vector3(tiles[tilePos].x * scale, 2.5f * 1.5f, (tiles[tilePos].y - 1) * scale);
+                newObject.transform.localRotation = Quaternion.Euler(-90, 0, 0);
                 break;
             case 'c': // Chair
-                newObject = GameObject.Instantiate(objects[5],
-                    new Vector3((tiles[tilePos].x - startTile.x) * scale, 2.5f * 1.5f,
-                        (tiles[tilePos].y - (startTile.y + 1)) * scale),
-                    Quaternion.identity, objectParent.transform);
+                newObject = GameObject.Instantiate(objects[5], parent.transform);
                 newObject.transform.localScale *= 2;
+                newObject.transform.localPosition = new Vector3(tiles[tilePos].x * scale, 2.5f * 1.5f, (tiles[tilePos].y - 1) * scale);
+                newObject.transform.localRotation = Quaternion.identity;
                 break;
             case 't': // DOS terminal
-                newObject = GameObject.Instantiate(objects[3],
-                    new Vector3((tiles[tilePos].x - startTile.x) * scale, 3f, 
-                        (tiles[tilePos].y - (startTile.y + 1)) * scale),
-                     Quaternion.Euler(-90, 0, 0), objectParent.transform);
+                newObject = GameObject.Instantiate(objects[3], parent.transform);
+                newObject.transform.localPosition = new Vector3(tiles[tilePos].x * scale, 3f, (tiles[tilePos].y - 1) * scale);
+                newObject.transform.localRotation = Quaternion.Euler(-90, 0, 0);
                 break;
             case 'l': // light
-                newObject = GameObject.Instantiate(objects[4],
-                    new Vector3((tiles[tilePos].x - startTile.x) * scale, 15f, 
-                        (tiles[tilePos].y - (startTile.y + 1)) * scale),
-                     Quaternion.Euler(-90, 0, 0), objectParent.transform);
+                newObject = GameObject.Instantiate(objects[4], parent.transform);
+                newObject.transform.localPosition = new Vector3(tiles[tilePos].x * scale, 15f, (tiles[tilePos].y - 1) * scale);
+                newObject.transform.localRotation = Quaternion.Euler(-90, 0, 0);
                 break;
             case 'F': // fan
-                newObject = GameObject.Instantiate(objects[2],
-                    new Vector3((tiles[tilePos].x - startTile.x) * scale, 5.5f, 
-                        (tiles[tilePos].y - (startTile.y + 1)) * scale),
-                    Quaternion.identity, objectParent.transform);
+                newObject = GameObject.Instantiate(objects[2], parent.transform);
+                newObject.transform.localPosition = new Vector3(tiles[tilePos].x * scale, 5.5f, (tiles[tilePos].y - 1) * scale);
+                newObject.transform.localRotation = Quaternion.identity;
                 break;
             default:
                 break;
