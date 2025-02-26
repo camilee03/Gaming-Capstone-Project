@@ -3,6 +3,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine.UI;
 using System;
+using Unity.VisualScripting;
 
 public class DOSInteraction : MonoBehaviour
 {
@@ -13,6 +14,7 @@ public class DOSInteraction : MonoBehaviour
     private Quaternion originalRotation;
     public bool InInteraction = false;
     public Interact interact;
+    PlayerController playerController;
 
     private Coroutine interactionCoroutine;
 
@@ -24,8 +26,6 @@ public class DOSInteraction : MonoBehaviour
     {
         camera = Camera.main.gameObject;
         CameraMovementScript = camera.GetComponent<CameraMovement>();
-        
-
     }
 
     private void Update()
@@ -66,9 +66,10 @@ public class DOSInteraction : MonoBehaviour
                 EndInteraction();
         
     }
-    public void SetInteract(Interact input)
+    public void SetInteract(Interact input, PlayerController player)
     {
         interact = input;
+        playerController = player;
     }
     public void StartInteraction()
     {
@@ -82,6 +83,7 @@ public class DOSInteraction : MonoBehaviour
 
         interactionCoroutine = StartCoroutine(LerpCamera(cameraMovementPoint.position, cameraMovementPoint.rotation, 1f, false));
 
+        playerController.enabled = false;
     }
 
     public void EndInteraction()
@@ -92,6 +94,9 @@ public class DOSInteraction : MonoBehaviour
 
         InInteraction = false;
         interactionCoroutine = StartCoroutine(LerpCamera(originalPosition, originalRotation, 1f, true));
+
+        playerController.enabled = true;
+        playerController = null;
     }
 
     private IEnumerator LerpCamera(Vector3 targetPosition, Quaternion targetRotation, float duration, bool enableCameraMovement)
