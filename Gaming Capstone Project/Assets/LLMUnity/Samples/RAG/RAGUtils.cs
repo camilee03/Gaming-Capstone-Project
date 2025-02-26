@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace LLMUnitySamples
@@ -37,25 +38,12 @@ namespace LLMUnitySamples
                 messages[name].Add(message);
             }
 
-            void AddMessages(string message, string name, string name2)
-            {
-                foreach (string chunk in SplitText(message))
-                {
-                    if (chunk == "") continue;
-                    AddMessage(chunk, name);
-                    AddMessage(chunk, name2);
-                }
-            }
-
             // read the Hamlet play from the Gutenberg file
-            string skipPattern = @"\[.*?\]";
-            string namePattern = "^[A-Z and]+\\.$";
+            string namePattern = "^[A-Z]+$"; // ^ = start, [] = character set, \+ = more than one, $ = end
             Regex nameRegex = new Regex(namePattern);
 
             string name = null;
-            string name2 = null;
             string message = "";
-            bool add = false;
             int numWords = 0;
             int numLines = 0;
 
@@ -64,35 +52,17 @@ namespace LLMUnitySamples
             {
                 string line = lines[i];
 
-                if (line.Contains("***")) add = !add;
-                if (!add) continue;
-
                 line = line.Replace("\r", "");
-                line = Regex.Replace(line, skipPattern, "");
                 string lineTrim = line.Trim();
-                if (lineTrim == "" || lineTrim.StartsWith("Re-enter ") || lineTrim.StartsWith("Enter ") || lineTrim.StartsWith("SCENE")) continue;
 
-                numWords += line.Split(new[] { ' ', '\t' }, System.StringSplitOptions.RemoveEmptyEntries).Length;
+                numWords += line.Split(new[] { ' ', '\t' }, System.StringSplitOptions.RemoveEmptyEntries).Length; // things split by space or tab
                 numLines++;
 
-                if (line.StartsWith("ACT"))
+                if (nameRegex.IsMatch(line)) // has name
                 {
-                    AddMessages(message, name, name2);
-                    name = null;
-                    name2 = null;
+                    name = line;
+                    AddMessage(message, name);
                     message = "";
-                }
-                else if (nameRegex.IsMatch(line))
-                {
-                    AddMessages(message, name, name2);
-                    message = "";
-                    name = line.Replace(".", "");
-                    if (name.Contains("and"))
-                    {
-                        string[] names = name.Split(" and ");
-                        name = names[0];
-                        name2 = names[1];
-                    }
                 }
                 else if (name != null)
                 {

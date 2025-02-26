@@ -1,5 +1,6 @@
 using UnityEngine.UI;
 using LLMUnity;
+using System.Diagnostics;
 
 namespace LLMUnitySamples
 {
@@ -13,7 +14,8 @@ namespace LLMUnitySamples
             playerText.interactable = false;
             AIText.text = "...";
             (string[] similarPhrases, float[] distances) = await rag.Search(message, 1);
-            string similarPhrase = similarPhrases[0];
+            string similarPhrase = "";
+            if (similarPhrases.Length > 0) { similarPhrase = similarPhrases[0]; }
             if (!ParaphraseWithLLM.isOn)
             {
                 AIText.text = similarPhrase;

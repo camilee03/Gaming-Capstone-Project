@@ -1,4 +1,9 @@
-﻿The properties and their respective identifiers are described below:
+﻿ROOM
+
+The following document describes how to generate a series of rooms, each of which will contain a list of 
+objects whose respetive properties should stay consistent.
+
+The properties and their respective identifiers are described below:
 
     "essential": at least one of these items must be present in the room. 
     "scarce": 0-1 objects can be present in the list.
@@ -7,16 +12,14 @@
     "none": an object does not have any constraints and can be placed in any room.
 
 
-
 Objects and their respective properties and identifiers (Properties are shown as P):
 
     Box (P: none)
     Button (P: none)
     Lever (P: none)
-    Light (P: essential)
+    Light (P: plentiful, essential)
     Table (P: scarce, paired[Chair])
     Chair (P: paired[Table])
-    Door (P: essential)
     BulletinBoard (P: essential, scarce)
     Radio (P: none)
     Terminal (P: essential, scarce)
@@ -37,11 +40,40 @@ Objects and their respective properties and identifiers (Properties are shown as
 The user may ask to create a list. A list is a series of objects that adhere to the above properties and contains no more than 
 20 entries. 
 
-An acceptable list is list L = 
-{ Light, Light, BulletinBoard, Trash, Trash, Trash, Door, Fan, Terminal, Radio, Chair, Chair, Table }
+An acceptable list is as follows:
 
-Another accetable list is list L1 = 
-{ Chair, Table, Vent, Light, BulletinBoard, Chair, Door, Terminal, Door, Chair, Box, Button }
+"objects":
+{ 
+    { "name": "Light", "properties": "plentiful", "essential" }, 
+    { "name": "Light", "properties": "plentiful", "essential" }, 
+    { "name": "BulletinBoard", "properties": "essential", "scarce" },
+    { "name": "Trash", "properties": "plentiful" }
+    { "name": "Trash", "properties": "plentiful" },
+    { "name": "Fan", "properties": "essential" }, 
+    { "name": "Terminal", "properties": "essential", "scarce" }, 
+    { "name": "Radio", "properties": "none" },
+    { "name": "Chair", "properties": "paired[Table]" }, 
+    { "name": "Chair", "properties": "paired[Table]" },
+    { "name": "Table", "properties": "scarce", "paired[Chair]" } 
+}
+
+Another accetable list is as follows:
+
+"objects": 
+{
+    { "name": "Chair", "properties": "paired[Table]" },
+    { "name": "Table", "properties": "scarce", "paired[Chair]" },
+    { "name": "Vent", "properties": "none" }
+    { "name": "Light", "properties": "plentiful", "essential" }, 
+    { "name": "Light", "properties": "plentiful", "essential" }, 
+    { "name": "BulletinBoard", "properties": "essential", "scarce" },
+    { "name": "Chair", "properties": "paired[Table]" },
+    { "name": "Terminal", "properties": "essential", "scarce" }, 
+    { "name": "Chair", "properties": "paired[Table]" },
+    { "name": "Box", "properties": "none" },
+    { "name": "Button", "properties": "none" },
+    { "name": "Light", "properties": "plentiful", "essential" }, 
+}
 
 
 

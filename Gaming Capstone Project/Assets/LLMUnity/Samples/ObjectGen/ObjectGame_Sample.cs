@@ -7,18 +7,18 @@ using UnityEngine.UI;
 using LLMUnity;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using UnityEngine.Windows.Speech;
 
 namespace LLMUnitySamples
 {
     public class ObjectGame_Sample : MonoBehaviour
     {
-        // Variables
         public RAG rag;
         public InputField playerText;
         public Text AIText;
-        public TextAsset ObjectText;
+        public TextAsset HamletText;
         List<string> phrases;
-        string ragPath = "ObjectSample.zip";
+        string ragPath = "RAGSample.zip";
 
         async void Start()
         {
@@ -32,7 +32,11 @@ namespace LLMUnitySamples
 
         public void LoadPhrases()
         {
-            phrases = RAGUtils.ReadGutenbergFile(ObjectText.text)["OBJECTINSTRUCTIONS"];
+            foreach (KeyValuePair<string, List<string>> phrase in RAGUtils.ReadGutenbergFile(HamletText.text))
+            {
+                Debug.Log("HERE" + phrase.Key);
+            }
+            phrases = RAGUtils.ReadGutenbergFile(HamletText.text)["ROOM"];
         }
 
         public async Task CreateEmbeddings()
@@ -40,7 +44,7 @@ namespace LLMUnitySamples
             bool loaded = await rag.Load(ragPath);
             if (!loaded)
             {
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
                 // build the embeddings
                 playerText.text += $"Creating Embeddings (only once)...\n";
                 Stopwatch stopwatch = new Stopwatch();
@@ -50,10 +54,10 @@ namespace LLMUnitySamples
                 Debug.Log($"embedded {rag.Count()} phrases in {stopwatch.Elapsed.TotalMilliseconds / 1000f} secs");
                 // store the embeddings
                 rag.Save(ragPath);
-    #else
+#else
                 // if in play mode throw an error
                 throw new System.Exception("The embeddings could not be found!");
-    #endif
+#endif
             }
         }
 
@@ -62,7 +66,7 @@ namespace LLMUnitySamples
             playerText.interactable = false;
             AIText.text = "...";
             (string[] similarPhrases, float[] distances) = await rag.Search(message, 1);
-            AIText.text = similarPhrases[0];
+            if (similarPhrases != null) { AIText.text = similarPhrases[0]; }
         }
 
         public void SetAIText(string text)
@@ -70,7 +74,6 @@ namespace LLMUnitySamples
             AIText.text = text;
         }
 
-        /// <summary> Resets player text option after call is complete </summary>
         public void AIReplyComplete()
         {
             playerText.interactable = true;
@@ -84,7 +87,6 @@ namespace LLMUnitySamples
             Application.Quit();
         }
 
-        /// <summary> Makes sure LLM is loaded </summary>
         protected void CheckLLM(LLMCaller llmCaller, bool debug)
         {
             if (!llmCaller.remote && llmCaller.llm != null && llmCaller.llm.model == "")
@@ -95,13 +97,11 @@ namespace LLMUnitySamples
             }
         }
 
-        /// <summary> Precursor to CheckLLM </summary>
         protected virtual void CheckLLMs(bool debug)
         {
             CheckLLM(rag.search.llmEmbedder, debug);
         }
 
-        /// <summary> Is called to CheckLLMs after Start </summary>
         bool onValidateWarning = true;
         void OnValidate()
         {
