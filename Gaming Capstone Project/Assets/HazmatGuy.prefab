@@ -400,6 +400,8 @@ MonoBehaviour:
   Anchor: {fileID: 3991990011750316167}
   HorizontalSensitivity: 5
   VerticalSensitivity: 5
+  yaw: 0
+  pitch: -90
   playerController: {fileID: 1469907842913153512}
   canMove: 1
 --- !u!114 &1888980506854677528
@@ -651,14 +653,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8162135321301356539}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 1, z: -0.00000008940697, w: 0}
-  m_LocalPosition: {x: 0, y: 0.97999954, z: -0.66}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalPosition: {x: 0.64, y: 0.64, z: -0.2}
   m_LocalScale: {x: 50.00001, y: 50, z: 50}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 9196418883111517580}
   m_Father: {fileID: 3538499981760847243}
-  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 180}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1 &8223643534273309030
 GameObject:
   m_ObjectHideFlags: 0
