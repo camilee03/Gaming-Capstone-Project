@@ -21,6 +21,8 @@ public class PlayerController : NetworkBehaviour
     private float yaw = 0.0f;
     private float pitch = 0.0f;
 
+    public bool debugOffline = false;
+
     public bool canMove = true;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -35,7 +37,10 @@ public class PlayerController : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-                    if (!IsOwner || !IsSpawned) return;
+        if (!debugOffline)
+        {
+            if (!IsOwner || !IsSpawned) return;
+        }
 
         if (canMove)
         {
@@ -53,7 +58,7 @@ public class PlayerController : NetworkBehaviour
 
             // Move body based on mouse movement
             yaw += HorizontalSensitivity * Input.GetAxis("Mouse X");
-            //pitch -= VerticalSensitivity * Input.GetAxis("Mouse Y");
+            pitch -= VerticalSensitivity * Input.GetAxis("Mouse Y");
 
             gameObject.transform.eulerAngles = new Vector3(0, yaw, 0);
         }

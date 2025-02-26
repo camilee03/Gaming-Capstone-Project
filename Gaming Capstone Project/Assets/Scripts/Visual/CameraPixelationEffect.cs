@@ -9,6 +9,8 @@ public class CameraPixelationEffect : MonoBehaviour
     public float scaling = 6;
     [SerializeField] private RawImage ViewPort;
 
+    public Camera PlayerCam;
+
 
 
     void OnRectTransformDimensionsChange()
@@ -22,13 +24,13 @@ public class CameraPixelationEffect : MonoBehaviour
         if (RenderPixelationEffect)
         {
             PlayerRenderTexture = new RenderTexture((int)(Screen.width / scaling), (int)(Screen.height / scaling), PlayerRenderTexture.depth);
-            Camera.main.targetTexture = PlayerRenderTexture;
+            PlayerCam.targetTexture = PlayerRenderTexture;
             ViewPort.texture = PlayerRenderTexture;
         }
         else
         {
             PlayerRenderTexture = new RenderTexture(Screen.width,Screen.height, PlayerRenderTexture.depth);
-            Camera.main.targetTexture = PlayerRenderTexture;
+           PlayerCam.targetTexture = PlayerRenderTexture;
             ViewPort.texture = PlayerRenderTexture;
         }
     }

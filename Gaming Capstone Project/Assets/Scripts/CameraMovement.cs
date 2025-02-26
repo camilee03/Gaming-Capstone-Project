@@ -7,37 +7,45 @@ public class CameraMovement : NetworkBehaviour
     public float HorizontalSensitivity = 10f;
     public float VerticalSensitivity = 10f;
 
-    public float yaw = 0.0f;
-    public  float pitch = 180.0f; // Initial downward facing angle
+    private float yaw = 180.0f;  // Start looking backwards (0,180,0)
+    private float pitch = 0.0f;  // Start with a neutral pitch
+
     public PlayerController playerController;
     public bool canMove = true;
+    public bool debugOffline = false;
 
-    // Start is called before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+        if (playerController != null)
+        {
+            debugOffline = playerController.debugOffline;
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        if (!IsOwner || !IsSpawned) return;
+        if (!debugOffline && (!IsOwner || !IsSpawned)) return;
+        if (!canMove) return;
 
-        if (canMove)
+        // Get raw mouse input for instant responsiveness
+        float mouseX = Input.GetAxisRaw("Mouse X") * HorizontalSensitivity;
+        float mouseY = Input.GetAxisRaw("Mouse Y") * VerticalSensitivity;
+
+        // Apply rotation
+        yaw += mouseX;
+        pitch -= mouseY;
+
+        // Clamp pitch to prevent unnatural flipping
+        pitch = Mathf.Clamp(pitch, -89f, 89f);
+
+        // Apply rotation to the anchor
+        Anchor.rotation = Quaternion.Euler(pitch, yaw, 0);
+
+        // Keep camera position locked to anchor
+        if (transform.position != Anchor.position)
         {
-            // Sync camera position and rotation with anchor
             transform.position = Anchor.position;
-            transform.rotation = Anchor.rotation;
-
-            // Get mouse input
-            yaw += HorizontalSensitivity * Input.GetAxis("Mouse X");
-            pitch -= VerticalSensitivity * Input.GetAxis("Mouse Y");
-
-            // Clamp pitch to prevent unnatural flipping
-            pitch = Mathf.Clamp(pitch, 90f, 270f);
-
-            // Apply rotation to the anchor
-            Anchor.eulerAngles = new Vector3(pitch, yaw, 180);
         }
     }
 
