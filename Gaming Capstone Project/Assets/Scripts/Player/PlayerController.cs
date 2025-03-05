@@ -1,4 +1,5 @@
 using DG.Tweening;
+using TMPro;
 using Unity.Netcode;
 using UnityEditor.ShaderGraph;
 using UnityEngine;
@@ -27,13 +28,18 @@ public class PlayerController : NetworkBehaviour
     public float maxStamina = 100f;
     public float staminaDrainRate = 10f;
     public float staminaRegenRate = 5f;
-    public float staminaRegenDelay = 2f;        // New: delay time before stamina can begin regenerating
+    public float staminaRegenDelay = 2f;   // Delay time before stamina can begin regenerating
     public StaminaTracker staminaTracker;
 
     [Header("Health and Team Settings")]
     public bool isDopple = false;
+    public TMP_Text TeamDeclaration;
     public bool isDead = false;
     public CanvasGroup DeathScreen;
+    public float AttackDistance = 3f;
+    public float AttackDelay = 20f;        // Cooldown time (in seconds) before you can attack again
+    public Transform shootingPoint;
+    public LayerMask playerLayerMask;
 
     // Private variables
     private float currentStamina;
@@ -46,8 +52,9 @@ public class PlayerController : NetworkBehaviour
     private PlayerInput playerInput;
     private CameraMovement camMovement;
 
-    private float staminaRegenTimer;            // New: tracks the countdown before we can regenerate
-
+    private bool canAttack = true;
+    private float staminaRegenTimer;
+    private float attackTimer;                  // Tracks time left before we can attack again
     public bool isGrounded;
     public bool debugOffline = false;
     public bool canMove = true;
@@ -62,6 +69,12 @@ public class PlayerController : NetworkBehaviour
 
         // Initialize current stamina
         currentStamina = maxStamina;
+
+        if (isDopple)
+        {
+            TeamDeclaration.text = "You are a : Dopple";
+        }
+        else TeamDeclaration.text = "You are a : Scientist";
     }
 
     private void Update()
@@ -72,6 +85,7 @@ public class PlayerController : NetworkBehaviour
             if (!IsOwner || !IsSpawned) return;
         }
 
+        // If we're dead, show death screen, disable movement, then exit
         if (isDead)
         {
             canMove = false;
@@ -80,14 +94,13 @@ public class PlayerController : NetworkBehaviour
                 Debug.Log("dead as hell");
                 DeathScreen.DOFade(1, 3);
             }
-
             return;
         }
-
 
         // Check if on the ground
         isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayer);
 
+        // Handle movement (if allowed)
         if (canMove)
         {
             // Calculate forward/right movement based on camera's transform
@@ -99,17 +112,18 @@ public class PlayerController : NetworkBehaviour
             rgd.linearVelocity += new Vector3(linearVelocity.x, 0f, linearVelocity.z);
 
             // Update animator (walking state)
+
             animator.SetBool("isWalking", Mathf.Abs(x) > 0 || Mathf.Abs(z) > 0);
 
             // Handle rotation with mouse movement
             yaw += HorizontalSensitivity * Input.GetAxis("Mouse X");
             transform.eulerAngles = new Vector3(0f, yaw, 0f);
-            #region sprinting
-            // Sprint stamina handling
+
+            #region Sprinting
             if (isSprinting)
             {
                 currentStamina -= staminaDrainRate * Time.deltaTime;
-
+                animator.speed = 1.25f;
                 // Out of stamina? Stop sprinting
                 if (currentStamina <= 0f)
                 {
@@ -121,6 +135,7 @@ public class PlayerController : NetworkBehaviour
             }
             else
             {
+                animator.speed = 1;
                 // If we're not sprinting, decrement our regeneration timer first
                 if (staminaRegenTimer > 0f)
                 {
@@ -148,6 +163,16 @@ public class PlayerController : NetworkBehaviour
             animator.SetBool("isWalking", false);
         }
 
+        // Handle attack cooldown
+        if (!canAttack)
+        {
+            attackTimer -= Time.deltaTime;
+            if (attackTimer <= 0f)
+            {
+                canAttack = true;
+                attackTimer = 0f;
+            }
+        }
     }
 
     private void FixedUpdate()
@@ -192,9 +217,33 @@ public class PlayerController : NetworkBehaviour
 
     public void Attack(InputAction.CallbackContext context)
     {
-        
-    }
+        // Only proceed if the action was performed (button fully pressed),
+        // the player is a dopple, and we can still attack
+        if (context.performed && isDopple && canAttack)
+        {
+            Debug.Log("Attacking");
+            RaycastHit hit;
+            // Attempt to hit something within AttackDistance
+            if (Physics.Raycast(new Ray(shootingPoint.position,shootingPoint.forward),
+                                out hit, AttackDistance, playerLayerMask))
+            {
+                GameObject hitObject = hit.collider.gameObject;
+                Debug.Log("hit player: " + hitObject.name);
+                // If we hit another player, mark them as dead
+                if (hitObject.GetComponent<PlayerController>() != null)
+                {
+                    if (!hitObject.GetComponent<PlayerController>().isDopple)
+                    {
+                        hitObject.GetComponent<PlayerController>().isDead = true;
+                    }
+                }
+            }
 
+            // Begin our attack cooldown
+            canAttack = false;
+            attackTimer = AttackDelay;
+        }
+    }
 
     // Helper method to cleanly stop sprinting logic
     private void StopSprinting()
