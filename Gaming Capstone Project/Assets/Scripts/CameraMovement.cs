@@ -1,39 +1,52 @@
-using System.Globalization;
 using Unity.Netcode;
 using UnityEngine;
 
 public class CameraMovement : NetworkBehaviour
 {
     public Transform Anchor;
-    public float HorizontalSensitivity = 10;
-    public float VerticalSensitivity = 10;
+    public float HorizontalSensitivity = 10f;
+    public float VerticalSensitivity = 10f;
 
-    private float yaw = 0.0f;
-    private float pitch = -90.0f;
+    private float yaw = 180.0f;  // Start looking backwards (0,180,0)
+    private float pitch = 0.0f;  // Start with a neutral pitch
+
     public PlayerController playerController;
     public bool canMove = true;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public bool debugOffline = false;
+
+    private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
-        //player = GameObject.Find("Player");
+        if (playerController != null)
+        {
+            debugOffline = playerController.debugOffline;
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        if (!IsOwner || !IsSpawned) return;
+        if (!debugOffline && (!IsOwner || !IsSpawned)) return;
+        if (!canMove) return;
 
-        if (canMove)
+        // Get raw mouse input for instant responsiveness
+        float mouseX = Input.GetAxisRaw("Mouse X") * HorizontalSensitivity;
+        float mouseY = Input.GetAxisRaw("Mouse Y") * VerticalSensitivity;
+
+        // Apply rotation
+        yaw += mouseX;
+        pitch -= mouseY;
+
+        // Clamp pitch to prevent unnatural flipping
+        pitch = Mathf.Clamp(pitch, -89f, 89f);
+
+        // Apply rotation to the anchor
+        Anchor.rotation = Quaternion.Euler(pitch, yaw, 0);
+
+        // Keep camera position locked to anchor
+        if (transform.position != Anchor.position)
         {
-            gameObject.transform.position = Anchor.transform.position;
-            gameObject.transform.rotation = Anchor.transform.rotation;
-            yaw += HorizontalSensitivity * Input.GetAxis("Mouse X");
-            pitch -= VerticalSensitivity * Input.GetAxis("Mouse Y");
-
-            Anchor.transform.eulerAngles = new Vector3(pitch, yaw, 180);
+            transform.position = Anchor.position;
         }
-        
     }
 
     public void SetPlayerController(PlayerController controller)
