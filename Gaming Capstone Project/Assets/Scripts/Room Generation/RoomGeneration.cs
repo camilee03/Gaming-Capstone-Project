@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.InputSystem.XR;
@@ -18,6 +19,7 @@ public class RoomGeneration : MonoBehaviour
     bool[,] outline;
     char[,] room;
     List<Vector2> finalRoomTiles;
+    List<int> finishedRooms = new(); // holds rooms that have been paired
 
     public List<(char[,] room, List<Vector2> finalRoomTiles, GameObject roomParent)> roomsInfo;
     public bool finishedProcedure;
@@ -323,155 +325,197 @@ public class RoomGeneration : MonoBehaviour
     /// <summary> Use the room procedure to create multiple rooms </summary>
     void GenerateMultipleRooms()
     {
-        roomsInfo = new List<(char[,] room, List<Vector2> finalRoomTiles, GameObject roomParent)>();
+        roomsInfo = new();
         ClearMap(); // only neccessary if regenerating the entire map
 
-        int numRooms = 4;
+        int numPlayers = 2;
+        int numRooms = (int)Mathf.Pow(2, numPlayers);
         GameObject[] rooms = new GameObject[numRooms];
 
-        doorAndRoom = new();
+
+        // -- Maybe try to take out this section at some point? --//
+
+        doorAndRoom = new(); // set by replacewallwithdoor
 
         for (int i = 0; i < numRooms; i++) // spawn in each room and set doors
         {
             rooms[i] = RoomProcedure(i);
-            ReplaceWallWithDoor(1, rooms[i].transform.GetChild(0).gameObject, rooms[i], roomsInfo[i].room);
+            ReplaceWallWithDoor(rooms[i].transform.GetChild(0).gameObject, rooms[i]);
         }
 
-        if (numRooms > 1) { MoveAndPairDoors(numRooms); }
+        rooms = PairRooms();
+        numRooms /= 2;
+
+        //-- end --//
+
+
+        while (numRooms > 1)
+        {
+            doorAndRoom = new();
+            for (int i = 0; i < numRooms; i++)
+            {
+                // choose a room from paired rooms to add a door to
+                GameObject chosenRoom = GetRootChild(rooms[i], "WallParent");
+
+                ReplaceWallWithDoor(chosenRoom.transform.GetChild(0).gameObject, rooms[i]);
+            }
+
+            rooms = PairRooms();
+            numRooms /= 2;
+        }
 
         finishedProcedure = true;
     }
 
-    /// <summary> Chooses random walls to replace with a door </summary>
-    void ReplaceWallWithDoor(int numDoors, GameObject wallParent, GameObject room, char[,] roomTiles)
+    GameObject GetRootChild(GameObject parent, string name)
     {
-        for (int i = 0; i < numDoors; i++)
-        {
-            int index = Random.Range(0, wallParent.transform.childCount - 1); // find random wall
-
-            // set door rotation as same as wall
-            Transform wallTransform = wallParent.transform.GetChild(index);
-            Vector3 wallPosition = wallTransform.position;
-            Quaternion wallRotation = wallTransform.rotation;
-
-            string name = wallParent.transform.GetChild(index).gameObject.name;
-            char lastChar = name[name.Length - 1];
-            int direction = (int) char.GetNumericValue(lastChar);
-
-            // replace wall with door
-            Destroy(wallParent.transform.GetChild(index).gameObject);
-            GameObject tempObject = GameObject.Instantiate(doors, wallPosition, wallRotation, wallParent.transform);
-
-            doorAndRoom.Add((tempObject, direction, room));
+        if (parent.transform.GetChild(0).name == name) { return parent; }
+        else {
+            int chooseRoom = Random.Range(0, parent.transform.childCount - 1);
+            return GetRootChild(parent.transform.GetChild(chooseRoom).gameObject, name); 
         }
     }
 
-    /// <summary> Take spawned rooms and doors and connect together </summary>
-    void MoveAndPairDoors(int numRooms)
+    /// <summary> Chooses random walls to replace with a door </summary>
+    void ReplaceWallWithDoor(GameObject wallParent, GameObject room)
     {
-        // Ok so I'm thinking this is the first iteration with only one set of doors. Then run 
-        // replacewallwithdoors again and connect doors based on where the rooms' positions are
+        int index = Random.Range(0, wallParent.transform.childCount - 1); // find random wall
 
-        // 0 = left, 1 = up, 2 = right, 3 = down
+        // set door rotation as same as wall
+        Transform wallTransform = wallParent.transform.GetChild(index);
+        Vector3 wallPosition = wallTransform.position;
+        Quaternion wallRotation = wallTransform.rotation;
 
-        float roomDistance = 4 * scale;
-        bool perfectlyAligned;
+        string name = wallParent.transform.GetChild(index).gameObject.name;
+        char lastChar = name[name.Length - 1];
+        int direction = (int)char.GetNumericValue(lastChar);
 
-        bool[,] pairedRooms = new bool[doorAndRoom.Count,doorAndRoom.Count];
-        List<int> finishedRooms = new List<int>();
+        // replace wall with door
+        Destroy(wallParent.transform.GetChild(index).gameObject);
+        GameObject tempObject = GameObject.Instantiate(doors, wallPosition, wallRotation, wallParent.transform);
+
+        doorAndRoom.Add((tempObject, direction, room));
+    }
+
+    /// <summary> Take spawned rooms and doors, connect together, and return the list of paired rooms </summary>
+    GameObject[] PairRooms()
+    {
+        int numRooms = doorAndRoom.Count;
+        int roomIndex = 0;
+        GameObject[] newRooms = new GameObject[numRooms]; // stores generated parent rooms
+        finishedRooms = new(); // stores indices of finished rooms
 
         for (int i = 0; i < numRooms; i++) 
         {
-            perfectlyAligned = false;
-
-            if (finishedRooms.Contains(i)) { break; }
+            if (finishedRooms.Contains(i)) { continue; }
 
             (GameObject door, int pos, GameObject room) dar1 = doorAndRoom[i]; // new door to pair
-            (GameObject door, int pos, GameObject room) dar2 = new();
 
-            for (int ii = i; ii < doorAndRoom.Count; ii++)
+            // try to pair doors
+            GameObject newRoomParent = PairDoors(i, dar1);
+
+            if (newRoomParent != null)
             {
-                if (finishedRooms.Contains(ii)) { break; }
-
-                dar2 = doorAndRoom[ii]; // new door to pair
-
-                if (dar1.pos != dar2.pos)
-                {
-                    LinkDoors(dar1, dar2, roomDistance);
-
-                    perfectlyAligned = true;
-                    finishedRooms.Add(i);
-                    finishedRooms.Add(ii);
-                    pairedRooms[i, ii] = true;
-                    break;
-                }
+                newRooms[roomIndex] = newRoomParent; 
+                roomIndex++;
             }
-
-            if (!perfectlyAligned)
+            else
             {
-                Debug.Log("Rotating room");
                 // rerotate dar to attempt to fit
-                if (dar1.pos > 3) { dar1.pos -= 2; }
-                else { dar1.pos += 2; }
+                Debug.Log("Rotating room");
 
+                if (dar1.pos > 1) { dar1.pos -= 2; }
+                else { dar1.pos += 2; }
                 dar1.room.transform.Rotate(new Vector3(0, 180, 0));
 
-                // rerun program
-                for (int ii = i; ii < doorAndRoom.Count; ii++)
+                // try to pair doors again
+                newRoomParent = PairDoors(i, dar1);
+                if (newRoomParent != null) 
                 {
-                    if (finishedRooms.Contains(ii)) { break; }
-
-                    dar2 = doorAndRoom[ii]; // new door to pair
-
-                    if (dar1.pos != dar2.pos)
-                    {
-                        LinkDoors(dar1, dar2, roomDistance);
-
-                        perfectlyAligned = true;
-
-                        finishedRooms.Add(i);
-                        finishedRooms.Add(ii);
-                        pairedRooms[i, ii] = true;
-                        break;
-                    }
+                    newRooms[roomIndex] = newRoomParent; 
+                    roomIndex++;
                 }
+                else { Debug.Log("ERROR: no combination found"); }
             }
         }
+
+        return newRooms;
     }
     
-    /// <summary> Take two doors and tie them together </summary>
-    void LinkDoors((GameObject door, int pos, GameObject room) dar1, (GameObject door, int pos, GameObject room) dar2, float roomDistance)
+    /// <summary> Assigns old rooms and hallway to new room and returns new room </summary>
+    GameObject PairDoors(int i, (GameObject door, int pos, GameObject room) dar1)
     {
-        Vector3[] directions = { Vector3.left, Vector3.forward, Vector3.right, Vector3.back };
+        float roomDistance = 2 * scale;
+        GameObject newRoomParent = null;
+        (GameObject door, int pos, GameObject room) dar2 = new();
 
-        Debug.Log(dar1.pos + " -- " + dar2.pos);
+        for (int ii = i; ii < doorAndRoom.Count; ii++)
+        {
+            if (finishedRooms.Contains(ii)) { continue; }
+
+            dar2 = doorAndRoom[ii]; // new door to pair
+            if (dar1.room.name.Contains(dar2.room.name.Remove(0,4)) || dar2.room.name.Contains(dar1.room.name.Remove(0,4))) { continue; }
+
+            if (dar1.pos != dar2.pos) // if the doors face different directions
+            {
+                // Create a hallway
+                GameObject newHallway = LinkDoors(dar1, dar2, roomDistance);
+
+                // add paired rooms to finished
+                finishedRooms.Add(i); finishedRooms.Add(ii);
+
+                // change room parent to new gameobject
+                newRoomParent = new GameObject("Room" + dar1.room.name.Remove(0,4) + dar2.room.name.Remove(0,4));
+                dar1.room.transform.parent = newRoomParent.transform;
+                dar2.room.transform.parent = newRoomParent.transform;
+                newHallway.transform.parent = newRoomParent.transform;
+
+                break;
+            }
+        }
+
+        return newRoomParent;
+    }
+
+    /// <summary> Take two doors and tie them together </summary>
+    GameObject LinkDoors((GameObject door, int pos, GameObject room) dar1, (GameObject door, int pos, GameObject room) dar2, float roomDistance)
+    {
+        Vector3[] directions = { Vector3.left, Vector3.back, Vector3.right, Vector3.forward };
 
         Vector3 tile1 = dar1.door.transform.position + directions[dar1.pos] * scale/2;
         Vector3 tile2 = dar2.door.transform.position + directions[dar2.pos] * scale/2;
 
         Vector3 doorDisplacement = tile1 - tile2; // start at same place
-        Debug.Log("Door displacement before:" + doorDisplacement);
 
-        doorDisplacement += roomDistance * directions[dar1.pos];
-        if (dar1.pos + 2 != dar2.pos || dar1.pos - 2 != dar2.pos)
-        {
-            doorDisplacement += roomDistance * directions[dar2.pos];
-        }
-
-        Debug.Log("Door displacement after:" + doorDisplacement);
 
         // move room based on door displacement
+        doorDisplacement += roomDistance * directions[dar1.pos];
+        if (dar1.pos + 2 != dar2.pos && dar1.pos - 2 != dar2.pos)
+        {
+            doorDisplacement -= roomDistance * directions[dar2.pos];
+        }
         dar2.room.transform.Translate(doorDisplacement);
-        //dar2.door.transform.Translate(doorDisplacement);
 
-        Debug.Log("Dir: " + dar1.pos + " Pos: " + dar1.door.transform.position);
-        Debug.Log("Dir: " + dar2.pos + " Pos: " + dar2.door.transform.position);
+        // move again if too close
+        int debugInt = 0;
+        while (CheckForCollisions(dar2.room) && debugInt < 100)
+        {
+            dar2.room.transform.Translate(doorDisplacement/2);
+            Debug.Log(debugInt);
+            debugInt++;
+        }
 
-        tile1 = dar1.door.transform.position - directions[dar1.pos] * scale / 2;
-        tile2 = dar2.door.transform.position - directions[dar2.pos] * scale / 2;
+        //Debug.Log("Dir: " + dar1.pos + " Pos: " + dar1.door.transform.position);
+        //Debug.Log("Dir: " + dar2.pos + " Pos: " + dar2.door.transform.position);
+
+        // recheck tile positions
+        tile1 = dar1.door.transform.position + directions[dar1.pos] * scale / 2; // different from first?
+        tile2 = dar2.door.transform.position + directions[dar2.pos] * scale / 2;
 
         // Create a path in between doors
-        List<Vector3> hallwayPath = GeneralFunctions.FindShortestPath(tile1, tile2, scale);
+        List<Vector3> hallwayPath = GeneralFunctions.FindShortestPathExcludingCollisions(tile1, tile2, scale);
+        hallwayPath.Insert(0, tile1); hallwayPath.Insert(hallwayPath.Count - 1, tile2);
+
         GameObject hallwayParent = new GameObject("Hallway");
         Vector3 prevPos = dar1.door.transform.position;
         for (int i=0; i < hallwayPath.Count-1; i++)
@@ -480,6 +524,38 @@ public class RoomGeneration : MonoBehaviour
             DrawWallsAroundDoors(prevPos, hallwayPath[i], hallwayPath[i + 1], hallwayParent);
             prevPos = hallwayPath[i];
         }
+
+        return hallwayParent;
+    }
+
+    bool CheckForCollisions(GameObject room)
+    {
+        bool hasCollided = false;
+
+        // Iterate through trying to find a collision
+        if (room.transform.GetChild(1).name == "TileParent")
+        {
+            Transform tiles = room.transform.GetChild(1);
+
+            int childNum = tiles.childCount;
+
+            for (int i = 0; i < childNum; i++)
+            {
+                Collider[] collisions = Physics.OverlapBox(tiles.GetChild(i).position, Vector3.one * size);
+                if (collisions.Length > 0) { Debug.Log(tiles.GetChild(i).name + " hit something"); return true; }
+            }
+        }
+        // Go to next child to find collision
+        else
+        {
+            for (int i = 0; i < room.transform.childCount-1; i++)
+            {
+                hasCollided = hasCollided || CheckForCollisions(room.transform.GetChild(i).gameObject);
+            }
+        }
+
+        if (hasCollided) { Debug.Log("should have hit something"); }
+        return hasCollided;
     }
     
     /// <summary> Outlines a hallway with walls </summary>

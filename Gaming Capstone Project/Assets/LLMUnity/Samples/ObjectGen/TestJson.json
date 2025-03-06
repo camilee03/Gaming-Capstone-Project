@@ -1,0 +1,152 @@
+{
+  "objects": [
+    {
+      "name": "BulletinBoard",
+      "properties": [ "essential", "scarce" ]
+    },
+    {
+      "name": "Button",
+      "properties": [ "none" ]
+    },
+    {
+      "name": "Box",
+      "properties": [ "none" ]
+    },
+    {
+      "name": "Cabinet",
+      "properties": [ "paired[Food]" ]
+    },
+    {
+      "name": "Chair",
+      "properties": [ "paired[Table]" ]
+    },
+    {
+      "name": "Clothes",
+      "properties": [ "plentiful" ]
+    },
+    {
+      "name": "Coal",
+      "properties": [ "paired[Furnace]", "plentiful" ]
+    },
+    {
+      "name": "Fan",
+      "properties": [ "essential" ]
+    },
+    {
+      "name": "Food",
+      "properties": [ "paired[Table]" ]
+    },
+    {
+      "name": "Furnace",
+      "properties": [ "paired[Coal]", "scarce" ]
+    },
+    {
+      "name": "EnergyCore",
+      "properties": [ "paired[Button]", "scarce" ]
+    },
+    {
+      "name": "Lever",
+      "properties": [ "none" ]
+    },
+    {
+      "name": "Light",
+      "properties": [ "plentiful", "essential" ]
+    },
+    {
+      "name": "Table",
+      "properties": [ "scarce", "paired[Chair]" ]
+    },
+    {
+      "name": "Trash",
+      "properties": [ "plentiful" ]
+    },
+    {
+      "name": "Terminal",
+      "properties": [ "essential", "scarce" ]
+    },
+    {
+      "name": "Radio",
+      "properties": [ "none" ]
+    }
+  ],
+  "rooms": [
+    "Command Center",
+    "Communication Room",
+    "Operations Room",
+    "Briefing Room",
+    "War Room",
+    "Control Room",
+    "Surveillance Room",
+    "Intelligence Room",
+    "Strategy",
+    "Room",
+    "Map",
+    "Room",
+    "Situation",
+    "Room",
+    "Planning",
+    "Room",
+    "Conference",
+    "Room",
+    "Security",
+    "Room",
+    "Armory",
+    "Weapons",
+    "Storage",
+    "Ammunition",
+    "Depot",
+    "Equipment",
+    "Room",
+    "Supply",
+    "Room",
+    "Medical",
+    "Bay",
+    "Infirmary",
+    "Quarantine",
+    "Room",
+    "Laboratory",
+    "Research",
+    "Room",
+    "Engineering",
+    "Room",
+    "Maintenance",
+    "Room",
+    "Workshop",
+    "Power",
+    "Room",
+    "Generator",
+    "Room",
+    "Fuel",
+    "Storage",
+    "Water",
+    "Treatment",
+    "Room",
+    "Food",
+    "Storage",
+    "Kitchen",
+    "Dining",
+    "Hall",
+    "Living",
+    "Quarters",
+    "Sleeping",
+    "Quarters",
+    "Officer's Quarters",
+    "Barracks",
+    "Recreation Room",
+    "Gym",
+    "Training Room",
+    "Library",
+    "Archive Room",
+    "Storage Room",
+    "Laundry Room",
+    "Shower",
+    "Room",
+    "Restroom",
+    "Escape",
+    "Tunnel",
+    "Air",
+    "Filtration",
+    "Room",
+    "Decontamination Room"
+  ]
+}
