@@ -8,6 +8,7 @@ TagManager:
   - DOS Terminal
   - Selectable
   - Room
+  - Tile
   layers:
   - Default
   - TransparentFX

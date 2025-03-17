@@ -525,7 +525,6 @@ GameObject:
   - component: {fileID: 560831489}
   - component: {fileID: 560831491}
   - component: {fileID: 560831493}
-  - component: {fileID: 560831494}
   m_Layer: 0
   m_Name: RAG
   m_TagString: Untagged
@@ -547,8 +546,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   searchType: 1
   search: {fileID: 560831493}
-  chunkingType: 1
-  chunking: {fileID: 560831494}
+  chunkingType: 0
+  chunking: {fileID: 0}
 --- !u!114 &560831491
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -596,19 +595,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   llmEmbedder: {fileID: 560831491}
---- !u!114 &560831494
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 560831488}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 783ce7a7cb52dc89eb18ad9d345ce68d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  numTokens: 10
 --- !u!1 &680371219
 GameObject:
   m_ObjectHideFlags: 0
@@ -885,8 +871,8 @@ MonoBehaviour:
   slot: -1
   grammar: jsonRoom.gbnf
   cachePrompt: 1
-  seed: 0
-  temperature: 0.2
+  seed: -1
+  temperature: 0.1
   topK: 40
   topP: 0.9
   minP: 0.05
@@ -911,70 +897,95 @@ MonoBehaviour:
   prompt: "Instructions:\r\n    - You will receive a list of objects and their properties.
     Based on the properties, generate a list of objects for a specific room.\r\n   
     - Select objects only from the provided object list\r\n    - Select room names
-    only from the provided room list\r\n\r\nProperty Definitions:\r\n    - Essential:
-    Must be included in the final list.\r\n    - Scarce: Only zero or one of these
-    objects can be included.\r\n    - Plentiful: If included, at least one more of
-    this type must be included.\r\n    - Paired: If included, the object in brackets
-    must also be included.\r\n    - None: Can be placed without constraints.\r\n\r\nOutput
-    Format: \r\n    - Create a list of 5-20 objects. Each list will be considered
-    a \"room.\"\r\n\r\nExamples:\r\n\r\nRoom: Command Center\r\n\r\njson\r\n{\r\n   
-    \"room\": \"Command Center\",\r\n    \"objects\": [\r\n        {\"object\": \"Light\",
-    \"properties\": [\"plentiful\", \"essential\"]},\r\n        {\"object\": \"Light\",
-    \"properties\": [\"plentiful\", \"essential\"]},\r\n        {\"object\": \"BulletinBoard\",
-    \"properties\": [\"essential\", \"scarce\"]},\r\n        {\"object\": \"Trash\",
-    \"properties\": [\"plentiful\"]},\r\n        {\"object\": \"Trash\", \"properties\":
-    [\"plentiful\"]},\r\n        {\"object\": \"Fan\", \"properties\": [\"essential\"]},\r\n       
-    {\"object\": \"Terminal\", \"properties\": [\"essential\", \"scarce\"]},\r\n       
-    {\"object\": \"Radio\", \"properties\": [\"none\"]},\r\n        {\"object\":
-    \"Chair\", \"properties\": [\"paired[Table]\"]},\r\n        {\"object\": \"Chair\",
-    \"properties\": [\"paired[Table]\"]},\r\n        {\"object\": \"Table\", \"properties\":
-    [\"scarce\", \"paired[Chair]\"]}\r\n    ]\r\n}\r\n\r\nRoom: Storage\r\n\r\njson\r\n{\r\n   
-    \"room\": \"Storage\",\r\n    \"objects\": [\r\n        {\"object\": \"Chair\",
-    \"properties\": [\"paired[Table]\"]},\r\n        {\"object\": \"Table\", \"properties\":
-    [\"scarce\", \"paired[Chair]\"]},\r\n        {\"object\": \"Vent\", \"properties\":
-    [\"none\"]},\r\n        {\"object\": \"Light\", \"properties\": [\"plentiful\",
-    \"essential\"]},\r\n        {\"object\": \"Light\", \"properties\": [\"plentiful\",
-    \"essential\"]},\r\n        {\"object\": \"BulletinBoard\", \"properties\": [\"essential\",
-    \"scarce\"]},\r\n        {\"object\": \"Chair\", \"properties\": [\"paired[Table]\"]},\r\n       
-    {\"object\": \"Terminal\", \"properties\": [\"essential\", \"scarce\"]},\r\n       
-    {\"object\": \"Chair\", \"properties\": [\"paired[Table]\"]},\r\n        {\"object\":
-    \"Box\", \"properties\": [\"none\"]},\r\n        {\"object\": \"Button\", \"properties\":
-    [\"none\"]},\r\n        {\"object\": \"Light\", \"properties\": [\"plentiful\",
-    \"essential\"]}\r\n    ]\r\n}\r\n\r\nNaming the Rooms: Each room's name should
-    reflect the objects present. For instance:\r\n    - A room with food, a table,
-    and some chairs could be a Dining Room.\r\n    - A room with an energy core,
-    coal, and a furnace might be a Power Room\r\n"
+    only from the provided room list\r\n    - Only return the json file as your answer\r\n\r\nProperty
+    Definitions:\r\n    - Essential: Must be included in the final list.\r\n    -
+    Scarce: Only zero or one of these objects can be included.\r\n    - Plentiful:
+    If included, at least one more of this type must be included.\r\n    - Paired:
+    If included, the object in brackets must also be included.\r\n    - None: Can
+    be placed without constraints.\r\n\r\nOutput Format: \r\n    - Create a list
+    of 5-20 objects. Each list will be considered a \"room.\"\r\n\r\nExamples:\r\n\r\nRoom:
+    Command Center\r\n\r\njson\r\n{\r\n    \"roomName\": \"Command Center\",\r\n   
+    \"objects\": [\r\n        {\"objectName\": \"Light\", \"properties\": [\"plentiful\",
+    \"essential\"]},\r\n        {\"objectName\": \"Light\", \"properties\": [\"plentiful\",
+    \"essential\"]},\r\n        {\"objectName\": \"BulletinBoard\", \"properties\":
+    [\"essential\", \"scarce\"]},\r\n        {\"objectName\": \"Trash\", \"properties\":
+    [\"plentiful\"]},\r\n        {\"objectName\": \"Trash\", \"properties\": [\"plentiful\"]},\r\n       
+    {\"objectName\": \"Fan\", \"properties\": [\"essential\"]},\r\n        {\"objectName\":
+    \"Terminal\", \"properties\": [\"essential\", \"scarce\"]},\r\n        {\"objectName\":
+    \"Radio\", \"properties\": [\"none\"]},\r\n        {\"objectName\": \"Chair\",
+    \"properties\": [\"paired[Table]\"]},\r\n        {\"objectName\": \"Chair\",
+    \"properties\": [\"paired[Table]\"]},\r\n        {\"objectName\": \"Table\",
+    \"properties\": [\"scarce\", \"paired[Chair]\"]}\r\n    ]\r\n}\r\n\r\nRoom: Storage\r\n\r\njson\r\n{\r\n   
+    \"roomName\": \"Storage\",\r\n    \"objects\": [\r\n        {\"objectName\":
+    \"Chair\", \"properties\": [\"paired[Table]\"]},\r\n        {\"objectName\":
+    \"Table\", \"properties\": [\"scarce\", \"paired[Chair]\"]},\r\n        {\"objectName\":
+    \"Vent\", \"properties\": [\"none\"]},\r\n        {\"objectName\": \"Light\",
+    \"properties\": [\"plentiful\", \"essential\"]},\r\n        {\"objectName\":
+    \"Light\", \"properties\": [\"plentiful\", \"essential\"]},\r\n        {\"objectName\":
+    \"BulletinBoard\", \"properties\": [\"essential\", \"scarce\"]},\r\n        {\"objectName\":
+    \"Chair\", \"properties\": [\"paired[Table]\"]},\r\n        {\"objectName\":
+    \"Terminal\", \"properties\": [\"essential\", \"scarce\"]},\r\n        {\"objectName\":
+    \"Chair\", \"properties\": [\"paired[Table]\"]},\r\n        {\"objectName\":
+    \"Box\", \"properties\": [\"none\"]},\r\n        {\"objectName\": \"Button\",
+    \"properties\": [\"none\"]},\r\n        {\"objectName\": \"Light\", \"properties\":
+    [\"plentiful\", \"essential\"]}\r\n    ]\r\n}\r\n\r\nNaming the Rooms: Each room's
+    name should reflect the objects present. For instance:\r\n    - Dining Room:
+    A room with food, a table, and 2 chairs.\r\n    - Power Room: A room with an
+    energy core, coal, and a furnace."
   setNKeepToPrompt: 1
   chat: []
   grammarString: 'root ::= Room
 
-    Object ::= "{"   ws   "\"object\":"   ws   string  
-    ","   ws   "\"properties\":"   ws   stringlist   "}"
+    RoomName ::= "\"Command Center\"" | "\"Communication
+    Room\"" | "\"Operations Room\"" | "\"Briefing Room\"" | "\"War Room\"" | "\"Control
+    Room\"" | "\"Surveillance Room\"" | "\"Intelligence Room\"" | "\"Strategy Room\""
+    | "\"Map Room\"" | "\"Situation Room\"" | "\"Planning Room\"" | "\"Conference
+    Room\"" | "\"Security Room\"" | "\"Armory\"" | "\"Weapons\"" | "\"Storage\""
+    | "\"Ammunition\"" | "\"Depot\"" | "\"Equipment Room\"" | "\"Supply Room\"" |
+    "\"Medical Bay\"" | "\"Infirmary\"" | "\"Quarantine Room\"" | "\"Laboratory\""
+    | "\"Research Room\"" | "\"Engineering Room\"" | "\"Maintenance Room\"" | "\"Workshop\""
+    | "\"Power Room\"" | "\"Generator Room\"" | "\"Fuel Storage\"" | "\"Water Treatment
+    Room\"" | "\"Food Storage\"" | "\"Kitchen\"" | "\"Dining Hall\"" | "\"Living
+    Quarters\"" | "\"Sleeping Quarters\"" | "\"Officer''s Quarters\"" | "\"Barracks\""
+    | "\"Recreation Room\"" | "\"Gym\"" | "\"Training Room\"" | "\"Library\"" | "\"Archive
+    Room\"" | "\"Storage Room\"" | "\"Laundry Room\"" | "\"Shower Room\"" | "\"Restroom\""
+    | "\"Escape Tunnel\"" | "\"Air Filtration Room\"" | "\"Decontamination Room\""
 
-    Objectlist ::= "[]"
-    | "["   ws   Object   (","   ws   Object)*   "]"
+    Properties
+    ::= "''Scarce''" | "''Plentiful''" | "''Essential''" | "''None''"
 
-    Room ::= "{"   ws   "\"room\":"  
-    ws   string   ","   ws   "\"objects\":"   ws   Objectlist   "}"
+    ObjectName
+    ::= "''BulletinBoard''" | "''Button''" | "''Box''" | "\"Cabinet\"" | "\"Chair\""
+    | "\"Clothes\"" | "\"Coal\"" | "\"Fan\"" | "\"Food\"" | "\"Furnace\"" | "\"EnergyCore\""
+    | "\"Lever\"" | "\"Light\"" | "\"Table\"" | "\"Trash\"" | "\"Terminal\"" | "\"Radio\""
 
-    Roomlist
-    ::= "[]" | "["   ws   Room   (","   ws   Room)*   "]"
+    Object
+    ::= "{"   ws   "\"objectName\":"   ws   ObjectName   ","   ws   "\"properties\":"  
+    ws   Propertieslist   "}"
 
-    string ::= "\""  
-    ([^"]*)   "\""
+    Objectlist ::= "[]" | "["   ws   Object   (","  
+    ws   Object)*   "]"
 
-    boolean ::= "true" | "false"
+    Room ::= "{"   ws   "\"roomName\":"   ws   RoomName  
+    ","   ws   "\"objects\":"   ws   Objectlist   "}"
+
+    Roomlist ::= "[]" | "["  
+    ws   Room   (","   ws   Room)*   "]"
+
+    string ::= "\""   ([^"]*)   "\""
+
+    boolean
+    ::= "true" | "false"
 
     ws ::= [ \t\n]*
 
-    number
-    ::= [0-9]+   "."?   [0-9]*
+    number ::= [0-9]+   "."?   [0-9]*
 
-    stringlist ::= "["   ws   "]" | "["   ws   string  
-    (","   ws   string)*   ws   "]"
+    stringlist
+    ::= "["   ws   "]" | "["   ws   string   (","   ws   string)*   ws   "]"
 
-    numberlist ::= "["   ws   "]" | "["   ws  
-    string   (","   ws   number)*   ws   "]"
+    numberlist
+    ::= "["   ws   "]" | "["   ws   string   (","   ws   number)*   ws   "]"
 
 '
 --- !u!4 &813859531

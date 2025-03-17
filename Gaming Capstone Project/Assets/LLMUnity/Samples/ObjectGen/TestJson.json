@@ -67,6 +67,11 @@
     {
       "name": "Radio",
       "properties": [ "none" ]
+    },
+
+    {
+      "name": "Vent",
+      "properties": [ "none" ]
     }
   ],
   "rooms": [

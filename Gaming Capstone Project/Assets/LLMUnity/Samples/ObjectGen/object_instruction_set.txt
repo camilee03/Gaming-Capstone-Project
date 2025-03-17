@@ -2,13 +2,14 @@
     - You will receive a list of objects and their properties. Based on the properties, generate a list of objects for a specific room.
     - Select objects only from the provided object list
     - Select room names only from the provided room list
+    - Only return the json file as your answer
 
 Property Definitions:
     - Essential: Must be included in the final list.
     - Scarce: Only zero or one of these objects can be included.
     - Plentiful: If included, at least one more of this type must be included.
     - Paired: If included, the object in brackets must also be included.
-    - None: Can be placed without constraints.
+    - None: Has no other properties
 
 Output Format: 
     - Create a list of 5-20 objects. Each list will be considered a "room."
@@ -19,19 +20,19 @@ Room: Command Center
 
 json
 {
-    "room": "Command Center",
+    "roomName": "Command Center",
     "objects": [
-        {"object": "Light", "properties": ["plentiful", "essential"]},
-        {"object": "Light", "properties": ["plentiful", "essential"]},
-        {"object": "BulletinBoard", "properties": ["essential", "scarce"]},
-        {"object": "Trash", "properties": ["plentiful"]},
-        {"object": "Trash", "properties": ["plentiful"]},
-        {"object": "Fan", "properties": ["essential"]},
-        {"object": "Terminal", "properties": ["essential", "scarce"]},
-        {"object": "Radio", "properties": ["none"]},
-        {"object": "Chair", "properties": ["paired[Table]"]},
-        {"object": "Chair", "properties": ["paired[Table]"]},
-        {"object": "Table", "properties": ["scarce", "paired[Chair]"]}
+        {"objectName": "Light", "properties": ["plentiful", "essential"]},
+        {"objectName": "Light", "properties": ["plentiful", "essential"]},
+        {"objectName": "BulletinBoard", "properties": ["essential", "scarce"]},
+        {"objectName": "Trash", "properties": ["plentiful"]},
+        {"objectName": "Trash", "properties": ["plentiful"]},
+        {"objectName": "Fan", "properties": ["essential"]},
+        {"objectName": "Terminal", "properties": ["essential", "scarce"]},
+        {"objectName": "Radio", "properties": ["none"]},
+        {"objectName": "Chair", "properties": ["paired[Table]"]},
+        {"objectName": "Chair", "properties": ["paired[Table]"]},
+        {"objectName": "Table", "properties": ["scarce", "paired[Chair]"]}
     ]
 }
 
@@ -39,26 +40,26 @@ Room: Storage
 
 json
 {
-    "room": "Storage",
+    "roomName": "Storage",
     "objects": [
-        {"object": "Chair", "properties": ["paired[Table]"]},
-        {"object": "Table", "properties": ["scarce", "paired[Chair]"]},
-        {"object": "Vent", "properties": ["none"]},
-        {"object": "Light", "properties": ["plentiful", "essential"]},
-        {"object": "Light", "properties": ["plentiful", "essential"]},
-        {"object": "BulletinBoard", "properties": ["essential", "scarce"]},
-        {"object": "Chair", "properties": ["paired[Table]"]},
-        {"object": "Terminal", "properties": ["essential", "scarce"]},
-        {"object": "Chair", "properties": ["paired[Table]"]},
-        {"object": "Box", "properties": ["none"]},
-        {"object": "Button", "properties": ["none"]},
-        {"object": "Light", "properties": ["plentiful", "essential"]}
+        {"objectName": "Chair", "properties": ["paired[Table]"]},
+        {"objectName": "Table", "properties": ["scarce", "paired[Chair]"]},
+        {"objectName": "Vent", "properties": ["none"]},
+        {"objectName": "Light", "properties": ["plentiful", "essential"]},
+        {"objectName": "Light", "properties": ["plentiful", "essential"]},
+        {"objectName": "BulletinBoard", "properties": ["essential", "scarce"]},
+        {"objectName": "Chair", "properties": ["paired[Table]"]},
+        {"objectName": "Terminal", "properties": ["essential", "scarce"]},
+        {"objectName": "Chair", "properties": ["paired[Table]"]},
+        {"objectName": "Box", "properties": ["none"]},
+        {"objectName": "Button", "properties": ["none"]},
+        {"objectName": "Light", "properties": ["plentiful", "essential"]}
     ]
 }
 
 Naming the Rooms: Each room's name should reflect the objects present. For instance:
-    - A room with food, a table, and some chairs could be a Dining Room.
-    - A room with an energy core, coal, and a furnace might be a Power Room
+    - Dining Room: A room with food, a table, and 2 chairs.
+    - Power Room: A room with an energy core, coal, and a furnace.
 
 
 
@@ -82,7 +83,6 @@ Objects and their respective properties and identifiers (Properties are shown as
     Cabinet (P: paired[Food])
     Chair (P: paired[Table])
     Coal (P: paired[Furnace], plentiful)
-    Terminal (P: essential, scarce)
     EnergyCore (P: paired[Button])
     Fan (P: essential)
     Food (P: paired[Table])
@@ -90,6 +90,7 @@ Objects and their respective properties and identifiers (Properties are shown as
     Lever (P: none)
     Light (P: plentiful, essential)
     Table (P: scarce, paired[Chair])
+    Terminal (P: essential, scarce)
     Radio (P: none)
     Wires (P: none)
     Vent (P: none)
