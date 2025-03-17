@@ -72,5 +72,19 @@ namespace LLMUnitySamples
             }
             return messages;
         }
+
+        public static List<string> ReadFile(string text)
+        {
+            List<string> allLines = new List<string>();
+
+            string[] lines = text.Split("\n");
+            for (int i = 0; i < lines.Length; i++)
+            {
+                string line = lines[i].Replace("\r", "").Trim();
+                allLines.Add(line);
+            }
+
+            return allLines;
+        }
     }
 }

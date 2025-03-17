@@ -16,7 +16,8 @@ namespace LLMUnitySamples
         public RAG rag;
         public InputField playerText;
         public Text AIText;
-        public TextAsset HamletText;
+        public TextAsset JsonSchema;
+        public TextAsset RAGText;
         List<string> phrases;
         string ragPath = "RAGSample.zip";
 
@@ -24,19 +25,15 @@ namespace LLMUnitySamples
         {
             CheckLLMs(false);
             playerText.interactable = false;
-            LoadPhrases();
-            await CreateEmbeddings();
+            //LoadPhrases();
+            //await CreateEmbeddings();
             playerText.onSubmit.AddListener(onInputFieldSubmit);
             AIReplyComplete();
         }
 
         public void LoadPhrases()
         {
-            foreach (KeyValuePair<string, List<string>> phrase in RAGUtils.ReadGutenbergFile(HamletText.text))
-            {
-                Debug.Log("HERE" + phrase.Key);
-            }
-            phrases = RAGUtils.ReadGutenbergFile(HamletText.text)["ROOM"];
+            phrases = RAGUtils.ReadFile(RAGText.text);
         }
 
         public async Task CreateEmbeddings()
