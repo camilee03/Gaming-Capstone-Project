@@ -614,6 +614,7 @@ MonoBehaviour:
   VerticalSensitivity: 5
   playerController: {fileID: 1469907842913153512}
   canMove: 1
+  debugOffline: 0
 --- !u!114 &1888980506854677528
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1959,7 +1960,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2544651151
+  GlobalObjectIdHash: 3157054698
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1985,9 +1986,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  cam: {fileID: 6909898074491242324}
+  velocity: 10
+  jumpForce: 7.5
+  fallMultiplier: 2
   HorizontalSensitivity: 5
   VerticalSensitivity: 5
+  groundCheck: {fileID: 0}
+  groundCheckRadius: 0.2
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  cam: {fileID: 6909898074491242324}
+  maxStamina: 100
+  staminaDrainRate: 10
+  staminaRegenRate: 5
+  staminaRegenDelay: 2
+  staminaTracker: {fileID: 0}
+  isDopple: 0
+  TeamDeclaration: {fileID: 0}
+  isDead: 0
+  DeathScreen: {fileID: 0}
+  AttackDistance: 3
+  AttackDelay: 20
+  shootingPoint: {fileID: 0}
+  playerLayerMask:
+    serializedVersion: 2
+    m_Bits: 8
+  isGrounded: 0
+  debugOffline: 0
   canMove: 1
 --- !u!114 &2526506209443638112
 MonoBehaviour:
@@ -2114,6 +2140,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 9caa3d8a-6b2f-4e8e-8bad-6ede561bd9be
     m_ActionName: UI/TrackedDeviceOrientation
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 8e2ad543-25fc-44a9-95cf-f635adfcfef3
+    m_ActionName: 'Player/FlashLightToggle[/Keyboard/f]'
   m_NeverAutoSwitchControlSchemes: 1
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player

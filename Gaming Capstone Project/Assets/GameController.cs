@@ -1,135 +1,147 @@
 using System.Collections.Generic;
+using System.Linq;
+using Unity.Netcode;
 using UnityEngine;
 
-public class GameController : MonoBehaviour
+public class GameController : NetworkBehaviour
 {
-    Dictionary<int, GameObject> Players;
+    public static GameController Instance { get; private set; }
 
+    public Dictionary<ulong, GameObject> Players = new Dictionary<ulong, GameObject>();
 
-    public Transform[] LobbySpawnPoints;
-    public Transform[] GameSpawnPoints;
+    public List<Transform> LobbySpawnPoints = new List<Transform>();
+    public List<Transform> GameSpawnPoints = new List<Transform>();
 
     private int numberOfDopples = 1;
 
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        if (IsServer)
+        {
+            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+            NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+        }
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        if (IsServer)
+        {
+            NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+            NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
+        }
+    }
+
+    private void OnClientConnected(ulong clientId)
+    {
+        GameObject playerObj = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.gameObject;
+
+        Players.Add(clientId, playerObj);
+
+        playerObj.name = $"Player{Players.Count}";
+
+        Debug.Log($"Player connected: {playerObj.name} with ClientId: {clientId}");
+
+        // Teleport only the newly joined player
+        
+        Transform spawnPoint = LobbySpawnPoints[0];
+        playerObj.transform.position = spawnPoint.position;
+        playerObj.transform.rotation = spawnPoint.rotation;
+    }
+
+
+    private void OnClientDisconnected(ulong clientId)
+    {
+        if (Players.ContainsKey(clientId))
+        {
+            Debug.Log($"Player disconnected: {Players[clientId].name}");
+            Players.Remove(clientId);
+        }
+    }
+
     #region Team Logic
+
+    public bool CanIncreaseDopples(int num)
+    {
+        return num < Players.Count;
+    }
 
     public void SetNumberOfDopples(int num)
     {
-        if(num > Players.Count-1)
-        {
-            num = Players.Count-1;
-        }
-        numberOfDopples = num;
+        numberOfDopples = Mathf.Min(num, Players.Count - 1);
     }
-     private void AssignTeams()
+
+    private void AssignTeams()
     {
-        //pick numberOfDopples amount of players randomly, set them to dopples.
-        for (int i = 0; i < numberOfDopples; i++) {
-            int indexToChange = Random.Range(0, Players.Count);
-            if(Players[indexToChange].GetComponent<PlayerController>().isDopple )
-            {
-                i--;
-                continue;
-            }
-            else
-            {
-                Players[indexToChange].GetComponent<PlayerController>().isDopple = true;   
-            }
+        // First, reset all players' isDopple status
+        foreach (var player in Players.Values)
+        {
+            player.GetComponent<PlayerController>().isDopple = false;
+        }
 
+        // Create a shuffled list of players
+        var shuffledPlayers = Players.Values.OrderBy(p => Random.value).ToList();
+
+        // Assign the first 'numberOfDopples' players as Dopples
+        for (int i = 0; i < numberOfDopples && i < shuffledPlayers.Count; i++)
+        {
+            shuffledPlayers[i].GetComponent<PlayerController>().isDopple = true;
         }
     }
-
-    #endregion
-
-    #region Task Logic
-
-    #endregion
-
-    #region Voting
-
-
-
-
-
 
 
     #endregion
 
     #region Start of Game
 
-
-    /// <summary>
-    /// Spawn players in start area.
-    /// 
-    /// Have host (or anybody) start game
-    /// 
-    /// assign teams
-    /// assn tasks
-    /// 
-    /// teleport to spawn points in room
-    /// </summary>
-
-    private void SpawnInLobby()
+    public void HostSelectsStart()
     {
-        SpawnAtPoints(LobbySpawnPoints);
-    }
-    private void SpawnInGame()
-    {
-        SpawnAtPoints(LobbySpawnPoints);
-    }
-
-
-    public void HostSelectsStart()//called from button
-    {
-
-
         AssignTeams();
         SpawnInGame();
-
     }
 
+    public void SpawnInLobby()
+    {
+        SpawnAtPoints(LobbySpawnPoints);
+    }
+
+    private void SpawnInGame()
+    {
+        SpawnAtPoints(GameSpawnPoints);
+    }
 
     #endregion
-
 
     #region Helper Functions
 
-
-    private void SpawnAtPoints(Transform[] spawnPoints)
+    private void SpawnAtPoints(List<Transform> spawnPoints)
     {
-        
-        for (int i = 0; i < Players.Keys.Count; i++)
+        int i = 0;
+        foreach (var player in Players.Values)
         {
-            if (i > spawnPoints.Length)
-            {
-                if (Players.TryGetValue(i, out GameObject Overlap))
-                {
-                    Overlap.transform.position = spawnPoints[i - spawnPoints.Length].position;
-                    Overlap.transform.rotation = spawnPoints[i - spawnPoints.Length].rotation;
-                    continue;
-                }
-            }
-
-           if(Players.TryGetValue(i,out GameObject temp))
-            {
-                temp.transform.position = spawnPoints[i].position;
-                temp.transform.rotation = spawnPoints[i].rotation;
-
-            }
-
+            Transform targetPoint = spawnPoints[i % spawnPoints.Count];
+            player.transform.position = targetPoint.position;
+            player.transform.rotation = targetPoint.rotation;
+            i++;
         }
     }
 
-    #endregion
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public int GetNumberOfPlayers()
     {
-        
+        return Players.Count;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    #endregion
 }
