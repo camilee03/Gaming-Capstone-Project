@@ -4,6 +4,7 @@ using Unity.Netcode;
 using UnityEditor.ShaderGraph;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public class PlayerController : NetworkBehaviour
 {
@@ -52,6 +53,8 @@ public class PlayerController : NetworkBehaviour
     private PlayerInput playerInput;
     private CameraMovement camMovement;
 
+    private bool isTransformed = false;
+    [SerializeField]
     private bool canAttack = true;
     private float staminaRegenTimer;
     private float attackTimer;                  // Tracks time left before we can attack again
@@ -115,7 +118,9 @@ public class PlayerController : NetworkBehaviour
 
         // Check if on the ground
         isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayer);
-
+        animator.SetBool("Grounded", isGrounded);
+        animator.SetBool("Transformed", isTransformed);
+        animator.SetFloat("YVelocity", rgd.linearVelocity.y);
         // Handle movement (if allowed)
         if (canMove)
         {
@@ -129,7 +134,7 @@ public class PlayerController : NetworkBehaviour
 
             // Update animator (walking state)
 
-            animator.SetBool("isWalking", Mathf.Abs(x) > 0 || Mathf.Abs(z) > 0);
+            animator.SetFloat("Speed", new Vector2(Mathf.Abs(x), Mathf.Abs(z)).magnitude);
 
             // Handle rotation with mouse movement
             yaw += HorizontalSensitivity * Input.GetAxis("Mouse X");
@@ -176,12 +181,13 @@ public class PlayerController : NetworkBehaviour
             // Stop all movement if can't move
             rgd.linearVelocity = Vector3.zero;
             rgd.angularVelocity = Vector3.zero;
-            animator.SetBool("isWalking", false);
+            animator.SetFloat("Speed", 0);
         }
 
         // Handle attack cooldown
         if (!canAttack)
         {
+            animator.SetBool("Attacking", attackTimer > AttackDelay - 0.3f);
             attackTimer -= Time.deltaTime;
             if (attackTimer <= 0f)
             {
@@ -214,7 +220,6 @@ public class PlayerController : NetworkBehaviour
         {
             // Launch the character upward
             rgd.linearVelocity = new Vector3(rgd.linearVelocity.x, jumpForce, rgd.linearVelocity.z);
-            animator.SetBool("isJumping", true);
         }
     }
 
@@ -230,12 +235,34 @@ public class PlayerController : NetworkBehaviour
             StopSprinting();
         }
     }
+    public void Morph(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            if (isDopple && !isTransformed)
+            {
+                isTransformed = true;
+                StartCoroutine(Morph());
+            }
+            else isTransformed = false;
+            animator.SetBool("Transformed", isTransformed);
+        }
+    }
+
+    public IEnumerator Morph()
+    {
+        canMove = false;
+        canAttack = false;
+        yield return new WaitForSeconds(1.1f);
+        canMove = true;
+        canAttack = true;
+    }
 
     public void Attack(InputAction.CallbackContext context)
     {
         // Only proceed if the action was performed (button fully pressed),
         // the player is a dopple, and we can still attack
-        if (context.performed && isDopple && canAttack)
+        if (context.performed && isTransformed && canAttack)
         {
             Debug.Log("Attacking");
             RaycastHit hit;

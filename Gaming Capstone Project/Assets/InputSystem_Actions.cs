@@ -116,6 +116,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Morph"",
+                    ""type"": ""Button"",
+                    ""id"": ""e95b6a8c-ad76-4d46-9a16-3692bfd767f7"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -512,6 +521,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""FlashLightToggle"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a2131141-8911-4499-ac3e-72bbdd80ac77"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""Morph"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1109,6 +1129,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_Next = m_Player.FindAction("Next", throwIfNotFound: true);
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         m_Player_FlashLightToggle = m_Player.FindAction("FlashLightToggle", throwIfNotFound: true);
+        m_Player_Morph = m_Player.FindAction("Morph", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1198,6 +1219,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Next;
     private readonly InputAction m_Player_Sprint;
     private readonly InputAction m_Player_FlashLightToggle;
+    private readonly InputAction m_Player_Morph;
     public struct PlayerActions
     {
         private @InputSystem_Actions m_Wrapper;
@@ -1212,6 +1234,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         public InputAction @Next => m_Wrapper.m_Player_Next;
         public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
         public InputAction @FlashLightToggle => m_Wrapper.m_Player_FlashLightToggle;
+        public InputAction @Morph => m_Wrapper.m_Player_Morph;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1251,6 +1274,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @FlashLightToggle.started += instance.OnFlashLightToggle;
             @FlashLightToggle.performed += instance.OnFlashLightToggle;
             @FlashLightToggle.canceled += instance.OnFlashLightToggle;
+            @Morph.started += instance.OnMorph;
+            @Morph.performed += instance.OnMorph;
+            @Morph.canceled += instance.OnMorph;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -1285,6 +1311,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @FlashLightToggle.started -= instance.OnFlashLightToggle;
             @FlashLightToggle.performed -= instance.OnFlashLightToggle;
             @FlashLightToggle.canceled -= instance.OnFlashLightToggle;
+            @Morph.started -= instance.OnMorph;
+            @Morph.performed -= instance.OnMorph;
+            @Morph.canceled -= instance.OnMorph;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -1477,6 +1506,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         void OnNext(InputAction.CallbackContext context);
         void OnSprint(InputAction.CallbackContext context);
         void OnFlashLightToggle(InputAction.CallbackContext context);
+        void OnMorph(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {
