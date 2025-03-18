@@ -76,8 +76,19 @@ public class PlayerController : NetworkBehaviour
             cam.enabled = false;
             camMovement.enabled = false;
         }
-    }
 
+    }
+    [ClientRpc]
+    public void SetDoppleClientRpc(bool newIsDopple)
+    {
+        isDopple = newIsDopple;
+        if (isDopple)
+            TeamDeclaration.text = "You are a : Dopple";
+        else
+            TeamDeclaration.text = "You are a : Scientist";
+
+        Debug.Log($"[ClientRpc] Player {OwnerClientId} => isDopple={isDopple}");
+    }
     private void Start()
     {
         rgd = GetComponent<Rigidbody>();
@@ -233,33 +244,57 @@ public class PlayerController : NetworkBehaviour
 
     public void Attack(InputAction.CallbackContext context)
     {
-        // Only proceed if the action was performed (button fully pressed),
-        // the player is a dopple, and we can still attack
-        if (context.performed && isDopple && canAttack)
-        {
-            Debug.Log("Attacking");
-            RaycastHit hit;
-            // Attempt to hit something within AttackDistance
-            if (Physics.Raycast(new Ray(shootingPoint.position,shootingPoint.forward),
-                                out hit, AttackDistance, playerLayerMask))
-            {
-                GameObject hitObject = hit.collider.gameObject;
-                Debug.Log("hit player: " + hitObject.name);
-                // If we hit another player, mark them as dead
-                if (hitObject.GetComponent<PlayerController>() != null)
-                {
-                    if (!hitObject.GetComponent<PlayerController>().isDopple)
-                    {
-                        hitObject.GetComponent<PlayerController>().isDead = true;
-                    }
-                }
-            }
+        // Client side input
+        // If you want only Dopples to do this, check isDopple here:
+        // if (!isDopple) return;
 
-            // Begin our attack cooldown
+        if (context.performed && canAttack)
+        {
+            // Start the cooldown
             canAttack = false;
             attackTimer = AttackDelay;
+
+            // We gather necessary info for the server to do the raycast:
+            Vector3 origin = shootingPoint.position;
+            Vector3 direction = shootingPoint.forward;
+
+            // Call a ServerRpc, passing in the needed data
+            Debug.Log("Local Attack => calling AttackServerRpc");
+            AttackServerRpc(origin, direction);
         }
     }
+    [ServerRpc]
+    private void AttackServerRpc(Vector3 origin, Vector3 direction)
+    {
+        Debug.Log("[Server] AttackServerRpc triggered by " + OwnerClientId);
+
+        RaycastHit hit;
+        if (Physics.Raycast(origin, direction, out hit, AttackDistance, playerLayerMask))
+        {
+            GameObject hitObject = hit.collider.gameObject;
+            var targetPlayer = hitObject.GetComponent<PlayerController>();
+            if (targetPlayer != null && !targetPlayer.isDead)
+            {
+                Debug.Log($"[Server] Player {OwnerClientId} killed {targetPlayer.OwnerClientId}");
+                // We kill them via a ClientRpc call to the victim
+                targetPlayer.KillClientRpc();
+            }
+        }
+    }
+
+    // ------------------------------------------------
+    // Called on the victim to set isDead = true,
+    // show the death screen, etc.
+    // ------------------------------------------------
+    [ClientRpc]
+    private void KillClientRpc()
+    {
+        isDead = true;
+        Debug.Log($"[ClientRpc] KillClientRpc => Player {OwnerClientId} is now dead.");
+        // The next Update() will show the death screen and disable movement.
+    }
+
+
 
     // Helper method to cleanly stop sprinting logic
     private void StopSprinting()
