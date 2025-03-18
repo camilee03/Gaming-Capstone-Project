@@ -7,8 +7,8 @@ public class SpawnPoint : MonoBehaviour
     private void Start()
     {
         if (IsLobbySpawnPoint)
-            GameController.Instance.LobbySpawnPoints.Add(transform);
+            GameController.Instance.LobbySpawnPoint = transform;
         else
-            GameController.Instance.GameSpawnPoints.Add(transform);
+            GameController.Instance.GameSpawnPoint = transform;
     }
 }

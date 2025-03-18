@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 
 public class GameController : NetworkBehaviour
@@ -8,12 +9,18 @@ public class GameController : NetworkBehaviour
     public static GameController Instance { get; private set; }
 
     public Dictionary<ulong, GameObject> Players = new Dictionary<ulong, GameObject>();
+    public int numPlayers = 1;
 
-    public List<Transform> LobbySpawnPoints = new List<Transform>();
-    public List<Transform> GameSpawnPoints = new List<Transform>();
+    [Header("Spawn Points")]
+    public Transform LobbySpawnPoint;
+    public Transform GameSpawnPoint;
 
+    // Number of Doppleganger players to assign
     private int numberOfDopples = 1;
 
+    // -------------------------------------------------------
+    // Initialization / Singleton
+    // -------------------------------------------------------
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -44,103 +51,136 @@ public class GameController : NetworkBehaviour
         }
     }
 
+    // -------------------------------------------------------
+    // Client (Player) Connect / Disconnect
+    // -------------------------------------------------------
     private void OnClientConnected(ulong clientId)
     {
+        if (!IsServer) return;
+
+        // Grab the spawned PlayerObject (the default from Netcode)
         GameObject playerObj = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.gameObject;
+        Players[clientId] = playerObj;
 
-        Players.Add(clientId, playerObj);
-
-        playerObj.name = $"Player{Players.Count}";
-
-        Debug.Log($"Player connected: {playerObj.name} with ClientId: {clientId}");
-
-        // Teleport only the newly joined player
-        
-        Transform spawnPoint = LobbySpawnPoints[0];
-        playerObj.transform.position = spawnPoint.position;
-        playerObj.transform.rotation = spawnPoint.rotation;
+        Debug.Log($"[Server] Player connected => ClientId {clientId}, {playerObj.name}");
     }
-
 
     private void OnClientDisconnected(ulong clientId)
     {
+        if (!IsServer) return;
+
         if (Players.ContainsKey(clientId))
         {
-            Debug.Log($"Player disconnected: {Players[clientId].name}");
+            Debug.Log($"[Server] Player disconnected => ClientId {clientId}, {Players[clientId].name}");
             Players.Remove(clientId);
         }
     }
 
-    #region Team Logic
-
+    // -------------------------------------------------------
+    // Team Logic
+    // -------------------------------------------------------
     public bool CanIncreaseDopples(int num)
     {
         return num < Players.Count;
     }
 
-    public void SetNumberOfDopples(int num)
+    public void SetNumberOfDopples(int newCount)
     {
-        numberOfDopples = Mathf.Min(num, Players.Count - 1);
+        if (!IsServer) return;
+        // At most #players -1 can be dopples, or do your own logic
+        numberOfDopples = Mathf.Min(newCount, Players.Count - 1);
+    }
+
+    public int GetNumberOfDopples()
+    {
+        return numberOfDopples;
     }
 
     private void AssignTeams()
     {
-        // First, reset all players' isDopple status
-        foreach (var player in Players.Values)
+        // Reset all to Scientist
+        foreach (var kvp in Players)
         {
-            player.GetComponent<PlayerController>().isDopple = false;
+            var pc = kvp.Value.GetComponent<PlayerController>();
+            pc.SetDoppleClientRpc(false);
         }
 
-        // Create a shuffled list of players
+        // Shuffle the players
         var shuffledPlayers = Players.Values.OrderBy(p => Random.value).ToList();
 
-        // Assign the first 'numberOfDopples' players as Dopples
+        // Assign the first 'numberOfDopples' as Dopples
         for (int i = 0; i < numberOfDopples && i < shuffledPlayers.Count; i++)
         {
-            shuffledPlayers[i].GetComponent<PlayerController>().isDopple = true;
+            var pc = shuffledPlayers[i].GetComponent<PlayerController>();
+            pc.SetDoppleClientRpc(true);
         }
     }
 
 
-    #endregion
-
-    #region Start of Game
-
+    // -------------------------------------------------------
+    // Start of Game
+    // -------------------------------------------------------
+    // Called ONLY by the server/host to assign teams and spawn players in the game
     public void HostSelectsStart()
     {
+        if (!IsServer) return; // only the server/host does team assignment
+
+        Debug.Log("[Server] HostSelectsStart() => AssignTeams()");
         AssignTeams();
-        SpawnInGame();
     }
 
+    // Teleports players back to the Lobby
     public void SpawnInLobby()
     {
-        SpawnAtPoints(LobbySpawnPoints);
+        SpawnAtPoints(LobbySpawnPoint);
     }
 
+    // Teleports players to the game spawn point
     private void SpawnInGame()
     {
-        SpawnAtPoints(GameSpawnPoints);
+        SpawnAtPoints(GameSpawnPoint);
     }
 
+    // Example: a single player respawn method
     public void RespawnInLobby(GameObject player)
     {
-        player.transform.position = LobbySpawnPoints[0].position;
-        player.transform.rotation = LobbySpawnPoints[0].rotation;
+        var netTransform = player.GetComponent<NetworkTransform>();
+        if (netTransform != null)
+        {
+            netTransform.Teleport(
+                LobbySpawnPoint.position,
+                LobbySpawnPoint.rotation,
+                new Vector3(0.75f, 0.75f, 0.75f) // example scale
+            );
+        }
+        else
+        {
+            player.transform.position = LobbySpawnPoint.position;
+            player.transform.rotation = LobbySpawnPoint.rotation;
+        }
     }
 
-    #endregion
-
-    #region Helper Functions
-
-    private void SpawnAtPoints(List<Transform> spawnPoints)
+    // -------------------------------------------------------
+    // Helper Functions
+    // -------------------------------------------------------
+    private void SpawnAtPoints(Transform spawnPoint)
     {
-        int i = 0;
+        // Teleport every player in the dictionary
         foreach (var player in Players.Values)
         {
-            Transform targetPoint = spawnPoints[i % spawnPoints.Count];
-            player.transform.position = targetPoint.position;
-            player.transform.rotation = targetPoint.rotation;
-            i++;
+            Debug.Log($"Teleporting: {player.name} to {spawnPoint.name}");
+
+            var netTransform = player.GetComponent<NetworkTransform>();
+            if (netTransform != null)
+            {
+                netTransform.Teleport(spawnPoint.position, spawnPoint.rotation, new Vector3(0.75f, 0.75f, 0.75f));
+            }
+            else
+            {
+                // fallback
+                player.transform.position = spawnPoint.position;
+                player.transform.rotation = spawnPoint.rotation;
+            }
         }
     }
 
@@ -149,5 +189,12 @@ public class GameController : NetworkBehaviour
         return Players.Count;
     }
 
-    #endregion
+    private void Update()
+    {
+        if (IsServer && Input.GetKeyDown(KeyCode.Return))
+        {
+            HostSelectsStart();
+        }
+    }
+
 }
