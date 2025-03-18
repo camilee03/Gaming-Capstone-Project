@@ -161,7 +161,7 @@ public class GeneralFunctions : ScriptableObject
         (Vector3 pos, List<Vector3> path, int cost) node;
 
         //While fringe set is not empty
-        while (fringe._list.Count > 0 && currentCost < 100)
+        while (fringe._list.Count > 0 && currentCost < 50)
         {
             // pursue a new path
             node = fringe.Pop();
@@ -241,6 +241,7 @@ public class GeneralFunctions : ScriptableObject
         List<Vector3> successors = new List<Vector3>();
         bool[] hasSuccessor = new bool[4] { true, true, true, true };
 
+        // check to see if any tiles collide with successors
         foreach (GameObject tile in listOfTiles) 
         {
             if (Vector3.Distance(tile.transform.position, parent + new Vector3(scale, 0, 0)) == 0)
@@ -261,10 +262,14 @@ public class GeneralFunctions : ScriptableObject
             }
         }
 
+        Debug.Log("Checking " + parent);
+
         if (hasSuccessor[0]) { successors.Add(parent + new Vector3(scale, 0, 0)); }
         if (hasSuccessor[1]) { successors.Add(parent + new Vector3(-scale, 0, 0)); }
         if (hasSuccessor[2]) { successors.Add(parent + new Vector3(0, 0, scale)); }
         if (hasSuccessor[3]) { successors.Add(parent + new Vector3(0, 0, -scale)); }
+
+        Debug.Log("Num successors: " +  successors.Count);
 
         return successors;
     }
