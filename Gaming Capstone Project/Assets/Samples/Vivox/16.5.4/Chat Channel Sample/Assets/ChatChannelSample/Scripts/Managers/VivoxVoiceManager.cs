@@ -10,13 +10,9 @@ using Unity.Services.Authentication;
 public class VivoxVoiceManager : MonoBehaviour
 {
     public const string LobbyChannelName = "lobbyChannel";
-
-    // Check to see if we're about to be destroyed.
     static object m_Lock = new object();
     static VivoxVoiceManager m_Instance;
 
-    //These variables should be set to the projects Vivox credentials if the authentication package is not being used
-    //Credentials are available on the Vivox Developer Portal (developer.vivox.com) or the Unity Dashboard (dashboard.unity3d.com), depending on where the organization and project were made
     [SerializeField]
     string _key;
     [SerializeField]
@@ -25,10 +21,6 @@ public class VivoxVoiceManager : MonoBehaviour
     string _domain;
     [SerializeField]
     string _server;
-
-    /// <summary>
-    /// Access singleton instance through this propriety.
-    /// </summary>
     public static VivoxVoiceManager Instance
     {
         get
@@ -37,19 +29,14 @@ public class VivoxVoiceManager : MonoBehaviour
             {
                 if (m_Instance == null)
                 {
-                    // Search for existing instance.
-                    m_Instance = (VivoxVoiceManager)FindObjectOfType(typeof(VivoxVoiceManager));
-
-                    // Create new instance if one doesn't already exist.
+                    m_Instance = (VivoxVoiceManager)FindFirstObjectByType(typeof(VivoxVoiceManager));
                     if (m_Instance == null)
                     {
-                        // Need to create a new GameObject to attach the singleton to.
                         var singletonObject = new GameObject();
                         m_Instance = singletonObject.AddComponent<VivoxVoiceManager>();
                         singletonObject.name = typeof(VivoxVoiceManager).ToString() + " (Singleton)";
                     }
                 }
-                // Make instance persistent even if its already in the scene
                 DontDestroyOnLoad(m_Instance.gameObject);
                 return m_Instance;
             }

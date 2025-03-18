@@ -1096,6 +1096,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d4dbc965b4fc02842af1fd954448f669, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4467996737706164103}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d4dbc965b4fc02842af1fd954448f669, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8374899082534661747}
     - targetCorrespondingSourceObject: {fileID: 3984137631858743321, guid: d4dbc965b4fc02842af1fd954448f669, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4469207960533563960}
@@ -1544,6 +1547,19 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &8374899082534661747
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4695278996734167265}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d88ab2109b6adb43880b46853478e14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 4695278996734167265}
 --- !u!4 &4957813954461148287 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 658689967997702607, guid: d4dbc965b4fc02842af1fd954448f669, type: 3}
