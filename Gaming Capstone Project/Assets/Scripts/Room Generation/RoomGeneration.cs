@@ -67,19 +67,16 @@ public class RoomGeneration : MonoBehaviour
     {
         ClearMap(); // only neccessary if regenerating the entire map
 
-        int numRooms = numPlayers * 2;
+        int numRooms = 4;
 
         // Spawn first room
-        /*
         Room newRoom = new(scale, tiles, walls);
         newRoom.RoomProcedure(0);
         rooms.Add(newRoom);
         GameObject room1 = newRoom.parent;
-        numRooms--;
-        */
 
         // Find and spawn lobby
-        GameObject room1 = GameObject.Find("Room0");
+        //GameObject room1 = GameObject.Find("Room0");
 
 
         int index = 1;
@@ -88,7 +85,8 @@ public class RoomGeneration : MonoBehaviour
         {
             // choose a random room from room1 to edit
             GameObject chosenRoom = RoomFunctions.GetRootChild(room1, "WallParent", 0, true)[0];
-            bool isLobby = chosenRoom.name == "Room0";
+            //bool isLobby = chosenRoom.name == "Room0";
+            bool isLobby = false;
 
             // Spawn next room
             Room room2 = new(scale, tiles, walls);
@@ -256,8 +254,8 @@ public class RoomGeneration : MonoBehaviour
             debugInt++;
         }
 
-        //Debug.Log("Dir: " + dar1.pos + " Pos: " + dar1.door.transform.position);
-        //Debug.Log("Dir: " + dar2.pos + " Pos: " + dar2.door.transform.position);
+        Debug.Log("Dir: " + dar1.pos + " Pos: " + dar1.door.transform.position);
+        Debug.Log("Dir: " + dar2.pos + " Pos: " + dar2.door.transform.position);
 
         // recheck tile positions
         tile1 = dar1.door.transform.position + directions[dar1.pos] * scale / 2;

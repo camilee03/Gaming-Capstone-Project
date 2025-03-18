@@ -15,7 +15,7 @@ public class TileSpawner : MonoBehaviour
     MainRoomPG mainRoom;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void Awake()
     {
         upPool = new ObjectPool<GameObject>(CreatePool, GetPool, ReleasePool, DestroyPool, true, 5, 20);
         downPool = new ObjectPool<GameObject>(CreatePool, GetPool, ReleasePool, DestroyPool, true, 5, 20);

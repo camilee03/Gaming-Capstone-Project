@@ -170,7 +170,7 @@ public class GeneralFunctions : ScriptableObject
             currentCost = node.cost;
 
             // If have arrived at destination, set path and stop
-            if (Vector3.Distance(pos2, currentState) < tileScale / 2)
+            if (Vector3.Distance(pos2, currentState) < tileScale / 4)
             {
                 solution = currentPath;
                 return solution;
@@ -190,7 +190,7 @@ public class GeneralFunctions : ScriptableObject
             }
         }
 
-        Debug.Log("No path found");
+        Debug.Log("No path found. Current cost = " + currentCost + " Current path length = " + currentPath.Count);
         return null;
 
     }
@@ -244,25 +244,25 @@ public class GeneralFunctions : ScriptableObject
         // check to see if any tiles collide with successors
         foreach (GameObject tile in listOfTiles) 
         {
-            if (Vector3.Distance(tile.transform.position, parent + new Vector3(scale, 0, 0)) == 0)
+            if (Vector3.Distance(tile.transform.position, parent + new Vector3(scale, 0, 0)) < scale / 4)
             {
                 hasSuccessor[0] = false; continue;
             }
-            if (Vector3.Distance(tile.transform.position, parent + new Vector3(-scale, 0, 0)) == 0)
+            if (Vector3.Distance(tile.transform.position, parent + new Vector3(-scale, 0, 0)) < scale / 4)
             {
                 hasSuccessor[1] = false; continue;
             }
-            if (Vector3.Distance(tile.transform.position, parent + new Vector3(0, 0, scale)) == 0)
+            if (Vector3.Distance(tile.transform.position, parent + new Vector3(0, 0, scale)) < scale / 4)
             {
                 hasSuccessor[2] = false; continue;
             }
-            if (Vector3.Distance(tile.transform.position, parent + new Vector3(0, 0, -scale)) == 0)
+            if (Vector3.Distance(tile.transform.position, parent + new Vector3(0, 0, -scale)) < scale / 4)
             {
                 hasSuccessor[3] = false; continue;
             }
         }
 
-        Debug.Log("Checking " + parent);
+        //Debug.Log("Checking " + parent);
 
         if (hasSuccessor[0]) { successors.Add(parent + new Vector3(scale, 0, 0)); }
         if (hasSuccessor[1]) { successors.Add(parent + new Vector3(-scale, 0, 0)); }
