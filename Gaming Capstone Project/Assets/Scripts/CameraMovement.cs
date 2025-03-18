@@ -26,6 +26,8 @@ public class CameraMovement : NetworkBehaviour
     private void Update()
     {
         if (!debugOffline && (!IsOwner || !IsSpawned)) return;
+        canMove = playerController.canMove;
+
         if (!canMove) return;
 
         // Get raw mouse input for instant responsiveness
@@ -37,10 +39,10 @@ public class CameraMovement : NetworkBehaviour
         pitch -= mouseY;
 
         // Clamp pitch to prevent unnatural flipping
-        pitch = Mathf.Clamp(pitch, -89f, 89f);
+        pitch = Mathf.Clamp(pitch, -60f, 60f);
 
         // Apply rotation to the anchor
-        Anchor.rotation = Quaternion.Euler(pitch, yaw, 0);
+        Anchor.rotation = Quaternion.Euler(pitch, yaw, Anchor.rotation.z);
 
         // Keep camera position locked to anchor
         if (transform.position != Anchor.position)

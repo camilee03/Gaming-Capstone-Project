@@ -101,6 +101,13 @@ public class DOSInteraction : MonoBehaviour
 
     private IEnumerator LerpCamera(Vector3 targetPosition, Quaternion targetRotation, float duration, bool enableCameraMovement)
     {
+        if (!enableCameraMovement) //if movement is disabled call before lerp
+        {
+            CameraMovementScript.canMove = enableCameraMovement;
+            CameraMovementScript.playerController.ToggleMovement(enableCameraMovement);
+
+        }
+
         float timeElapsed = 0f;
         Vector3 startPosition = camera.transform.position;
         Quaternion startRotation = camera.transform.rotation;
@@ -115,9 +122,11 @@ public class DOSInteraction : MonoBehaviour
 
         camera.transform.position = targetPosition;
         camera.transform.rotation = targetRotation;
-
-        CameraMovementScript.canMove = enableCameraMovement;
-        CameraMovementScript.playerController.ToggleMovement(enableCameraMovement);
+        if (enableCameraMovement)
+        {
+            CameraMovementScript.canMove = enableCameraMovement;
+            CameraMovementScript.playerController.ToggleMovement(enableCameraMovement);
+        }
     }
     #endregion
 }
