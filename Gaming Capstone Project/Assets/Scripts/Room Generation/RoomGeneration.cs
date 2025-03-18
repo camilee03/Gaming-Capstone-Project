@@ -43,12 +43,12 @@ public class RoomGeneration : MonoBehaviour
     void Start()
     {
         roomObjectType = GetComponent<RoomObjectType>();
-        //StartGeneration();
+        StartGeneration();
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Return)) { StartGeneration(); }
+        //if (Input.GetKeyDown(KeyCode.Return)) { StartGeneration(); }
     }
 
 
