@@ -54,7 +54,6 @@ public class PlayerController : NetworkBehaviour
     private CameraMovement camMovement;
 
     private bool isTransformed = false;
-    [SerializeField]
     private bool canAttack = true;
     private float staminaRegenTimer;
     private float attackTimer;                  // Tracks time left before we can attack again

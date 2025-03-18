@@ -659,11 +659,12 @@ MonoBehaviour:
   isDead: 0
   DeathScreen: {fileID: 7703377802476485135}
   AttackDistance: 3
-  AttackDelay: 20
+  AttackDelay: 2
   shootingPoint: {fileID: 3966302185056718904}
   playerLayerMask:
     serializedVersion: 2
     m_Bits: 8
+  canAttack: 1
   isGrounded: 0
   debugOffline: 1
   canMove: 1
@@ -2057,7 +2058,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.5
+  near clip plane: 0.01
   far clip plane: 1000
   field of view: 80
   orthographic: 0
@@ -2163,6 +2164,9 @@ MonoBehaviour:
   popupText: {fileID: 3219534976187767037}
   popupMenu: {fileID: 8485730259446256347}
   onInteract: 0
+  rightHand: {fileID: 7204770718620598341}
+  anim: {fileID: 3629479870446271976}
+  offset: {x: 0, y: 1, z: -0.4}
 --- !u!1 &4331356012126060348
 GameObject:
   m_ObjectHideFlags: 0
