@@ -2428,6 +2428,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 71.998, y: 0, z: 0}
+--- !u!1 &808004300
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 808004302}
+  - component: {fileID: 808004301}
+  m_Layer: 0
+  m_Name: Game Controller
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &808004301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 808004300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c026ea06081c134c9d8f572ee1c3114, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  LobbySpawnPoints: []
+  GameSpawnPoints: []
+--- !u!4 &808004302
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 808004300}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 16.63447, y: 10.2565155, z: 17.22887}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &839429751
 GameObject:
   m_ObjectHideFlags: 0
@@ -5783,6 +5829,10 @@ PrefabInstance:
       propertyPath: shootingpoint
       value: 
       objectReference: {fileID: 1963428169}
+    - target: {fileID: 6785213434307940285, guid: e4332b6727f5eea479cac2f8f3ff4356, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7397377101512692298, guid: e4332b6727f5eea479cac2f8f3ff4356, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 4278476891
@@ -5832,3 +5882,4 @@ SceneRoots:
   - {fileID: 1706780045}
   - {fileID: 6163413127449851739}
   - {fileID: 377691134}
+  - {fileID: 808004302}
