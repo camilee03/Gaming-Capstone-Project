@@ -122,6 +122,12 @@ public class GameController : NetworkBehaviour
         SpawnAtPoints(GameSpawnPoints);
     }
 
+    public void RespawnInLobby(GameObject player)
+    {
+        player.transform.position = LobbySpawnPoints[0].position;
+        player.transform.rotation = LobbySpawnPoints[0].rotation;
+    }
+
     #endregion
 
     #region Helper Functions

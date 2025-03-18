@@ -59,23 +59,39 @@ public class PlayerController : NetworkBehaviour
     public bool debugOffline = false;
     public bool canMove = true;
 
+    public override void OnNetworkSpawn()
+    {
+        playerInput = GetComponent<PlayerInput>();
+        camMovement = cam.GetComponent<CameraMovement>();
+
+        if (IsOwner)
+        {
+            playerInput.enabled = true;
+            cam.enabled = true;
+            camMovement.enabled = true;
+        }
+        else
+        {
+            playerInput.enabled = false;
+            cam.enabled = false;
+            camMovement.enabled = false;
+        }
+    }
+
     private void Start()
     {
         rgd = GetComponent<Rigidbody>();
-        playerInput = GetComponent<PlayerInput>();
         animator = GetComponent<Animator>();
-        camMovement = cam.GetComponent<CameraMovement>();
-        camMovement.SetPlayerController(this);
 
-        // Initialize current stamina
         currentStamina = maxStamina;
 
         if (isDopple)
-        {
             TeamDeclaration.text = "You are a : Dopple";
-        }
-        else TeamDeclaration.text = "You are a : Scientist";
+        else
+            TeamDeclaration.text = "You are a : Scientist";
     }
+
+
 
     private void Update()
     {
@@ -257,5 +273,14 @@ public class PlayerController : NetworkBehaviour
     public void ToggleMovement(bool input)
     {
         canMove = input;
+    }
+
+    public void UpdateTeam(bool Dopple)
+    {
+        isDopple = Dopple;
+        if (isDopple)
+            TeamDeclaration.text = "You are a : Dopple";
+        else
+            TeamDeclaration.text = "You are a : Scientist";
     }
 }

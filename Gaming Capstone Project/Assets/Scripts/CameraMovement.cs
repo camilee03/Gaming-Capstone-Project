@@ -7,12 +7,20 @@ public class CameraMovement : NetworkBehaviour
     public float HorizontalSensitivity = 10f;
     public float VerticalSensitivity = 10f;
 
-    private float yaw = 180.0f;  // Start looking backwards (0,180,0)
-    private float pitch = 0.0f;  // Start with a neutral pitch
+    private float yaw = 180.0f;
+    private float pitch = 0.0f;
 
     public PlayerController playerController;
     public bool canMove = true;
     public bool debugOffline = false;
+
+    public override void OnNetworkSpawn()
+    {
+        if (!IsOwner && !debugOffline)
+        {
+            gameObject.SetActive(false);  // Important: disable non-owner cameras
+        }
+    }
 
     private void Start()
     {
@@ -26,25 +34,21 @@ public class CameraMovement : NetworkBehaviour
     private void Update()
     {
         if (!debugOffline && (!IsOwner || !IsSpawned)) return;
+
         canMove = playerController.canMove;
 
         if (!canMove) return;
 
-        // Get raw mouse input for instant responsiveness
         float mouseX = Input.GetAxisRaw("Mouse X") * HorizontalSensitivity;
         float mouseY = Input.GetAxisRaw("Mouse Y") * VerticalSensitivity;
 
-        // Apply rotation
         yaw += mouseX;
         pitch -= mouseY;
 
-        // Clamp pitch to prevent unnatural flipping
         pitch = Mathf.Clamp(pitch, -60f, 60f);
 
-        // Apply rotation to the anchor
         Anchor.rotation = Quaternion.Euler(pitch, yaw, Anchor.rotation.z);
 
-        // Keep camera position locked to anchor
         if (transform.position != Anchor.position)
         {
             transform.position = Anchor.position;

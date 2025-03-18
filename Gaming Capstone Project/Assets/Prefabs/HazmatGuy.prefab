@@ -1495,7 +1495,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4278476891
+  GlobalObjectIdHash: 3620917758
   InScenePlacedSourceGlobalObjectIdHash: 1566806722
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1537,7 +1537,7 @@ MonoBehaviour:
   staminaRegenRate: 5
   staminaRegenDelay: 2
   staminaTracker: {fileID: 0}
-  isDopple: 1
+  isDopple: 0
   TeamDeclaration: {fileID: 2036125462041173202}
   isDead: 0
   DeathScreen: {fileID: 4980911588182948685}
@@ -1548,7 +1548,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   isGrounded: 0
-  debugOffline: 1
+  debugOffline: 0
   canMove: 1
 --- !u!114 &6024289853012604093
 MonoBehaviour:
@@ -1557,7 +1557,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1640891303535538884}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
   m_Name: 
@@ -1777,7 +1777,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1640891303535538884}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da52bf8bbc1de48cfb221a6ff30f7972, type: 3}
   m_Name: 
