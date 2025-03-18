@@ -251,11 +251,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92fc883937d8d17429a91dbd7309a05d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &1279199678 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 7204770718620598341, guid: e4332b6727f5eea479cac2f8f3ff4356, type: 3}
-  m_PrefabInstance: {fileID: 1632380112}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1325286682
 GameObject:
   m_ObjectHideFlags: 0
@@ -561,26 +556,6 @@ PrefabInstance:
       propertyPath: isDopple
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 5476030278728962401, guid: e4332b6727f5eea479cac2f8f3ff4356, type: 3}
-      propertyPath: AttackDelay
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 5614172236908327053, guid: e4332b6727f5eea479cac2f8f3ff4356, type: 3}
-      propertyPath: anim
-      value: 
-      objectReference: {fileID: 2128994770}
-    - target: {fileID: 5614172236908327053, guid: e4332b6727f5eea479cac2f8f3ff4356, type: 3}
-      propertyPath: offset.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5614172236908327053, guid: e4332b6727f5eea479cac2f8f3ff4356, type: 3}
-      propertyPath: offset.z
-      value: -0.4
-      objectReference: {fileID: 0}
-    - target: {fileID: 5614172236908327053, guid: e4332b6727f5eea479cac2f8f3ff4356, type: 3}
-      propertyPath: rightHand
-      value: 
-      objectReference: {fileID: 1279199678}
     - target: {fileID: 6268471921103493399, guid: e4332b6727f5eea479cac2f8f3ff4356, type: 3}
       propertyPath: m_ActionEvents.Array.size
       value: 21
@@ -625,21 +600,12 @@ PrefabInstance:
       propertyPath: GlobalObjectIdHash
       value: 1757066808
       objectReference: {fileID: 0}
-    - target: {fileID: 7856044162782231786, guid: e4332b6727f5eea479cac2f8f3ff4356, type: 3}
-      propertyPath: near clip plane
-      value: 0.01
-      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 8994247163194973631, guid: e4332b6727f5eea479cac2f8f3ff4356, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e4332b6727f5eea479cac2f8f3ff4356, type: 3}
---- !u!95 &2128994770 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 3629479870446271976, guid: e4332b6727f5eea479cac2f8f3ff4356, type: 3}
-  m_PrefabInstance: {fileID: 1632380112}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
