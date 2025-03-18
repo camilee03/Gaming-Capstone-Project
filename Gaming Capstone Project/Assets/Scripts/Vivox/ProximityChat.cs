@@ -18,13 +18,8 @@ public class ProximityChat : MonoBehaviour
             audioFadeIntensityByDistanceaudio: 1.0f,  // Smooth fading
             audioFadeModel: AudioFadeModel.LinearByDistance
         );
-
-        // var joinOptions = new ChannelOptions
-        // {
-        //     IsPositional = true,  // Enables 3D positional audio
-        //     Channel3DProperties = properties
-        // };
-        await VivoxService.Instance.JoinPositionalChannelAsync(channelName, ChatCapability.AudioOnly, properties);
+        //await VivoxService.Instance.JoinPositionalChannelAsync(channelName, ChatCapability.AudioOnly, properties);
+        await VivoxService.Instance.JoinEchoChannelAsync(channelName, ChatCapability.AudioOnly);
         Debug.Log("Joined Proximity Voice Chat");
         chatJoined = true;
     }

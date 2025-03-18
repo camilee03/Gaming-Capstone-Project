@@ -2631,8 +2631,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1121899717}
   - component: {fileID: 1121899718}
-  - component: {fileID: 1121899719}
-  - component: {fileID: 1121899720}
   m_Layer: 0
   m_Name: VoiceChat
   m_TagString: Untagged
@@ -2671,32 +2669,6 @@ MonoBehaviour:
   _issuer: 13751-gamin-80826-udash
   _domain: mtu1xp.vivox.com
   _server: https://unity.vivox.com/appconfig/13751-gamin-80826-udash
---- !u!114 &1121899719
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1121899715}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2d88ab2109b6adb43880b46853478e14, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  player: {fileID: 8903848004442796653}
---- !u!114 &1121899720
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1121899715}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26ad8f9b4757ea74a833f605e58c65d0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  proximityChat: {fileID: 1121899719}
 --- !u!1 &1208650971
 GameObject:
   m_ObjectHideFlags: 0
