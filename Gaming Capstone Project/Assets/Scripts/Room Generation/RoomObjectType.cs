@@ -34,6 +34,15 @@ public class RoomObjectType : MonoBehaviour
     SerializableDict dictionary;
     Dictionary<string, GameObject> objects;
 
+    public char[] objectsRoom0;
+    public char[] objectsRoom1;
+    public char[] objectsRoom2;
+    public char[] objectsRoom3;
+    public char[] objectsRoom4;
+    List<char[]> objectsInRooms;
+
+    char[] objectIdentifiers = new char[] { 'b', 'C', 'c', 'f', 'L', 'l', 's', 'T', 't', 'v' };
+
 
     enum ItemType { Box, Button, Lever, Light, Table, Chair, 
         Doors, BulletinBoard, Radio, Terminal, Fan, Wires, 
@@ -52,6 +61,9 @@ public class RoomObjectType : MonoBehaviour
         dictionary = GetComponent<SerializableDict>();
         objects = dictionary.dictionary;
 
+        // temp list for debugging
+        objectsInRooms = new List<char[]> { objectsRoom0, objectsRoom1, objectsRoom2, objectsRoom3, objectsRoom4 };
+
         // set random seed if there is one
         if (roomGenerator.seed != -1) { Random.InitState(roomGenerator.seed); }
 
@@ -60,6 +72,7 @@ public class RoomObjectType : MonoBehaviour
             CleanRoom(); // get rid of old objects and reset room
 
             // Goes through each room and spawns objects for each
+            int index = 0;
             foreach (var room in roomGenerator.rooms)
             {
                 preTiles = room.finalRoomTiles;
@@ -78,7 +91,8 @@ public class RoomObjectType : MonoBehaviour
                     tilePositions.Add(room.tileParent.transform.GetChild(i).position);
                 }
 
-                BacktrackingSearch(new char[8] { 't', 'F', 'b', 'b', 'l', 'l', 'l', 'T' });
+                BacktrackingSearch(objectsInRooms[index]);
+                index++;
             }
         }
     }
@@ -92,73 +106,19 @@ public class RoomObjectType : MonoBehaviour
 
         switch (newTileCode)
         {
-            case 'd': // door
-                if (oldTileCode == 'w') { return true; } break;
             case 't': // table
+            case 'T': // terminal
                 if (oldTileCode == 'f' && leftTile == 'f' && rightTile == 'f' && upTile == 'f' && downTile == 'f') 
                     { return true; } break;
             case 'b': // bulletin board
                 if (oldTileCode == 'w') { return true; } break;
-            case 'T': // DOS terminal
-                if (oldTileCode == 'f') { return true; } break;
-            case 'l': // light
-                if (oldTileCode != 'f' && oldTileCode != 'w') { return true; } break;
-            case 'F': // fan
-                if (oldTileCode == 'f') { return true; } break;
             default:
+                if (oldTileCode == 'f') { return true; }
                 break;
 
         }
         return false;
     }
-
-    private void BacktrackingSearchTest()
-    {
-        PrepareRoom();
-
-        GameObject objectParent = new GameObject("ObjectParent");
-        objectParent.transform.parent = roomParent.transform;
-
-        char[] objectList = new char[8] { 't', 'F', 'b', 'b', 'l', 'l', 'l', 'T'};
-        int scale = 10;
-        int randomTile = 0; char oldCode;
-
-        spawnObjects = false;
-
-        for (int i = 0; i < objectList.Length - 1; i++)
-        {
-            bool canSpawn = false;
-            randomTile = Random.Range(0, tiles.Count-1); // find new unassigned tile
-            int iterations = 1; // if iterations goes through, no acceptable tile
-
-            //-- Genreation Start --//
-            while (!canSpawn && iterations != tiles.Count)
-            {
-                if (randomTile < tiles.Count - 2) { randomTile++; } else { randomTile = 0; }
-
-                if (tiles[randomTile] != null)
-                {
-                    oldCode = descripterTiles[(int)tiles[randomTile].x, (int)tiles[randomTile].y]; // char code of current tile
-                    canSpawn = SpawnObject(objectList[i], oldCode, tiles[randomTile]); // check spawn conditions
-                }
-
-                iterations++;
-            }
-            //-- Generation Done --//
-
-            if (canSpawn)
-            {
-                tiles.Remove(tiles[randomTile]); // remove changed tile from potential tile list
-                descripterTiles[(int)tiles[randomTile].x, (int)tiles[randomTile].y] = objectList[i]; // set new tile
-
-                PlaceObjects(objectList[i], randomTile, scale, objectParent);
-
-            }
-        }
-
-        objectParent.transform.position += Vector3.forward * 20;
-    }
-
     private void BacktrackingSearch(char[] objectList)
     {
         int scale = 10;

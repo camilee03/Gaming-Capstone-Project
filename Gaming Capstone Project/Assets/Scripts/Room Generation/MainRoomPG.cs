@@ -89,6 +89,9 @@ public class MainRoomPG : MonoBehaviour
                 Vector3 delta1 = directions[loc] * (newCorners[one][loc] - oldCorners[one][loc]);
                 Vector3 delta2 = directions[loc] * (newCorners[two][loc] - oldCorners[two][loc]);
 
+                Debug.Log("Delta1: " + delta1);
+                Debug.Log("Delta2: " + delta2);
+
                 edges[index].transform.position += delta1 += delta2;
                 newCorners[one] = corners[one].transform.position += delta2;
                 newCorners[two] = corners[two].transform.position += delta1;

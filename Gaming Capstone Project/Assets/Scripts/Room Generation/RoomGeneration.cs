@@ -67,20 +67,26 @@ public class RoomGeneration : MonoBehaviour
     {
         ClearMap(); // only neccessary if regenerating the entire map
 
-        int numRooms = numPlayers * 2;
+        int numRooms = 4;
 
         // Spawn first room
         Room newRoom = new(scale, tiles, walls);
         newRoom.RoomProcedure(0);
         rooms.Add(newRoom);
         GameObject room1 = newRoom.parent;
-        numRooms--;
+
+        // Find and spawn lobby
+        //GameObject room1 = GameObject.Find("Room0");
+
+
         int index = 1;
 
         while (numRooms > 0)
         {
             // choose a random room from room1 to edit
             GameObject chosenRoom = RoomFunctions.GetRootChild(room1, "WallParent", 0, true)[0];
+            //bool isLobby = chosenRoom.name == "Room0";
+            bool isLobby = false;
 
             // Spawn next room
             Room room2 = new(scale, tiles, walls);
@@ -90,8 +96,8 @@ public class RoomGeneration : MonoBehaviour
 
             // Get new doors
             doorAndRoom = new();
-            ReplaceWallWithDoor(room2.wallParent, room2.parent);
-            ReplaceWallWithDoor(chosenRoom.transform.GetChild(0).gameObject, room1);
+            ReplaceWallWithDoor(chosenRoom.transform.GetChild(0).gameObject, room1, isLobby);
+            ReplaceWallWithDoor(room2.wallParent, room2.parent, false);
 
             // Link two rooms together
             room1 = RotateRooms();
@@ -115,7 +121,7 @@ public class RoomGeneration : MonoBehaviour
 
         foreach (GameObject room in spawnRooms)
         {
-            if (room != null) { GameObject.Destroy(room); }
+            if (room != null && room.name != "Room0") { GameObject.Destroy(room); }
         }
 
         rooms = new();
@@ -127,15 +133,25 @@ public class RoomGeneration : MonoBehaviour
     // -- DOOR GENERATION -- //
 
     /// <summary> Chooses random walls to replace with a door </summary>
-    void ReplaceWallWithDoor(GameObject wallParent, GameObject room)
+    void ReplaceWallWithDoor(GameObject wallParent, GameObject room, bool isLobby)
     {
         bool findWall = true;
         int index = 0;
 
+        // Go one step deeper if lobby
+        if (isLobby)
+        {
+            index = Random.Range(0, wallParent.transform.childCount - 1); // find random wall edge
+            wallParent = wallParent.transform.GetChild(index).gameObject;
+            Debug.Log(wallParent.name);
+        }
+
+
+        findWall = true;
         while (findWall)
         {
             index = Random.Range(0, wallParent.transform.childCount - 1); // find random wall
-            findWall = wallParent.transform.GetChild(index).gameObject.name[0] != 'W';
+            findWall = wallParent.transform.GetChild(index).gameObject.name[0] != 'W'; // while isn't a wall
         }
 
         // set door rotation as same as wall
@@ -143,6 +159,7 @@ public class RoomGeneration : MonoBehaviour
         Vector3 wallPosition = wallTransform.position;
         Quaternion wallRotation = wallTransform.rotation;
 
+        // find direction based on name
         string name = wallParent.transform.GetChild(index).gameObject.name;
         char lastChar = name[name.Length - 1];
         int direction = (int)char.GetNumericValue(lastChar);
@@ -232,14 +249,13 @@ public class RoomGeneration : MonoBehaviour
 
         while (collided && debugInt < 100)
         {
-            Debug.Log("Collided. Moving " + doorDisplacement);
             dar2.room.transform.Translate(doorDisplacement);
             collided = RoomFunctions.CheckForCollisions(dar2.room, scale);
             debugInt++;
         }
 
-        //Debug.Log("Dir: " + dar1.pos + " Pos: " + dar1.door.transform.position);
-        //Debug.Log("Dir: " + dar2.pos + " Pos: " + dar2.door.transform.position);
+        Debug.Log("Dir: " + dar1.pos + " Pos: " + dar1.door.transform.position);
+        Debug.Log("Dir: " + dar2.pos + " Pos: " + dar2.door.transform.position);
 
         // recheck tile positions
         tile1 = dar1.door.transform.position + directions[dar1.pos] * scale / 2;
