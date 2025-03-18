@@ -1,87 +1,70 @@
-﻿ROOM
+﻿Instructions:
+    - You will receive a list of objects and their properties. Based on the properties, generate a list of objects for a specific room.
+    - Select objects only from the provided object list
+    - Select room names only from the provided room list
+    - Only return the json file as your answer
 
-The following document describes how to generate a series of rooms, each of which will contain a list of 
-objects whose respetive properties should stay consistent.
+Property Definitions:
+    - Essential: Must be included in the final list.
+    - Scarce: Only zero or one of these objects can be included.
+    - Plentiful: If included, at least one more of this type must be included.
+    - Paired: If included, the object in brackets must also be included.
+    - None: Has no other properties
 
-The properties and their respective identifiers are described below:
+Output Format: 
+    - Create a list of 5-20 objects. Each list will be considered a "room."
 
-    "essential": at least one of these items must be present in the room. 
-    "scarce": 0-1 objects can be present in the list.
-    "plentiful": more than 2 objects of this name must be present in the list.
-    "paired": an object can only be included in the list if the object in the brackets is also in the list.
-    "none": an object does not have any constraints and can be placed in any room.
+Examples:
 
+Room: Command Center
 
-Objects and their respective properties and identifiers (Properties are shown as P):
-
-    Box (P: none)
-    Button (P: none)
-    Lever (P: none)
-    Light (P: plentiful, essential)
-    Table (P: scarce, paired[Chair])
-    Chair (P: paired[Table])
-    BulletinBoard (P: essential, scarce)
-    Radio (P: none)
-    Terminal (P: essential, scarce)
-    Fan (P: essential)
-    Wires (P: none)
-    Furnace (P: paired[Coal], scarce)
-    Coal (P: paired[Furnace], plentiful)
-    Vent (P: none)
-    Food (P: paired[Table])
-    WashingMachine (P: paired[Clothes])
-    Clothes (P: plentiful)
-    Cabinet (P: paired[Food])
-    EnergyCore (P: paired[Button])
-    Trash (P: plentiful)
-
-
-
-The user may ask to create a list. A list is a series of objects that adhere to the above properties and contains no more than 
-20 entries. 
-
-An acceptable list is as follows:
-
-"objects":
-{ 
-    { "name": "Light", "properties": "plentiful", "essential" }, 
-    { "name": "Light", "properties": "plentiful", "essential" }, 
-    { "name": "BulletinBoard", "properties": "essential", "scarce" },
-    { "name": "Trash", "properties": "plentiful" }
-    { "name": "Trash", "properties": "plentiful" },
-    { "name": "Fan", "properties": "essential" }, 
-    { "name": "Terminal", "properties": "essential", "scarce" }, 
-    { "name": "Radio", "properties": "none" },
-    { "name": "Chair", "properties": "paired[Table]" }, 
-    { "name": "Chair", "properties": "paired[Table]" },
-    { "name": "Table", "properties": "scarce", "paired[Chair]" } 
-}
-
-Another accetable list is as follows:
-
-"objects": 
+json
 {
-    { "name": "Chair", "properties": "paired[Table]" },
-    { "name": "Table", "properties": "scarce", "paired[Chair]" },
-    { "name": "Vent", "properties": "none" }
-    { "name": "Light", "properties": "plentiful", "essential" }, 
-    { "name": "Light", "properties": "plentiful", "essential" }, 
-    { "name": "BulletinBoard", "properties": "essential", "scarce" },
-    { "name": "Chair", "properties": "paired[Table]" },
-    { "name": "Terminal", "properties": "essential", "scarce" }, 
-    { "name": "Chair", "properties": "paired[Table]" },
-    { "name": "Box", "properties": "none" },
-    { "name": "Button", "properties": "none" },
-    { "name": "Light", "properties": "plentiful", "essential" }, 
+    "roomName": "Command Center",
+    "objects": [
+        {"objectName": "Light", "properties": ["plentiful", "essential"]},
+        {"objectName": "Light", "properties": ["plentiful", "essential"]},
+        {"objectName": "BulletinBoard", "properties": ["essential", "scarce"]},
+        {"objectName": "Trash", "properties": ["plentiful"]},
+        {"objectName": "Trash", "properties": ["plentiful"]},
+        {"objectName": "Fan", "properties": ["essential"]},
+        {"objectName": "Terminal", "properties": ["essential", "scarce"]},
+        {"objectName": "Radio", "properties": ["none"]},
+        {"objectName": "Chair", "properties": ["paired[Table]"]},
+        {"objectName": "Chair", "properties": ["paired[Table]"]},
+        {"objectName": "Table", "properties": ["scarce", "paired[Chair]"]}
+    ]
 }
 
+Room: Storage
+
+json
+{
+    "roomName": "Storage",
+    "objects": [
+        {"objectName": "Chair", "properties": ["paired[Table]"]},
+        {"objectName": "Table", "properties": ["scarce", "paired[Chair]"]},
+        {"objectName": "Vent", "properties": ["none"]},
+        {"objectName": "Light", "properties": ["plentiful", "essential"]},
+        {"objectName": "Light", "properties": ["plentiful", "essential"]},
+        {"objectName": "BulletinBoard", "properties": ["essential", "scarce"]},
+        {"objectName": "Chair", "properties": ["paired[Table]"]},
+        {"objectName": "Terminal", "properties": ["essential", "scarce"]},
+        {"objectName": "Chair", "properties": ["paired[Table]"]},
+        {"objectName": "Box", "properties": ["none"]},
+        {"objectName": "Button", "properties": ["none"]},
+        {"objectName": "Light", "properties": ["plentiful", "essential"]}
+    ]
+}
+
+Naming the Rooms: Each room's name should reflect the objects present. For instance:
+    - Dining Room: A room with food, a table, and 2 chairs.
+    - Power Room: A room with an energy core, coal, and a furnace.
 
 
-Each list of objects will be considered a "room". These rooms will have different themes depending on the objects present in them.
-For example, a room with food, a table, and some chairs might be a dining room while a room with an energy core, coal, and a furnace
-might be a power room. Rooms can be whatever type as long as they fit the theme of an underground bunker somewhere in Russia. 
 
-The following is a list of possible room ideas:
+
+The following is a list of possible room names:
 Command Center, Communication Room, Operations Room, Briefing Room, War Room, Control Room, Surveillance Room, Intelligence Room, 
 Strategy Room, Map Room, Situation Room, Planning Room, Conference Room, Security Room, Armory, Weapons Storage, Ammunition Depot, 
 Equipment Room, Supply Room, Medical Bay, Infirmary, Quarantine Room, Laboratory, Research Room, Engineering Room, Maintenance Room,
@@ -91,4 +74,25 @@ Shower Room, Restroom, Escape Tunnel, Air Filtration Room, Decontamination Room
 
 
 
-When creating a list for the user, the list name must be the theme of the room. 
+Objects and their respective properties and identifiers (Properties are shown as P):
+
+    BulletinBoard (P: essential, scarce)
+    Box (P: none)
+    Button (P: none)
+    Clothes (P: plentiful)
+    Cabinet (P: paired[Food])
+    Chair (P: paired[Table])
+    Coal (P: paired[Furnace], plentiful)
+    EnergyCore (P: paired[Button])
+    Fan (P: essential)
+    Food (P: paired[Table])
+    Furnace (P: paired[Coal], scarce)
+    Lever (P: none)
+    Light (P: plentiful, essential)
+    Table (P: scarce, paired[Chair])
+    Terminal (P: essential, scarce)
+    Radio (P: none)
+    Wires (P: none)
+    Vent (P: none)
+    WashingMachine (P: paired[Clothes])
+    Trash (P: plentiful)

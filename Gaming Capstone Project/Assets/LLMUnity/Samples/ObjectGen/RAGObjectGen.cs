@@ -1,6 +1,7 @@
 using UnityEngine.UI;
 using LLMUnity;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace LLMUnitySamples
 {
@@ -9,22 +10,24 @@ namespace LLMUnitySamples
         public LLMCharacter llmCharacter;
         public Toggle ParaphraseWithLLM;
 
-        protected async override void onInputFieldSubmit(string message)
+        public struct Room
+        {
+            public string roomName;
+            public List<Object> objects;
+        }
+
+        public struct Object
+        {
+            public string objectName;
+            public List<string> properties;
+        }
+
+
+        protected override void onInputFieldSubmit(string message)
         {
             playerText.interactable = false;
             AIText.text = "...";
-            (string[] similarPhrases, float[] distances) = await rag.Search(message, 1);
-            string similarPhrase = "";
-            if (similarPhrases.Length > 0) { similarPhrase = similarPhrases[0]; }
-            if (!ParaphraseWithLLM.isOn)
-            {
-                AIText.text = similarPhrase;
-                AIReplyComplete();
-            }
-            else
-            {
-                _ = llmCharacter.Chat("Paraphrase the following phrase: " + similarPhrase, SetAIText, AIReplyComplete);
-            }
+            _ = llmCharacter.Chat("Here is the object list and room list: " + RAGText.text + ". Please extract the relevant objects to put in the new json list.", SetAIText, AIReplyComplete, false);
         }
 
         public void CancelRequests()
