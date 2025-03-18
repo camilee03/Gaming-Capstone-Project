@@ -11015,7 +11015,7 @@ MonoBehaviour:
   seed: 69
   tiles: {fileID: 6140652643369139530, guid: d1ec0aef85ae9ad4b866c5705f6f3262, type: 3}
   walls: {fileID: 5069348235013271274, guid: 79a355e1f88fadc4d8d20744de239d25, type: 3}
-  doors: {fileID: 6134351026715822803, guid: a994d680f6c5eb04c8672c8f631d0985, type: 3}
+  doors: {fileID: 1119864338350597100, guid: 37686ac42d7693a4a804299b0e473abe, type: 3}
 --- !u!4 &1769834704
 Transform:
   m_ObjectHideFlags: 0
