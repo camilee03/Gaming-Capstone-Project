@@ -1,11 +1,9 @@
 using DG.Tweening;
 using TMPro;
 using Unity.Netcode;
-using UnityEditor.ShaderGraph;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
-using UnityEditor.Analytics;
 
 public class PlayerController : NetworkBehaviour
 {

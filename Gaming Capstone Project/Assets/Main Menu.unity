@@ -264,8 +264,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  LobbySpawnPoints: []
-  GameSpawnPoints: []
+  numPlayers: 1
+  LobbySpawnPoint: {fileID: 0}
+  GameSpawnPoint: {fileID: 0}
 --- !u!4 &220249976
 Transform:
   m_ObjectHideFlags: 0
