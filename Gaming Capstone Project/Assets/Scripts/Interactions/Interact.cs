@@ -105,6 +105,12 @@ public class Interact : MonoBehaviour
             // access object and perform action
             highlightedObject.GetComponent<Animator>().SetTrigger("isPressed");
         }
+        if (highlightedObject != null && highlightedObject.tag == "Door")
+        {
+            Animator animator = highlightedObject.GetComponent<Animator>();
+
+            animator.SetBool("Open", !animator.GetBool("Open"));
+        }
     }
     void FocusDOS()
     {

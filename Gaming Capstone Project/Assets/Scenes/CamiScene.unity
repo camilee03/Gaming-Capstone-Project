@@ -5221,8 +5221,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  LobbySpawnPoints: []
-  GameSpawnPoints: []
+  numPlayers: 1
+  LobbySpawnPoint: {fileID: 0}
+  GameSpawnPoint: {fileID: 0}
 --- !u!114 &792304934
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13723,8 +13724,8 @@ SceneRoots:
   - {fileID: 1840136401}
   - {fileID: 453768712}
   - {fileID: 1769834704}
-  - {fileID: 813541580}
   - {fileID: 727294598}
+  - {fileID: 813541580}
   - {fileID: 1240960239}
   - {fileID: 1111763458}
   - {fileID: 792304935}

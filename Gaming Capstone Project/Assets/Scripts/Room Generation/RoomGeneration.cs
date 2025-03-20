@@ -1,10 +1,7 @@
-using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
-using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.Rendering;
@@ -43,12 +40,12 @@ public class RoomGeneration : MonoBehaviour
     void Start()
     {
         roomObjectType = GetComponent<RoomObjectType>();
-        //StartGeneration();
+        StartGeneration();
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Return)) { StartGeneration(); }
+        //if (Input.GetKeyDown(KeyCode.Return)) { StartGeneration(); }
     }
 
 
