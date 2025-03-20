@@ -9,6 +9,7 @@ TagManager:
   - Selectable
   - Room
   - Tile
+  - Door
   layers:
   - Default
   - TransparentFX
