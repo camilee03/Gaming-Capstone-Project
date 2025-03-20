@@ -135,8 +135,8 @@ public class PlayerController : NetworkBehaviour
         if (canMove)
         {
             // Calculate forward/right movement based on camera's transform
-            Vector3 forwardMovement = cam.transform.forward * z * velocity;
-            Vector3 rightMovement = cam.transform.right * x * velocity;
+            Vector3 forwardMovement = new Vector3(cam.transform.forward.x, 0, cam.transform.forward.z) * z * velocity;
+            Vector3 rightMovement = new Vector3(cam.transform.right.x, 0, cam.transform.right.z) * x * velocity;
             Vector3 linearVelocity = forwardMovement + rightMovement - rgd.linearVelocity;
 
             // Apply horizontal movement (ignore existing vertical velocity to prevent messing up jumps)
@@ -144,7 +144,7 @@ public class PlayerController : NetworkBehaviour
 
             // Update animator (walking state)
 
-            animator.SetFloat("Speed", new Vector2(Mathf.Abs(x), Mathf.Abs(z)).magnitude);
+            animator.SetFloat("Speed", new Vector3(rgd.linearVelocity.x, 0, rgd.linearVelocity.z).magnitude);
 
             // Handle rotation with mouse movement
             yaw += HorizontalSensitivity * Input.GetAxis("Mouse X");
