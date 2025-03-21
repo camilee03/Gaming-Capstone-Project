@@ -711,7 +711,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.01
+  near clip plane: 0.7
   far clip plane: 1000
   field of view: 80
   orthographic: 0
@@ -816,7 +816,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   popupText: {fileID: 5658739873273601654}
   popupMenu: {fileID: 617971742748155554}
-  onInteract: 0
+  tags:
+  - Selectable
+  - Button
+  - Door
+  - DOS Terminal
+  onInteract: 1
   rightHand: {fileID: 5184059091674939020}
   anim: {fileID: 8537348181529872809}
   offset: {x: 0, y: 1, z: -0.4}
@@ -1492,7 +1497,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3048151523
+  GlobalObjectIdHash: 3620917758
   InScenePlacedSourceGlobalObjectIdHash: 1566806722
   DeferredDespawnTick: 0
   Ownership: 1

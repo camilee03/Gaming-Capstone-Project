@@ -502,8 +502,8 @@ Camera:
   m_GameObject: {fileID: 4145402792936998140}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -524,7 +524,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.5
   far clip plane: 1000
   field of view: 60
   orthographic: 0
@@ -630,6 +630,9 @@ MonoBehaviour:
   popupText: {fileID: 9162832306864791832}
   popupMenu: {fileID: 3023487584707599214}
   onInteract: 0
+  rightHand: {fileID: 0}
+  anim: {fileID: 0}
+  offset: {x: 0, y: 0, z: 0}
 --- !u!1 &5453747238626194054
 GameObject:
   m_ObjectHideFlags: 0
@@ -2156,6 +2159,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 8e2ad543-25fc-44a9-95cf-f635adfcfef3
     m_ActionName: 'Player/FlashLightToggle[/Keyboard/f]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: e95b6a8c-ad76-4d46-9a16-3692bfd767f7
+    m_ActionName: 'Player/Morph[/Keyboard/q]'
   m_NeverAutoSwitchControlSchemes: 1
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
