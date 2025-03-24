@@ -140,7 +140,6 @@ public class RoomGeneration : MonoBehaviour
         {
             index = Random.Range(0, wallParent.transform.childCount - 1); // find random wall edge
             wallParent = wallParent.transform.GetChild(index).gameObject;
-            Debug.Log(wallParent.name);
         }
 
 
@@ -181,7 +180,7 @@ public class RoomGeneration : MonoBehaviour
         else
         {
             // rerotate dar to attempt to fit
-            Debug.Log("Rotating room");
+            // Debug.Log("Rotating room");
 
             if (dar1.pos > 1) { dar1.pos -= 2; }
             else { dar1.pos += 2; }
@@ -251,8 +250,8 @@ public class RoomGeneration : MonoBehaviour
             debugInt++;
         }
 
-        Debug.Log("Dir: " + dar1.pos + " Pos: " + dar1.door.transform.position);
-        Debug.Log("Dir: " + dar2.pos + " Pos: " + dar2.door.transform.position);
+        //Debug.Log("Dir: " + dar1.pos + " Pos: " + dar1.door.transform.position);
+        //Debug.Log("Dir: " + dar2.pos + " Pos: " + dar2.door.transform.position);
 
         // recheck tile positions
         tile1 = dar1.door.transform.position + directions[dar1.pos] * scale / 2;
