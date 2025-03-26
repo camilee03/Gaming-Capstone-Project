@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6537843785457424190}
   - component: {fileID: 1443524919037549712}
   - component: {fileID: 370143422572536390}
+  - component: {fileID: 8358205256436747649}
   m_Layer: 0
   m_Name: Chute
   m_TagString: Selectable
@@ -86,3 +87,24 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &8358205256436747649
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6290924418242524118}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.06429548, y: 0.03999999, z: 0.059999987}
+  m_Center: {x: 0.029852247, y: -4.8849687e-17, z: 0.029999992}
