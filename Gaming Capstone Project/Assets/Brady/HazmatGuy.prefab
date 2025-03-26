@@ -664,7 +664,6 @@ MonoBehaviour:
   playerLayerMask:
     serializedVersion: 2
     m_Bits: 8
-  canAttack: 1
   isGrounded: 0
   debugOffline: 1
   canMove: 1
@@ -833,6 +832,10 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 8e2ad543-25fc-44a9-95cf-f635adfcfef3
     m_ActionName: 'Player/FlashLightToggle[/Keyboard/f]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: e95b6a8c-ad76-4d46-9a16-3692bfd767f7
+    m_ActionName: 'Player/Morph[/Keyboard/q]'
   m_NeverAutoSwitchControlSchemes: 1
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -2058,7 +2061,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.01
+  near clip plane: 0.7
   far clip plane: 1000
   field of view: 80
   orthographic: 0
