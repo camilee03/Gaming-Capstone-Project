@@ -134,9 +134,9 @@ Light:
   m_Type: 0
   m_Color: {r: 1, g: 0.8845376, b: 0.4811321, a: 1}
   m_Intensity: 100
-  m_Range: 100.55
-  m_SpotAngle: 160
-  m_InnerSpotAngle: 100
+  m_Range: 20
+  m_SpotAngle: 110
+  m_InnerSpotAngle: 0
   m_CookieSize: 10
   m_Shadows:
     m_Type: 0
@@ -164,7 +164,7 @@ Light:
       e32: 0
       e33: 1
     m_UseCullingMatrixOverride: 0
-  m_Cookie: {fileID: 2800000, guid: f9194ab122ae6ed45bdf20631794dff0, type: 3}
+  m_Cookie: {fileID: 2800000, guid: 4b584f11cd966234483692ca05533b6d, type: 3}
   m_DrawHalo: 0
   m_Flare: {fileID: 0}
   m_RenderMode: 0
@@ -175,7 +175,7 @@ Light:
   m_Lightmapping: 4
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
-  m_BounceIntensity: 1
+  m_BounceIntensity: 0
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}

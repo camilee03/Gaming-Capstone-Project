@@ -1,18 +1,45 @@
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class FlashLight : MonoBehaviour
+public class FlashLight : NetworkBehaviour
 {
     bool flashlightEnabled = false;
-    [SerializeField] private Light flashlight;
+    [SerializeField] GameObject flashlight;
     public void FlashLightToggle(InputAction.CallbackContext context)
     {
-        if(context.performed) flashlightEnabled = !flashlightEnabled;
-        flashlight.enabled = flashlightEnabled;
+        if (context.performed && IsLocalPlayer)
+        {
+            Toggle(); // always toggles locally
+
+            if (IsOwner)
+            {
+                if (IsServer) { FlashlightServerRpc(); }
+                else { FlashlightServerRpc(); }
+            }
+        }
+        //flashlight.GetComponent<NetworkObject>().enabled = flashlightEnabled;
     }
 
+    [ClientRpc]
+    private void FlashlightClientRpc()
+    {
+        Toggle();
+        //FlashlightServerRpc();
+        Debug.Log("Client");
+    }
 
+    [ServerRpc]
+    private void FlashlightServerRpc()
+    {
+        Toggle();
+        Debug.Log("Server");
+    }
 
-
+    private void Toggle()
+    {
+        flashlightEnabled = !flashlightEnabled;
+        flashlight.SetActive(flashlightEnabled);
+    }
 
 }
