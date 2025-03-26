@@ -1356,6 +1356,7 @@ GameObject:
   - component: {fileID: 4257613629345953098}
   - component: {fileID: 917763358606224804}
   - component: {fileID: 730179910265013865}
+  - component: {fileID: 5837110232429472584}
   m_Layer: 3
   m_Name: HazmatGuy
   m_TagString: Untagged
@@ -1549,9 +1550,12 @@ MonoBehaviour:
   playerLayerMask:
     serializedVersion: 2
     m_Bits: 8
+  otherrenderer: {fileID: 4961185174936972770}
+  selfrenderer: {fileID: 1364953303101327658}
   isGrounded: 0
   debugOffline: 1
   canMove: 1
+  useAnimator: 1
 --- !u!114 &6024289853012604093
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1838,6 +1842,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   Speed: 5
+--- !u!114 &5837110232429472584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1640891303535538884}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  TransitionStateInfoList: []
+  m_Animator: {fileID: 8537348181529872809}
 --- !u!1 &1699243972102732986
 GameObject:
   m_ObjectHideFlags: 0
@@ -3299,7 +3318,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 98e82dc00a3203e4fab2c214c1017ff0, type: 2}
+  - {fileID: 2100000, guid: dc50e93a34c119e48812239110861526, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
