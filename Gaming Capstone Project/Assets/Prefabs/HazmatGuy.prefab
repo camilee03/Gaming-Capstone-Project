@@ -1546,6 +1546,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   otherrenderer: {fileID: 4961185174936972770}
+  otherrenderer2: {fileID: 1767279707666266396}
   selfrenderer: {fileID: 1364953303101327658}
   isGrounded: 0
   debugOffline: 1
