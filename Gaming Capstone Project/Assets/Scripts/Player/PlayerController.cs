@@ -52,7 +52,7 @@ public class PlayerController : NetworkBehaviour
     private Rigidbody rgd;
     private Animator animator;
     private NetworkAnimator nanimator;
-    private PlayerInput playerInput;
+    public PlayerInput playerInput;
     private CameraMovement camMovement;
 
     private bool isTransformed = false;
