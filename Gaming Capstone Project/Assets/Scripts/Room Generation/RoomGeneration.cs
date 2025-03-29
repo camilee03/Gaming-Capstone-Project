@@ -20,32 +20,26 @@ public class RoomGeneration : MonoBehaviour
     public bool debug;
 
 
-    List<int> finishedRooms = new(); // holds rooms that have been paired
-
-    public List<Room> rooms = new();
-
     [Header("Spawn Data")]
     public float scale = 10; // how many tiles apart are different objects
     public int seed = -1; // set to -1 if no seed wanted
+    public int numRooms = 4;
     [SerializeField] GameObject tiles;
     [SerializeField] GameObject walls;
     [SerializeField] GameObject doors;
     List<(GameObject door, int pos, GameObject room)> doorAndRoom;
-    RoomObjectType roomObjectType;
+    ObjectGeneration objectGen;
+
 
     [Header("Collision Data")]
     bool collided;
     bool coroutineRunning;
 
+
     void Start()
     {
-        roomObjectType = GetComponent<RoomObjectType>();
+        objectGen = GetComponent<ObjectGeneration>();
         StartGeneration();
-    }
-
-    private void Update()
-    {
-        //if (Input.GetKeyDown(KeyCode.Return)) { StartGeneration(); }
     }
 
 
@@ -64,12 +58,10 @@ public class RoomGeneration : MonoBehaviour
     {
         ClearMap(); // only neccessary if regenerating the entire map
 
-        int numRooms = 4;
-
         // Spawn first room
         Room newRoom = new(scale, tiles, walls);
-        newRoom.RoomProcedure(0);
-        rooms.Add(newRoom);
+        newRoom.RoomProcedure(0, objectGen);
+        RoomManager.Instance.rooms.Add(newRoom);
         GameObject room1 = newRoom.parent;
 
         // Find and spawn lobby
@@ -87,8 +79,8 @@ public class RoomGeneration : MonoBehaviour
 
             // Spawn next room
             Room room2 = new(scale, tiles, walls);
-            room2.RoomProcedure(index);
-            rooms.Add(room2);
+            room2.RoomProcedure(index, objectGen);
+            RoomManager.Instance.rooms.Add(room2);
             numRooms--;
 
             // Get new doors
@@ -103,10 +95,7 @@ public class RoomGeneration : MonoBehaviour
             index++;
         }
 
-
-
         // Spawn Objects for each room
-        roomObjectType.ObjectGeneration();
 
     }
 
@@ -121,7 +110,7 @@ public class RoomGeneration : MonoBehaviour
             if (room != null && room.name != "Room0") { GameObject.Destroy(room); }
         }
 
-        rooms = new();
+        RoomManager.Instance.rooms = new();
     }
    
 

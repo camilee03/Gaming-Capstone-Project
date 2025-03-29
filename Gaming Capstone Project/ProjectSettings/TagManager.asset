@@ -10,6 +10,7 @@ TagManager:
   - Room
   - Tile
   - Door
+  - Button
   layers:
   - Default
   - TransparentFX

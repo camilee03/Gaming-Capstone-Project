@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6970827077181135502}
   - component: {fileID: 7854146006491320387}
   - component: {fileID: 5273622244777202}
+  - component: {fileID: 7843316225880752643}
   m_Layer: 0
   m_Name: RoomGenerationManager
   m_TagString: Untagged
@@ -50,6 +51,7 @@ MonoBehaviour:
   debug: 0
   scale: 10
   seed: 69
+  numRooms: 4
   tiles: {fileID: 6140652643369139530, guid: d1ec0aef85ae9ad4b866c5705f6f3262, type: 3}
   walls: {fileID: 5069348235013271274, guid: 79a355e1f88fadc4d8d20744de239d25, type: 3}
   doors: {fileID: 6134351026715822803, guid: a994d680f6c5eb04c8672c8f631d0985, type: 3}
@@ -65,11 +67,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96c40d8ea505f2e448f7b2185b293f5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectsRoom0: 4c004c00540043006400
-  objectsRoom1: 4c004c00660074007400
-  objectsRoom2: 4c004c00540074007400
-  objectsRoom3: 4c004c004c004c006300
-  objectsRoom4: 4c004c004c0054006300
 --- !u!114 &5273622244777202
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -109,3 +106,16 @@ MonoBehaviour:
     obj: {fileID: 7378980975851388449, guid: 548016657dcbe6a448425ceac9f0bd99, type: 3}
   - name: vent
     obj: {fileID: 7378980975851388449, guid: 548016657dcbe6a448425ceac9f0bd99, type: 3}
+--- !u!114 &7843316225880752643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4306520903681108259}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 246d78e01a78cec4297578ceea95c79f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnPoints: []

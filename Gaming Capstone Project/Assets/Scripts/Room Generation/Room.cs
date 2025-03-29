@@ -7,9 +7,11 @@ public class Room
 
     [Header("Public variables")]
     public GameObject parent;
-    public GameObject wallParent;
-    public GameObject tileParent;
-    public List<Vector2> finalRoomTiles;
+    public GameObject wallParent; // children = all walls & doors
+    public List<GameObject> spawnedWalls = new();
+    public GameObject tileParent; // children = all floor tiles
+    public GameObject objectParent; // children = all objects
+    public string roomName;
     public char[,] objectLocations;
 
 
@@ -19,11 +21,12 @@ public class Room
 
 
     List<GameObject> spawnedTiles = new();
-    List<GameObject> spawnedOutline = new();
     List<int> outlineDirections = new();
 
     int size;
     float scale;
+
+    [Header("Spawn Type")]
     GameObject tile;
     GameObject wall;
 
@@ -38,7 +41,7 @@ public class Room
     }
 
     /// <summary> Starts the room generation </summary>
-    public void RoomProcedure(int roomNum)
+    public void RoomProcedure(int roomNum, ObjectGeneration objectSpawner)
     {
         GameObject newRoom = null;
         GenerateNewRoom(); // create the array for the new room
@@ -56,6 +59,8 @@ public class Room
         newRoom.tag = "Room";
 
         parent = newRoom;
+
+        //SpawnObjects(objectSpawner);
     }
 
     /// <summary> Deletes old instances of room </summary>
@@ -90,8 +95,6 @@ public class Room
                     Vector3 position = new Vector3(x * scale, 2.5f, y * scale);
                     newObject.transform.position = position;
                     spawnedTiles.Add(newObject);
-
-                    finalRoomTiles.Add(new Vector2(x, y));
                 }
                 else if (objectLocations[x, y] == 'w') // spawn wall
                 {
@@ -109,7 +112,6 @@ public class Room
     {
         size = Random.Range(10, 20);
         objectLocations = new char[size, size]; // set random room size
-        finalRoomTiles = new(); // reset filled room tiles
 
         int numSquares = Random.Range(1, 5); // determine how many squares will be generated
 
@@ -149,12 +151,10 @@ public class Room
                 newObject.transform.localRotation = Quaternion.Euler(-90, ((i + 1) % 2) * 90, 0);
                 newObject.name = "Wall" + i;
 
-                spawnedOutline.Add(newObject);
+                spawnedWalls.Add(newObject);
                 outlineDirections.Add(i);
             }
         }
-
-        finalRoomTiles.Add(new Vector2(x, y));
 
     }
 
@@ -227,7 +227,6 @@ public class Room
     }
 
 
-
     // -- TILE GENERATION -- //
 
     /// <summary> Adds the generated room to the array </summary>
@@ -287,4 +286,12 @@ public class Room
     }
 
 
+    // -- OBJECT GENERATION -- //
+    void SpawnObjects(ObjectGeneration objectSpawner)
+    {
+        // Create a new list of objects
+
+        // spawn objects in the room
+        objectSpawner.GenerationProcedure(this, new char[5] {'T', 't', 'C', 'l', 'l'});
+    }
 }
