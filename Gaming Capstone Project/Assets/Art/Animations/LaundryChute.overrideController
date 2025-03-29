@@ -6,10 +6,10 @@ AnimatorOverrideController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: BigFan
+  m_Name: LaundryChute
   m_Controller: {fileID: 9100000, guid: 26fd81292fc072d438594971c0228841, type: 2}
   m_Clips:
   - m_OriginalClip: {fileID: 7400000, guid: af9b864d72f6f93428ca555769a12ce0, type: 2}
-    m_OverrideClip: {fileID: 7400000, guid: 5c1c8307e29021a41b98da4511712f31, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 5b506dc3cbbf2bf458608a26a369f9bc, type: 2}
   - m_OriginalClip: {fileID: 7400000, guid: e583a43824796f943870561fe8b26553, type: 2}
-    m_OverrideClip: {fileID: 7400000, guid: f7f55659904d6474cba9aa27de8141b3, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: bc33e3601e00c5d45823dd2c85cff3a4, type: 2}
