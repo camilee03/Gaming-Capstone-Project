@@ -16,24 +16,13 @@ public class Interact : MonoBehaviour
     private List<Material> materials;
     private GameObject highlightedObject;
     private GameObject pickedupObject;
-    private Rigidbody pickedupRigidBody;
 
     [Header("Interactable Variables")]
     [SerializeField] TextMeshProUGUI popupText;
     [SerializeField] GameObject popupMenu;
 
-    PlayerController player;
-    public bool onInteract;
-    public Transform rightHand;
-    public Animator anim;
-    public Vector3 offset;
 
     bool canChange = true;
-    private void Start()
-    {
-        player = gameObject.GetComponentInParent<PlayerController>();
-    }
-
     private void Update()
     {
         HitScan();
@@ -44,25 +33,12 @@ public class Interact : MonoBehaviour
         }
 
         // Shows the pickedup object in hand
-        if (!canPickup && pickedupObject != null)
+        if (!canPickup)
         {
-            pickedupObject.transform.position = rightHand.position + (rightHand.forward * offset.x) + (rightHand.up * offset.y) + (rightHand.right * offset.z);
-            pickedupObject.transform.rotation = rightHand.rotation;
-        }
-        
-        //Check for Doppel Transform, must drop if transformed.
-        if (anim.GetBool("Transformed"))
-        {
-            Place();
-            canPickup = false;
-        }
-        else if (pickedupObject == null) //reenable picking up if untransformed.
-        {
-            canPickup = true;
+            pickedupObject.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 0.8f + Camera.main.transform.right * 0.5f;
+            pickedupObject.transform.rotation = Camera.main.transform.rotation;
         }
 
-        if (onInteract) { player.enabled = false; }
-        else { player.enabled = true; }
     }
 
     private void Pickup()
@@ -72,13 +48,6 @@ public class Interact : MonoBehaviour
         {
             canPickup = false;
             pickedupObject = highlightedObject;
-            if (pickedupObject.GetComponent<Rigidbody>())
-            {
-                pickedupRigidBody = pickedupObject.GetComponent<Rigidbody>();
-                pickedupRigidBody.useGravity = false;
-            }
-            pickedupObject.GetComponent<Collider>().enabled = false;
-            anim.SetLayerWeight(1, 1);
             highlightedObject = null;
         }
     }
@@ -86,15 +55,8 @@ public class Interact : MonoBehaviour
     {
         if (pickedupObject != null)
         {
-            pickedupObject.transform.position = rightHand.position + rightHand.forward * offset.x + rightHand.up * offset.y + rightHand.right * offset.z;
-            pickedupObject.GetComponent<Collider>().enabled = true;
-            anim.SetLayerWeight(1, 0);
-            if (pickedupRigidBody != null)
-            {
-                pickedupRigidBody.useGravity = true;
-            }
+            pickedupObject.transform.position = Camera.main.transform.position + Camera.main.transform.forward + Camera.main.transform.up * 0.3f;
             pickedupObject = null;
-            pickedupRigidBody = null;
             canPickup = true;
         }
     }
@@ -105,19 +67,13 @@ public class Interact : MonoBehaviour
             // access object and perform action
             highlightedObject.GetComponent<Animator>().SetTrigger("isPressed");
         }
-        if (highlightedObject != null && highlightedObject.tag == "Door")
-        {
-            Animator animator = highlightedObject.GetComponent<Animator>();
-
-            animator.SetBool("Open", !animator.GetBool("Open"));
-        }
     }
     void FocusDOS()
     {
         if (highlightedObject != null && highlightedObject.tag == "DOS Terminal")
         {
             // access object and perform action
-            highlightedObject.GetComponent<DOSInteraction>().SetInteract(gameObject.GetComponent<Interact>(), player);
+            highlightedObject.GetComponent<DOSInteraction>().SetInteract(gameObject.GetComponent<Interact>());
             highlightedObject.GetComponent<DOSInteraction>().ToggleInteraction();
 
             Debug.Log("DOS Opened!");
