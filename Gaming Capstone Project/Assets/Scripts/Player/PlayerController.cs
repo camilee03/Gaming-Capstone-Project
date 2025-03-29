@@ -338,8 +338,6 @@ public class PlayerController : NetworkBehaviour
         // The next Update() will show the death screen and disable movement.
     }
 
-
-
     // Helper method to cleanly stop sprinting logic
     private void StopSprinting()
     {
