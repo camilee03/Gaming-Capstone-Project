@@ -1,11 +1,5 @@
 {
   "dependencies": {
-    "com.seaeees.simple-folder-icon": {
-      "version": "file:com.seaeees.simple-folder-icon",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
-    },
     "com.unity.2d.tilemap": {
       "version": "1.0.0",
       "depth": 1,

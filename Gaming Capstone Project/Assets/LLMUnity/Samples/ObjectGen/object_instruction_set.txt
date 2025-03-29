@@ -1,0 +1,62 @@
+﻿The properties and their respective identifiers are described below:
+
+    "essential": at least one of these items must be present in the room. 
+    "scarce": 0-1 objects can be present in the list.
+    "plentiful": more than 2 objects of this name must be present in the list.
+    "paired": an object can only be included in the list if the object in the brackets is also in the list.
+    "none": an object does not have any constraints and can be placed in any room.
+
+
+
+Objects and their respective properties and identifiers (Properties are shown as P):
+
+    Box (P: none)
+    Button (P: none)
+    Lever (P: none)
+    Light (P: essential)
+    Table (P: scarce, paired[Chair])
+    Chair (P: paired[Table])
+    Door (P: essential)
+    BulletinBoard (P: essential, scarce)
+    Radio (P: none)
+    Terminal (P: essential, scarce)
+    Fan (P: essential)
+    Wires (P: none)
+    Furnace (P: paired[Coal], scarce)
+    Coal (P: paired[Furnace], plentiful)
+    Vent (P: none)
+    Food (P: paired[Table])
+    WashingMachine (P: paired[Clothes])
+    Clothes (P: plentiful)
+    Cabinet (P: paired[Food])
+    EnergyCore (P: paired[Button])
+    Trash (P: plentiful)
+
+
+
+The user may ask to create a list. A list is a series of objects that adhere to the above properties and contains no more than 
+20 entries. 
+
+An acceptable list is list L = 
+{ Light, Light, BulletinBoard, Trash, Trash, Trash, Door, Fan, Terminal, Radio, Chair, Chair, Table }
+
+Another accetable list is list L1 = 
+{ Chair, Table, Vent, Light, BulletinBoard, Chair, Door, Terminal, Door, Chair, Box, Button }
+
+
+
+Each list of objects will be considered a "room". These rooms will have different themes depending on the objects present in them.
+For example, a room with food, a table, and some chairs might be a dining room while a room with an energy core, coal, and a furnace
+might be a power room. Rooms can be whatever type as long as they fit the theme of an underground bunker somewhere in Russia. 
+
+The following is a list of possible room ideas:
+Command Center, Communication Room, Operations Room, Briefing Room, War Room, Control Room, Surveillance Room, Intelligence Room, 
+Strategy Room, Map Room, Situation Room, Planning Room, Conference Room, Security Room, Armory, Weapons Storage, Ammunition Depot, 
+Equipment Room, Supply Room, Medical Bay, Infirmary, Quarantine Room, Laboratory, Research Room, Engineering Room, Maintenance Room,
+Workshop, Power Room, Generator Room, Fuel Storage, Water Treatment Room, Food Storage, Kitchen, Dining Hall, Living Quarters, 
+Sleeping Quarters, Officer's Quarters, Barracks, Recreation Room, Gym, Training Room, Library, Archive Room, Storage Room, Laundry Room,
+Shower Room, Restroom, Escape Tunnel, Air Filtration Room, Decontamination Room
+
+
+
+When creating a list for the user, the list name must be the theme of the room. 

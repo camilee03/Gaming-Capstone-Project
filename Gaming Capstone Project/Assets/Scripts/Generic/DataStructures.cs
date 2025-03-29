@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class DataStructures : ScriptableObject
 {
-    public class Pair<T>
+    class Pair<T>
     {
         public T First { get; private set; }
         public T Second { get; private set; }
@@ -51,7 +51,7 @@ public class DataStructures : ScriptableObject
     }
     public class PriorityQueue<T>
     {
-        public SortedList<Pair<int>, T> _list;
+        SortedList<Pair<int>, T> _list;
         public int count;
 
         public PriorityQueue()

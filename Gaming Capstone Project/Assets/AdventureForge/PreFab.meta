@@ -1,8 +1,16 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
 guid: 0935d1d7981d7d9419446b2b478236b0
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}
+=======
+guid: 80f53dbf8c78c4c44b482f8aa580216a
+folderAsset: yes
+timeCreated: 1448816213
+licenseType: Store
+DefaultImporter:
+>>>>>>> parent of 6369886 (Merge into Chase)
   userData: 
   assetBundleName: 
   assetBundleVariant: 

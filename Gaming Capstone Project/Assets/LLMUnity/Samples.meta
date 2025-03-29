@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
 guid: 815c342674a1c8b49b9704285c52644c
+=======
+guid: ba10ec18b15a9476c82bd085e2c17559
+>>>>>>> parent of 6369886 (Merge into Chase)
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}
