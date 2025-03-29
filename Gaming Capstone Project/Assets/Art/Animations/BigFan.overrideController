@@ -1,0 +1,15 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: BigFan
+  m_Controller: {fileID: 9100000, guid: 26fd81292fc072d438594971c0228841, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: af9b864d72f6f93428ca555769a12ce0, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 2bf9b5306646a434aa032e61aa4114c8, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: e583a43824796f943870561fe8b26553, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 3a12b04d79c09094a80450631eee6982, type: 2}
