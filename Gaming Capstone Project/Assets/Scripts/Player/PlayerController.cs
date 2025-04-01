@@ -64,6 +64,8 @@ public class PlayerController : NetworkBehaviour
     public bool canMove = true;
     public bool useAnimator = true;
 
+
+
     public override void OnNetworkSpawn()
     {
         playerInput = GetComponent<PlayerInput>();
@@ -102,6 +104,8 @@ public class PlayerController : NetworkBehaviour
 
         Debug.Log($"[ClientRpc] Player {OwnerClientId} => isDopple={isDopple}");
     }
+
+
     private void Start()
     {
         rgd = GetComponent<Rigidbody>();
@@ -116,7 +120,11 @@ public class PlayerController : NetworkBehaviour
             TeamDeclaration.text = "You are a : Scientist";
     }
 
-
+    [ClientRpc]
+    public void MoveToLobbyClientRpc(Vector3 pos, Quaternion rot)
+    {
+        transform.SetPositionAndRotation(pos, rot);
+    }
 
     private void Update()
     {
