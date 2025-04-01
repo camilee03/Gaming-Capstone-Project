@@ -86,10 +86,10 @@ public class Interact : NetworkBehaviour
                     }
                     break;
                 case "Button": // Press button / lever
-                    highlightedObject.GetComponent<Animator>().SetBool("Toggled", !highlightedObject.GetComponent<Animator>().GetBool("Toggled"));
+                    toggleAnimatedObject(highlightedObject);
                     break;
                 case "Door": // Open / close door
-                    highlightedObject.GetComponent<Animator>().SetBool("Toggled", !highlightedObject.GetComponent<Animator>().GetBool("Toggled"));
+                    toggleAnimatedObject(highlightedObject);
                     break;
                 case "DOS Terminal": // access object and perform action
                     highlightedObject.GetComponent<DOSInteraction>().SetInteract(gameObject.GetComponent<Interact>(), player);
@@ -161,4 +161,11 @@ public class Interact : NetworkBehaviour
         }
         highlightedObject = null;
     }
+
+    public void toggleAnimatedObject(GameObject g)
+    {
+        g.GetComponent<ClientNetworkAnimator>().AnimToggleServerRpc();
+        Debug.Log("Toggled " + g.name);
+    }
+
 }
