@@ -35,7 +35,6 @@ public class CameraMovement : NetworkBehaviour
     {
         if (!debugOffline && (!IsOwner || !IsSpawned)) return;
 
-        canMove = playerController.canMove;
 
         if (!canMove) return;
 

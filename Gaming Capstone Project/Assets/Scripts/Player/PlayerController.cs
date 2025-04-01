@@ -50,7 +50,7 @@ public class PlayerController : NetworkBehaviour
     private bool isSprinting;
     private Rigidbody rgd;
     private Animator animator;
-    private PlayerInput playerInput;
+    public PlayerInput playerInput;
     private CameraMovement camMovement;
 
     private bool isTransformed = false;
@@ -89,6 +89,12 @@ public class PlayerController : NetworkBehaviour
         }
 
     }
+    [ClientRpc]
+    public void MoveToLobbyClientRpc(Vector3 pos, Quaternion rot)
+    {
+        transform.SetPositionAndRotation(pos, rot);
+    }
+
     [ClientRpc]
     public void SetDoppleClientRpc(bool newIsDopple)
     {

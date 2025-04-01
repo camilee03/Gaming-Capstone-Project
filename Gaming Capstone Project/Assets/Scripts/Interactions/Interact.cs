@@ -22,7 +22,6 @@ public class Interact : NetworkBehaviour
     string[] tags = { "Selectable", "Button", "Door", "DOS Terminal" };
 
     PlayerController player;
-    bool onInteract = false;
     public Transform rightHand;
     public Animator anim;
     public Vector3 offset;
@@ -60,8 +59,6 @@ public class Interact : NetworkBehaviour
             canPickup = true;
         }
 
-        if (onInteract) { player.enabled = false; }
-        else { player.enabled = true; }
     }
 
     public void OnClick()
@@ -92,11 +89,8 @@ public class Interact : NetworkBehaviour
                     toggleAnimatedObject(highlightedObject);
                     break;
                 case "DOS Terminal": // access object and perform action
-                    highlightedObject.GetComponent<DOSInteraction>().SetInteract(gameObject.GetComponent<Interact>(), player);
+                    highlightedObject.GetComponent<DOSInteraction>().SetInteract(gameObject.GetComponent<Interact>());
                     highlightedObject.GetComponent<DOSInteraction>().ToggleInteraction();
-
-                    Debug.Log("DOS Opened!");
-                    onInteract = !onInteract;
                     break;
             }
         }
