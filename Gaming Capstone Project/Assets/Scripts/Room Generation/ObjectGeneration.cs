@@ -62,10 +62,12 @@ public class ObjectGeneration : MonoBehaviour
 
 
         // Create viable locations lists
+        wallPositions = new();
         for (int i = 0; i < room.wallParent.transform.childCount - 1; i++)
         {
             wallPositions.Add(room.wallParent.transform.GetChild(i).position);
         }
+        tilePositions = new();
         for (int i = 0; i < room.tileParent.transform.childCount - 1; ++i)
         {
             tilePositions.Add(room.tileParent.transform.GetChild(i).position);
@@ -195,18 +197,10 @@ public class ObjectGeneration : MonoBehaviour
         }
     }
 
-    public void CleanRoom()
-    {
-        foreach (GameObject obj in spawnedObjects)
-        {
-            GameObject.Destroy(obj);
-        }
-        spawnedObjects = new List<GameObject>();
-    }
-
     private void PlaceObjects2(char type, Vector3 tilePos, int scale, GameObject parent)
     {
         GameObject newObject = null;
+        Vector3 ceilingHeight = Vector3.up * 12;
 
         switch (type)
         {
@@ -218,13 +212,13 @@ public class ObjectGeneration : MonoBehaviour
             case 'C': // Chair
                 newObject = GameObject.Instantiate(objects["chair"], parent.transform);
                 newObject.transform.localScale *= 2;
-                newObject.transform.position = tilePos + Vector3.up * 10;
+                newObject.transform.position = tilePos;
                 newObject.transform.localRotation = Quaternion.identity;
                 break;
             case 'c': // Chute
                 newObject = GameObject.Instantiate(objects["chute"], parent.transform);
                 newObject.transform.localScale *= 2;
-                newObject.transform.position = tilePos + Vector3.up * 10;
+                newObject.transform.position = tilePos + Vector3.up * 5;
                 newObject.transform.localRotation = Quaternion.identity;
                 break;
             case 'F': // fan
@@ -234,7 +228,7 @@ public class ObjectGeneration : MonoBehaviour
                 break;
             case 'L': // light
                 newObject = GameObject.Instantiate(objects["light"], parent.transform);
-                newObject.transform.position = tilePos + Vector3.up * 14;
+                newObject.transform.position = tilePos + ceilingHeight;
                 newObject.transform.localRotation = Quaternion.Euler(-90, 0, 0);
                 break;
             case 'l': // lever
@@ -249,13 +243,14 @@ public class ObjectGeneration : MonoBehaviour
                 break;
             case 'T': // Table
                 newObject = GameObject.Instantiate(objects["table"], parent.transform);
-                newObject.transform.localScale *= 2;
-                newObject.transform.position = tilePos + Vector3.up * 10;
+                newObject.transform.localScale /= 1.1f;
+                newObject.transform.position = tilePos;
                 newObject.transform.localRotation = Quaternion.Euler(-90, 0, 0);
                 break;
             case 't': // DOS terminal
                 newObject = GameObject.Instantiate(objects["DOS terminal"], parent.transform);
-                newObject.transform.position = tilePos + Vector3.up * 1;
+                newObject.transform.localScale /= 1.1f;
+                newObject.transform.position = tilePos;
                 newObject.transform.localRotation = Quaternion.Euler(-90, 0, 0);
                 break;
             case 'v': // vent
@@ -278,8 +273,54 @@ public class ObjectGeneration : MonoBehaviour
 
     }
 
-    private void DetermineTask() // determine tasks based on GPT model
+
+
+
+    private char[] CreateObjectList(int numTiles, RoomType roomType) 
     {
+        if (2 * roomType.objects.Length > numTiles) { Debug.Log("ERROR: More objects than space"); }
+
+        char[] roomObjectList = new char[numTiles-2];
+        int wiggleRoom = Mathf.Max((numTiles - roomType.objects.Length * 2) - 5, 0);
+        int index = 0;
+
+        foreach (char obj in roomType.objects)
+        {
+            int numObjs = NumberOfObjectsToSpawn(obj, wiggleRoom);
+            for (int i = 0; i < numObjs; i++)
+            {
+                roomObjectList[index++] = obj;
+            }
+
+        }
+
+        return roomObjectList;
+    }
+
+    private int NumberOfObjectsToSpawn(char obj, int wiggleRoom)
+    {
+        switch (obj)
+        {
+            // Plentiful objects
+            case 'x': // Clothes
+            case 'c': // Coal
+            case 'X': // Food
+            case 'L': // Light
+            case 'p': // Paper
+                return 1;
+
+            // Scarce objects
+            case 'B': // Button
+            case 'F': // Fan
+            case 'f': // Furnace
+            case 't': // Table
+            case 'T': // Terminal
+                return Mathf.Min(Random.Range(5, 5 + wiggleRoom), 10);
+
+            // Default for objects without these properties
+            default:
+                return Mathf.Min(Random.Range(1, 1 + wiggleRoom), 5);
+        }
 
     }
 
@@ -299,6 +340,12 @@ public class ObjectGeneration : MonoBehaviour
         public List<Vector3> domains; // all the locations this object can be
         public Constraints constraint;
     };
+
+    struct RoomType
+    {
+        public string name;
+        public char[] objects;
+    }
 }
 
 

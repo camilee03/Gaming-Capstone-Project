@@ -11,6 +11,7 @@ TagManager:
   - Tile
   - Door
   - Button
+  - Useable
   layers:
   - Default
   - TransparentFX

@@ -12,6 +12,14 @@ public class RoomManager : MonoBehaviour
         else { Instance = this; }
     }
 
+    private void Start()
+    {
+        foreach (Room room in rooms)
+        {
+            spawnPoints.Add(room.parent.transform.position);
+        }
+    }
+
     public List<Room> rooms;
     public List<Vector3> spawnPoints;
 }

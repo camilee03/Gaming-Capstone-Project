@@ -36,7 +36,7 @@ public class RoomGeneration : MonoBehaviour
     bool coroutineRunning;
 
 
-    void Start()
+    void Awake()
     {
         objectGen = GetComponent<ObjectGeneration>();
         StartGeneration();
@@ -95,7 +95,12 @@ public class RoomGeneration : MonoBehaviour
             index++;
         }
 
+
         // Spawn Objects for each room
+        foreach (Room room in RoomManager.Instance.rooms)
+        {
+            objectGen.GenerationProcedure(room, new char[8] { 'T', 't', 'C', 'l', 'L', 'v' , 'f', 's'});
+        }
 
     }
 

@@ -1,60 +1,150 @@
 using UnityEngine;
 using System.Collections.Generic;
+using TMPro;
 
 public class TaskAssigner : MonoBehaviour
 {
+    // Task containers
     List<RoomTask> taskList;
-    List<RoomTask> assignedTasks;
+    List<RoomTask> assignedTasks = new List<RoomTask>();
+    bool[] finishedTasks;
     int numTasks = 3;
 
-    private void Start()
-    {
-        taskList = GetComponent<TaskManager>().taskList;
+    // Task display
+    [SerializeField] TMP_Text goalText;
+    [SerializeField] TMP_Text tasksCompleted;
 
-        // Add random tasks from total tasks in task manager
-        for (int i = 0; i < numTasks; i++)
-        {
-            int newTask = Random.Range(0, taskList.Count - 1);
-            while (assignedTasks.Contains(taskList[newTask])) { newTask = Random.Range(0, taskList.Count - 1); }
+    bool start = true;
+    bool donow = false;
 
-            assignedTasks.Add(taskList[newTask]);
-        }
-    }
 
     private void Update()
     {
-        for (int i=0; i < assignedTasks.Count; i++)
+        if (start)
         {
-            switch (assignedTasks[i].type)
+            AssignTasks();
+            start = false;
+        }
+        else
+        {
+            int numTasksFinished = 0;
+
+            for (int i = 0; i < assignedTasks.Count; i++)
             {
-                case TaskType.None: break;
-                case TaskType.Interact: if (InteractTask(assignedTasks[i])) { assignedTasks.RemoveAt(i); } break;
-                case TaskType.Terminal: if (TerminalTask(assignedTasks[i])) { assignedTasks.RemoveAt(i); } break;
-                case TaskType.Pickup: if (PickupTask(assignedTasks[i])) { assignedTasks.RemoveAt(i); } break;
-                case TaskType.Paper: break;
+                if (!finishedTasks[i])
+                {
+                    switch (assignedTasks[i].type)
+                    {
+                        case TaskType.None: break;
+                        case TaskType.Interact: if (InteractTask(assignedTasks[i])) { finishedTasks[i] = true; } break;
+                        case TaskType.Terminal: if (TerminalTask(assignedTasks[i])) { finishedTasks[i] = true; } break;
+                        case TaskType.Pickup: if (PickupTask(assignedTasks[i])) { finishedTasks[i] = true; } break;
+                        case TaskType.Paper: break;
+                    }
+                }
+                else { numTasksFinished++; }
             }
+
+            tasksCompleted.text = numTasksFinished + "/" + numTasks;
+        }
+    }
+
+    void AssignTasks()
+    {
+        taskList = GameObject.Find("TaskManager").GetComponent<TaskManager>().taskList;
+        string goalTextResult = "";
+
+        for (int i = 0; i < numTasks; i++)
+        {
+            // Add random tasks from total tasks in task manager
+            int newTask = Random.Range(0, taskList.Count - 1);
+            Debug.Log(newTask);
+            //while (assignedTasks.Contains(taskList[newTask])) { newTask = Random.Range(0, taskList.Count - 1); }
+
+            assignedTasks.Add(taskList[newTask]);
+
+            // Add to goalTextResult
+            goalTextResult += "Task " + i + ": " + DisplayText(taskList[newTask]) + "\n";
+        }
+
+        finishedTasks = new bool[assignedTasks.Count];
+
+        // set initial UI
+        goalText.text = goalTextResult;
+        tasksCompleted.text = "0/" + numTasks;
+    }
+
+    string DisplayText(RoomTask task)
+    {
+        string triggers = "";
+        foreach (GameObject trigger in task.triggerGameObject)
+        {
+            triggers += " " + trigger.name;
+        }
+
+        string triggerRooms = "";
+        foreach (Room room in task.rooms1)
+        {
+            triggerRooms += " " + room.roomName;
+        }
+
+        string results = "";
+        if (task.resultGameObject != null)
+        {
+            foreach (GameObject result in task.resultGameObject)
+            {
+                results += " " + result.name;
+            }
+        }
+
+        string resultRooms = "";
+        foreach (Room room in task.rooms2)
+        {
+            resultRooms += " " + room.roomName;
+        }
+
+        switch (task.type)
+        {
+            case TaskType.Interact: return "Activate " + results;
+            case TaskType.Terminal: return "Use the terminal in " + triggerRooms + " to ____";
+            case TaskType.Pickup: return "Move " + triggers + " in " + triggerRooms + " to " + resultRooms;
+            case TaskType.Paper: return "Piece the papers in " + triggerRooms + "together in " + resultRooms + ".";
+            default: return "";
         }
     }
 
 
     bool PickupTask(RoomTask task)
     {
-        if (task.triggerGameObject.transform.position == task.position)
+        foreach (GameObject trigger in task.triggerGameObject)
         {
-            return true;
+            if (trigger.transform.position != task.position)
+            {
+                return false;
+            }
         }
 
-        return false;
+        return true;
     }
 
     bool InteractTask(RoomTask task)
     {
-        if (task.data1.GetActiveAnimationState())
+        foreach (ObjectData data in task.data1)
         {
-            //task.data2.SetActiveAnimationState(true);
-            return true;
+            if (!data.GetActiveAnimationState())
+            {
+                return false;
+            }
         }
-        return false;
+
+        //task.data2.SetActiveAnimationState(true);
+        return true;
+    }
+
+    bool PaperTask(RoomTask task)
+    {
+        // on completion, display UI to put pieces of paper together
+        return true;
     }
 
     bool TerminalTask(RoomTask task)

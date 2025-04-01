@@ -56,11 +56,10 @@ public class Room
         }
 
         newRoom.name = "Room" + roomNum;
+        roomName = newRoom.name;
         newRoom.tag = "Room";
 
         parent = newRoom;
-
-        //SpawnObjects(objectSpawner);
     }
 
     /// <summary> Deletes old instances of room </summary>
@@ -283,15 +282,5 @@ public class Room
             }
             currentWalls = 0; inZeros = false;
         }
-    }
-
-
-    // -- OBJECT GENERATION -- //
-    void SpawnObjects(ObjectGeneration objectSpawner)
-    {
-        // Create a new list of objects
-
-        // spawn objects in the room
-        objectSpawner.GenerationProcedure(this, new char[5] {'T', 't', 'C', 'l', 'l'});
     }
 }
