@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
@@ -50,6 +51,35 @@ public class GameController : NetworkBehaviour
             NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
         }
     }
+    private void TeleportPlayerToLobby(ulong clientId)
+    {
+        if (!Players.ContainsKey(clientId) || LobbySpawnPoint == null)
+        {
+            Debug.LogWarning($"[Server] Could not teleport Client {clientId} — Missing player or spawn point.");
+            return;
+        }
+
+        GameObject playerObj = Players[clientId];
+
+        var netTransform = playerObj.GetComponent<NetworkTransform>();
+        if (netTransform != null)
+        {
+            netTransform.Teleport(
+                LobbySpawnPoint.position,
+                LobbySpawnPoint.rotation,
+                Vector3.one
+            );
+        }
+        else
+        {
+            playerObj.transform.SetPositionAndRotation(
+                LobbySpawnPoint.position,
+                LobbySpawnPoint.rotation
+            );
+        }
+
+        Debug.Log($"[Server] Teleported {playerObj.name} to lobby.");
+    }
 
     // -------------------------------------------------------
     // Client (Player) Connect / Disconnect
@@ -58,12 +88,31 @@ public class GameController : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        // Grab the spawned PlayerObject (the default from Netcode)
-        GameObject playerObj = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.gameObject;
+        NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
+        if (playerObject == null)
+        {
+            Debug.LogWarning($"[Server] PlayerObject for ClientId {clientId} is null.");
+            return;
+        }
+
+        GameObject playerObj = playerObject.gameObject;
         Players[clientId] = playerObj;
 
         Debug.Log($"[Server] Player connected => ClientId {clientId}, {playerObj.name}");
+
+        // Move the player using a ClientRpc
+        var pc = playerObj.GetComponent<PlayerController>();
+        if (pc != null && LobbySpawnPoint != null)
+        {
+            pc.MoveToLobbyClientRpc(LobbySpawnPoint.position, LobbySpawnPoint.rotation);
+        }
+        else
+        {
+            Debug.LogWarning("[Server] PlayerController or LobbySpawnPoint is null. Player will not be moved.");
+        }
     }
+
+
 
     private void OnClientDisconnected(ulong clientId)
     {
