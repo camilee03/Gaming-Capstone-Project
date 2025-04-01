@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 public class SoundEffector : MonoBehaviour
 {
+    public float lowerBound = 0.8f, upperBound = 1.2f;
     [System.Serializable]
     public class effectList
     {
