@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using Unity.Netcode;
 using UnityEngine.UI;
 
-public class Interact : MonoBehaviour
+public class Interact : NetworkBehaviour
 {
     [Header("HitScan Variables")]
     bool canPickup = true; // false if holding something already
@@ -85,11 +86,10 @@ public class Interact : MonoBehaviour
                     }
                     break;
                 case "Button": // Press button / lever
-                    highlightedObject.GetComponent<Animator>().SetTrigger("isPressed");
+                    toggleAnimatedObject(highlightedObject);
                     break;
                 case "Door": // Open / close door
-                    Animator animator = highlightedObject.GetComponent<Animator>();
-                    animator.SetBool("Open", !animator.GetBool("Open"));
+                    toggleAnimatedObject(highlightedObject);
                     break;
                 case "DOS Terminal": // access object and perform action
                     highlightedObject.GetComponent<DOSInteraction>().SetInteract(gameObject.GetComponent<Interact>(), player);
@@ -161,4 +161,11 @@ public class Interact : MonoBehaviour
         }
         highlightedObject = null;
     }
+
+    public void toggleAnimatedObject(GameObject g)
+    {
+        g.GetComponent<ClientNetworkAnimator>().AnimToggleServerRpc();
+        Debug.Log("Toggled " + g.name);
+    }
+
 }

@@ -1,7 +1,6 @@
 using DG.Tweening;
 using TMPro;
 using Unity.Netcode;
-using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
@@ -51,7 +50,6 @@ public class PlayerController : NetworkBehaviour
     private bool isSprinting;
     private Rigidbody rgd;
     private Animator animator;
-    private NetworkAnimator nanimator;
     private PlayerInput playerInput;
     private CameraMovement camMovement;
 
@@ -106,7 +104,6 @@ public class PlayerController : NetworkBehaviour
     {
         rgd = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
-        nanimator = GetComponent<NetworkAnimator>();
 
         currentStamina = maxStamina;
 
