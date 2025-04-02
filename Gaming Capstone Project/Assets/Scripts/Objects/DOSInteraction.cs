@@ -26,12 +26,19 @@ public class DOSInteraction : MonoBehaviour
 
     void Start()
     {
-        camera = Camera.main.gameObject;
-        CameraMovementScript = camera.GetComponent<CameraMovement>();
+
         DOSController = DOSCommandController.Instance;
 
-        playerController = camera.transform.parent.parent.parent.parent.parent.parent.GetComponent<PlayerController>();
 
+
+    }
+
+    public void SetCam(GameObject cam)
+    {
+        camera = cam;
+        camera = Camera.main.gameObject;
+        CameraMovementScript = camera.GetComponent<CameraMovement>();
+        playerController = camera.transform.parent.parent.parent.parent.parent.parent.GetComponent<PlayerController>();
 
     }
 

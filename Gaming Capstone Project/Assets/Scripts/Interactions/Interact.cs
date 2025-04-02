@@ -91,6 +91,7 @@ public class Interact : NetworkBehaviour
                 case "DOS Terminal": // access object and perform action
                     highlightedObject.GetComponent<DOSInteraction>().SetInteract(gameObject.GetComponent<Interact>());
                     highlightedObject.GetComponent<DOSInteraction>().ToggleInteraction();
+                    highlightedObject.GetComponent<DOSInteraction>().SetCam(gameObject);
                     break;
             }
         }
