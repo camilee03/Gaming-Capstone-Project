@@ -90,7 +90,8 @@ public class Interact : MonoBehaviour
                     break;
                 case "DOS Terminal": // access object and perform action
                     highlightedObject.GetComponent<DOSInteraction>().SetInteract(gameObject.GetComponent<Interact>());
-                    highlightedObject.GetComponent<DOSInteraction>().ToggleInteraction();
+                    if(highlightedObject.GetComponent<DOSInteraction>().camera == null)
+                    highlightedObject.GetComponent<DOSInteraction>().SetCamera(gameObject);
                     break;
             }
         }

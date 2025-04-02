@@ -51,8 +51,12 @@ public class PlayerController : NetworkBehaviour
     private bool isSprinting;
     private Rigidbody rgd;
     private Animator animator;
+<<<<<<< Updated upstream
     private NetworkAnimator nanimator;
     public PlayerInput playerInput;
+=======
+    private PlayerInput playerInput;
+>>>>>>> Stashed changes
     private CameraMovement camMovement;
 
     private bool isTransformed = false;
@@ -93,6 +97,13 @@ public class PlayerController : NetworkBehaviour
         }
 
     }
+    //private void OnLevelWasLoaded(int level)
+    //{
+    //    MoveToLobbyClientRpc(GameController.Instance.LobbySpawnPoint.position, GameController.Instance.LobbySpawnPoint.rotation);
+
+    //}
+
+
     [ClientRpc]
     public void SetDoppleClientRpc(bool newIsDopple)
     {
@@ -105,7 +116,18 @@ public class PlayerController : NetworkBehaviour
         Debug.Log($"[ClientRpc] Player {OwnerClientId} => isDopple={isDopple}");
     }
 
+<<<<<<< Updated upstream
 
+=======
+    public void SetInputValid(bool able)
+    {
+        if (IsOwner)
+        {
+            if (able) playerInput.ActivateInput();
+            if (!able) playerInput.DeactivateInput();
+        }
+    }
+>>>>>>> Stashed changes
     private void Start()
     {
         rgd = GetComponent<Rigidbody>();

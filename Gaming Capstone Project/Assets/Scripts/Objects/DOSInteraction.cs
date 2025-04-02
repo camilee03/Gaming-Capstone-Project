@@ -10,7 +10,7 @@ public class DOSInteraction : MonoBehaviour
     public Transform cameraMovementPoint;
     public CameraMovement CameraMovementScript;
     public PlayerController playerController;
-    private GameObject camera;
+    public GameObject camera;
     private Vector3 originalPosition;
     private Quaternion originalRotation;
     public bool InInteraction = false;
@@ -24,19 +24,19 @@ public class DOSInteraction : MonoBehaviour
 
     private DOSCommandController DOSController;
 
-    void Start()
+    
+
+    public void SetCamera(GameObject cam)
     {
-        camera = Camera.main.gameObject;
         CameraMovementScript = camera.GetComponent<CameraMovement>();
         DOSController = DOSCommandController.Instance;
 
         playerController = camera.transform.parent.parent.parent.parent.parent.parent.GetComponent<PlayerController>();
 
-
     }
-
     private void Update()
     {
+        
         if (InInteraction)
         {
             if (Input.GetKeyDown(KeyCode.Return))
@@ -93,7 +93,7 @@ public class DOSInteraction : MonoBehaviour
         if (interactionCoroutine != null)
             StopCoroutine(interactionCoroutine);
 
-        playerController.playerInput.enabled = false;
+        playerController.SetInputValid(false);
 
         InInteraction = true;
         originalPosition = camera.transform.position;
@@ -112,7 +112,7 @@ public class DOSInteraction : MonoBehaviour
         if (interactionCoroutine != null)
             StopCoroutine(interactionCoroutine);
 
-        playerController.playerInput.enabled = true;
+        playerController.SetInputValid(true);
 
         InInteraction = false;
         interactionCoroutine = StartCoroutine(LerpCamera(originalPosition, originalRotation, 1f, true));

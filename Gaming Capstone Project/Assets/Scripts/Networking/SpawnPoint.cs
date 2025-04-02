@@ -1,15 +1,16 @@
 using Unity.Netcode;
 using UnityEngine;
 
-public class SpawnPoint : NetworkBehaviour
+public class SpawnPoint : MonoBehaviour
 {
     public bool IsLobbySpawnPoint = false;
 
-    public override void OnNetworkSpawn()
+    public void Start()
     {
-        if (!IsOwner) return; // Optional: only set on the local client
         if (IsLobbySpawnPoint)
+        {
             GameController.Instance.LobbySpawnPoint = transform;
+        }
         else
             GameController.Instance.GameSpawnPoint = transform;
     }

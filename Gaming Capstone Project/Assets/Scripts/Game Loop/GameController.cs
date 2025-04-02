@@ -51,41 +51,14 @@ public class GameController : NetworkBehaviour
             NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
         }
     }
-    private void TeleportPlayerToLobby(ulong clientId)
-    {
-        if (!Players.ContainsKey(clientId) || LobbySpawnPoint == null)
-        {
-            Debug.LogWarning($"[Server] Could not teleport Client {clientId} — Missing player or spawn point.");
-            return;
-        }
-
-        GameObject playerObj = Players[clientId];
-
-        var netTransform = playerObj.GetComponent<NetworkTransform>();
-        if (netTransform != null)
-        {
-            netTransform.Teleport(
-                LobbySpawnPoint.position,
-                LobbySpawnPoint.rotation,
-                Vector3.one
-            );
-        }
-        else
-        {
-            playerObj.transform.SetPositionAndRotation(
-                LobbySpawnPoint.position,
-                LobbySpawnPoint.rotation
-            );
-        }
-
-        Debug.Log($"[Server] Teleported {playerObj.name} to lobby.");
-    }
+    
 
     // -------------------------------------------------------
     // Client (Player) Connect / Disconnect
     // -------------------------------------------------------
     private void OnClientConnected(ulong clientId)
     {
+        Debug.Log("WHAT");
         if (!IsServer) return;
 
         NetworkObject playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
@@ -102,9 +75,9 @@ public class GameController : NetworkBehaviour
 
         // Move the player using a ClientRpc
         var pc = playerObj.GetComponent<PlayerController>();
-        if (pc != null && LobbySpawnPoint != null)
+        if (pc != null)
         {
-            pc.MoveToLobbyClientRpc(LobbySpawnPoint.position, LobbySpawnPoint.rotation);
+            pc.MoveToLobbyClientRpc(new Vector3(0, 49.00503158569336f,0), new Quaternion(0,0,0,1));
         }
         else
         {
