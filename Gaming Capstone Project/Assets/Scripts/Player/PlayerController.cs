@@ -66,6 +66,7 @@ public class PlayerController : NetworkBehaviour
     {
         playerInput = GetComponent<PlayerInput>();
         camMovement = cam.GetComponent<CameraMovement>();
+        AudioListener al = cam.GetComponent<AudioListener>();
 
         if (IsOwner)
         {
@@ -76,6 +77,7 @@ public class PlayerController : NetworkBehaviour
             playerInput.enabled = true;
             cam.enabled = true;
             camMovement.enabled = true;
+            al.enabled = true;
         }
         else
         {
@@ -86,6 +88,7 @@ public class PlayerController : NetworkBehaviour
             playerInput.enabled = false;
             cam.enabled = false;
             camMovement.enabled = false;
+            al.enabled = false;
         }
 
     }

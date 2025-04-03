@@ -35,33 +35,37 @@ public class Interact : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        HitScan();
+        if (IsOwner)
+            HitScan();
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E)) { OnClick(); }
+        if (IsOwner)
+        {
+            if (Input.GetKeyDown(KeyCode.E)) { OnClick(); }
 
-        // Shows the pickedup object in hand
-        if (!canPickup && pickedupObject != null)
-        {
-            pickedupObject.transform.position = rightHand.position + (rightHand.forward * offset.x) + (rightHand.up * offset.y) + (rightHand.right * offset.z);
-            pickedupObject.transform.rotation = rightHand.rotation;
-        }
-        
-        //Check for Doppel Transform, must drop if transformed.
-        if (anim.GetBool("Transformed"))
-        {
-            Place();
-            canPickup = false;
-        }
-        else if (pickedupObject == null) //reenable picking up if untransformed.
-        {
-            canPickup = true;
-        }
+            // Shows the pickedup object in hand
+            if (!canPickup && pickedupObject != null)
+            {
+                pickedupObject.transform.position = rightHand.position + (rightHand.forward * offset.x) + (rightHand.up * offset.y) + (rightHand.right * offset.z);
+                pickedupObject.transform.rotation = rightHand.rotation;
+            }
 
-        if (onInteract) { player.enabled = false; }
-        else { player.enabled = true; }
+            //Check for Doppel Transform, must drop if transformed.
+            if (anim.GetBool("Transformed"))
+            {
+                Place();
+                canPickup = false;
+            }
+            else if (pickedupObject == null) //reenable picking up if untransformed.
+            {
+                canPickup = true;
+            }
+
+            if (onInteract) { player.enabled = false; }
+            else { player.enabled = true; }
+        }
     }
 
     public void OnClick()
