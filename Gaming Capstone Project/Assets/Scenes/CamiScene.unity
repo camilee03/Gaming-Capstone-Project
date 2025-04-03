@@ -1994,12 +1994,12 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 326003544}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 707681605}
+  m_Father: {fileID: 1587405318}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
@@ -6304,12 +6304,12 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 918654773}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 707681605}
+  m_Father: {fileID: 1587405318}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
@@ -8226,10 +8226,7 @@ PrefabInstance:
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 1772910116491687248, guid: 2d2617aaf1d7cb149bc33a836408dbc0, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 326003545}
-    - targetCorrespondingSourceObject: {fileID: 1772910116491687248, guid: 2d2617aaf1d7cb149bc33a836408dbc0, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 918654776}
+      addedObject: {fileID: 1587405318}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1640891303535538884, guid: 2d2617aaf1d7cb149bc33a836408dbc0, type: 3}
       insertIndex: -1
@@ -8312,6 +8309,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RoomGenerationManager
       objectReference: {fileID: 0}
+    - target: {fileID: 6970827077181135502, guid: 6fd500387efb0554a8b8cee9d31b95ad, type: 3}
+      propertyPath: networkManager
+      value: 
+      objectReference: {fileID: 1957912349}
     - target: {fileID: 8959854856453251929, guid: 6fd500387efb0554a8b8cee9d31b95ad, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -9990,6 +9991,83 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3146989325532141688, guid: d1ec0aef85ae9ad4b866c5705f6f3262, type: 3}
   m_PrefabInstance: {fileID: 1575923372}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1587405317
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1587405318}
+  - component: {fileID: 1587405320}
+  - component: {fileID: 1587405319}
+  m_Layer: 5
+  m_Name: Notebook
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1587405318
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1587405317}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 918654776}
+  - {fileID: 326003545}
+  m_Father: {fileID: 707681605}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1587405319
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1587405317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1587405320
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1587405317}
+  m_CullTransparentMesh: 1
 --- !u!4 &1607663791 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 22256275500120939, guid: 79a355e1f88fadc4d8d20744de239d25, type: 3}
@@ -12037,6 +12115,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1889033462}
   - component: {fileID: 1889033461}
+  - component: {fileID: 1889033463}
   m_Layer: 0
   m_Name: TaskManager
   m_TagString: Untagged
@@ -12071,6 +12150,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1889033463
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1889033460}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6855b6a728479c04cb049b1b9dbde180, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jsonFile: {fileID: 4900000, guid: 5a0851dda89435849b7252177a4dfe7d, type: 3}
 --- !u!1001 &1890032309
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12515,7 +12607,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1957912349
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12532,10 +12624,10 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 1957912351}
-    PlayerPrefab: {fileID: 0}
+    PlayerPrefab: {fileID: 1269086553}
     Prefabs:
       NetworkPrefabsLists:
-      - {fileID: 11400000, guid: 8558abcceb3551646bb66224dd585a1c, type: 2}
+      - {fileID: 11400000, guid: 6fc3bbdc4008047488cac6d26412eda5, type: 2}
     TickRate: 30
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 0

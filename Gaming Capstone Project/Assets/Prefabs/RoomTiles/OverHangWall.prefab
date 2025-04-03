@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7397651494744786755}
   - component: {fileID: 7453874141784397851}
   - component: {fileID: 1072726941322696056}
+  - component: {fileID: 6982667651465760528}
   m_Layer: 0
   m_Name: OverHangWall
   m_TagString: Untagged
@@ -110,6 +111,31 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -1696171036456999064, guid: 3609109201582054cb9933da41b924eb, type: 3}
+--- !u!114 &6982667651465760528
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6134351026715822803}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 729191227
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 8
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 0
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 1
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!1001 &3968655846451272936
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -162,13 +188,44 @@ PrefabInstance:
       propertyPath: m_Name
       value: Door
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2884021021915567575, guid: 37c5c36b0f9f900409389cccf34f087f, type: 3}
+    - {fileID: 5171232124316643286, guid: 37c5c36b0f9f900409389cccf34f087f, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7913157692718043554, guid: 37c5c36b0f9f900409389cccf34f087f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7459953246727621387}
   m_SourcePrefab: {fileID: 100100000, guid: 37c5c36b0f9f900409389cccf34f087f, type: 3}
+--- !u!95 &4402271450164829552 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 723810671047360920, guid: 37c5c36b0f9f900409389cccf34f087f, type: 3}
+  m_PrefabInstance: {fileID: 3968655846451272936}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6040481960570140993 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7261884120600503721, guid: 37c5c36b0f9f900409389cccf34f087f, type: 3}
   m_PrefabInstance: {fileID: 3968655846451272936}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &6539879261062991178 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7913157692718043554, guid: 37c5c36b0f9f900409389cccf34f087f, type: 3}
+  m_PrefabInstance: {fileID: 3968655846451272936}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7459953246727621387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6539879261062991178}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfd5b4fb6bf88a44a8ffe78acfe5811d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  TransitionStateInfoList: []
+  m_Animator: {fileID: 4402271450164829552}
+  toggleable: 1

@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8959854856453251929}
+  - component: {fileID: -3628062730311598645}
   - component: {fileID: 6970827077181135502}
   - component: {fileID: 7854146006491320387}
   - component: {fileID: 5273622244777202}
@@ -35,6 +36,31 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-3628062730311598645
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4306520903681108259}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3963467507
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 8
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 1
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &6970827077181135502
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -47,6 +73,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d428cdf2058b8648a436d7deb9e37ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   numPlayers: 4
   debug: 0
   scale: 10
@@ -55,6 +82,9 @@ MonoBehaviour:
   tiles: {fileID: 6140652643369139530, guid: d1ec0aef85ae9ad4b866c5705f6f3262, type: 3}
   walls: {fileID: 5069348235013271274, guid: 79a355e1f88fadc4d8d20744de239d25, type: 3}
   doors: {fileID: 6134351026715822803, guid: a994d680f6c5eb04c8672c8f631d0985, type: 3}
+  roomObject: {fileID: 2285477099221996806, guid: d58f024f93c3440409d8f1fbd4886452, type: 3}
+  roomParentObject: {fileID: 3124901466514758790, guid: e1a3d920a00decf499ed1cb9e43b642f, type: 3}
+  networkManager: {fileID: 0}
 --- !u!114 &7854146006491320387
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -118,4 +148,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 246d78e01a78cec4297578ceea95c79f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rooms: []
   spawnPoints: []

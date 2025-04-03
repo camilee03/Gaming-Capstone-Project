@@ -1,13 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
-public class RoomGeneration : MonoBehaviour
+public class RoomGeneration : NetworkBehaviour
 {
     // Syntax:
     // '' = undefined
@@ -27,6 +29,8 @@ public class RoomGeneration : MonoBehaviour
     [SerializeField] GameObject tiles;
     [SerializeField] GameObject walls;
     [SerializeField] GameObject doors;
+    [SerializeField] GameObject roomObject;
+    [SerializeField] GameObject roomParentObject;
     List<(GameObject door, int pos, GameObject room)> doorAndRoom;
     ObjectGeneration objectGen;
 
@@ -35,11 +39,13 @@ public class RoomGeneration : MonoBehaviour
     bool collided;
     bool coroutineRunning;
 
-
-    void Awake()
+    private void Start()
     {
-        objectGen = GetComponent<ObjectGeneration>();
-        StartGeneration();
+        if (IsOwner && IsHost)
+        {
+            objectGen = GetComponent<ObjectGeneration>();
+            StartGeneration();
+        }
     }
 
 
@@ -59,7 +65,7 @@ public class RoomGeneration : MonoBehaviour
         ClearMap(); // only neccessary if regenerating the entire map
 
         // Spawn first room
-        Room newRoom = new(scale, tiles, walls);
+        Room newRoom = new(scale, tiles, walls, roomObject, roomParentObject);
         newRoom.RoomProcedure(0, objectGen);
         RoomManager.Instance.rooms.Add(newRoom);
         GameObject room1 = newRoom.parent;
@@ -78,7 +84,7 @@ public class RoomGeneration : MonoBehaviour
             bool isLobby = false;
 
             // Spawn next room
-            Room room2 = new(scale, tiles, walls);
+            Room room2 = new(scale, tiles, walls, roomObject, roomParentObject);
             room2.RoomProcedure(index, objectGen);
             RoomManager.Instance.rooms.Add(room2);
             numRooms--;
@@ -115,7 +121,7 @@ public class RoomGeneration : MonoBehaviour
             if (room != null && room.name != "Room0") { GameObject.Destroy(room); }
         }
 
-        RoomManager.Instance.rooms = new();
+        RoomManager.Instance.rooms = new List<Room>();
     }
    
 
@@ -156,9 +162,9 @@ public class RoomGeneration : MonoBehaviour
 
         // replace wall with door
         Destroy(wallParent.transform.GetChild(index).gameObject);
-        GameObject tempObject = GameObject.Instantiate(doors, wallPosition, wallRotation, wallParent.transform);
+        GameObject newDoor = SpawnNetworkedObject(wallParent.transform, doors, wallPosition, wallRotation);
 
-        doorAndRoom.Add((tempObject, direction, room));
+        doorAndRoom.Add((newDoor, direction, room));
     }
 
     /// <summary> Take spawned rooms and doors, connect together, and return the list of paired rooms </summary>
@@ -204,10 +210,12 @@ public class RoomGeneration : MonoBehaviour
             if (newHallway == null) { Debug.Log("Couldn't find a path"); return null; }
 
             // change room parent to new gameobject
-            newRoomParent = new GameObject("Room" + dar1.room.name.Remove(0, 4) + dar2.room.name.Remove(0, 4));
+            newRoomParent = SpawnNetworkedObject(null, roomParentObject, new(), new());
+            newRoomParent.name = "Room" + dar1.room.name.Remove(0, 4) + dar2.room.name.Remove(0, 4);
             newRoomParent.tag = "Room";
-            dar1.room.transform.parent = newRoomParent.transform;
-            dar2.room.transform.parent = newRoomParent.transform;
+
+            dar1.room.transform.GetComponent<NetworkObject>().TrySetParent(newRoomParent.transform);
+            dar2.room.transform.GetComponent<NetworkObject>().TrySetParent(newRoomParent.transform);
             newHallway.transform.parent = newRoomParent.transform;
         }
 
@@ -244,8 +252,8 @@ public class RoomGeneration : MonoBehaviour
             debugInt++;
         }
 
-        //Debug.Log("Dir: " + dar1.pos + " Pos: " + dar1.door.transform.position);
-        //Debug.Log("Dir: " + dar2.pos + " Pos: " + dar2.door.transform.position);
+        // Debug.Log("Dir: " + dar1.pos + " Pos: " + dar1.door.transform.position);
+        // Debug.Log("Dir: " + dar2.pos + " Pos: " + dar2.door.transform.position);
 
         // recheck tile positions
         tile1 = dar1.door.transform.position + directions[dar1.pos] * scale / 2;
@@ -290,5 +298,24 @@ public class RoomGeneration : MonoBehaviour
                 newObject.transform.localRotation = Quaternion.Euler(-90, ((i + 1) % 2) * 90, 0);
             }
         }
+    }
+
+    /// <summary> Spawns a network object </summary>
+    GameObject SpawnNetworkedObject(Transform parent, GameObject child, Vector3 position, Quaternion rotation)
+    {
+        GameObject instance = null;
+        if (position != new Vector3())
+        {
+            instance = Instantiate(NetworkManager.Singleton.GetNetworkPrefabOverride(child), position, rotation);
+        }
+        else
+        {
+            instance = Instantiate(NetworkManager.Singleton.GetNetworkPrefabOverride(child));
+        }
+        var instanceNetworkObject = instance.GetComponent<NetworkObject>();
+        instanceNetworkObject.Spawn(true);
+        if (parent != null) { instanceNetworkObject.TrySetParent(parent); }
+
+        return instance;
     }
 }

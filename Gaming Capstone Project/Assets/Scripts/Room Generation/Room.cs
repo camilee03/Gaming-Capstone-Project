@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Drawing;
+using Unity.Netcode;
 using UnityEngine;
 
-public class Room 
+public class Room : NetworkBehaviour
 {
 
     [Header("Public variables")]
@@ -29,15 +30,19 @@ public class Room
     [Header("Spawn Type")]
     GameObject tile;
     GameObject wall;
+    GameObject roomObject;
+    GameObject roomParentObject;
 
 
     // -- Public Functions -- //
 
-    public Room(float scale, GameObject tile, GameObject wall)
+    public Room(float scale, GameObject tile, GameObject wall, GameObject roomObject, GameObject roomParentObject)
     {
         this.scale = scale;
         this.tile = tile;
         this.wall = wall;
+        this.roomObject = roomObject;
+        this.roomParentObject = roomParentObject;
     }
 
     /// <summary> Starts the room generation </summary>
@@ -76,11 +81,13 @@ public class Room
     GameObject DrawRoom()
     {
         // Create parenting objects which will store room
-        GameObject newRoom = new GameObject("RoomTempName");
-        wallParent = new GameObject("WallParent");
-        wallParent.transform.SetParent(newRoom.transform, false);
-        tileParent = new GameObject("TileParent");
-        tileParent.transform.SetParent(newRoom.transform, false);
+        GameObject newRoom = SpawnNetworkedObject(null, roomObject, new(), new());
+
+        wallParent = SpawnNetworkedObject(newRoom.transform, roomParentObject, new(), new());
+        wallParent.name = "WallParent";
+
+        tileParent = SpawnNetworkedObject(newRoom.transform, roomParentObject, new(), new());
+        tileParent.name = "TileParent";
 
         for (int x = 0; x < size; x++)
         {
@@ -282,5 +289,24 @@ public class Room
             }
             currentWalls = 0; inZeros = false;
         }
+    }
+
+
+    GameObject SpawnNetworkedObject(Transform parent, GameObject child, Vector3 position, Quaternion rotation)
+    {
+        GameObject instance = null;
+        if (position != null)
+        {
+            instance = Instantiate(NetworkManager.Singleton.GetNetworkPrefabOverride(child), position, rotation, parent);
+        }
+        else
+        {
+            instance = Instantiate(NetworkManager.Singleton.GetNetworkPrefabOverride(child));
+        }
+        var instanceNetworkObject = instance.GetComponent<NetworkObject>();
+        instanceNetworkObject.Spawn(true);
+        if (parent != null) {  instanceNetworkObject.TrySetParent(parent); }
+
+        return instance;
     }
 }
