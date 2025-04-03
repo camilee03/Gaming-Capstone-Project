@@ -114,7 +114,7 @@ public class PlayerController : NetworkBehaviour
         }
 
         // If we're dead, show death screen, disable movement, then exit
-        if (isDead)
+        if (isDead && IsOwner)
         {
             canMove = false;
             if (DeathScreen.alpha == 0)
@@ -247,7 +247,7 @@ public class PlayerController : NetworkBehaviour
     }
     public void Morph(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.performed && IsOwner)
         {
             if (isDopple && !isTransformed)
             {
@@ -274,7 +274,7 @@ public class PlayerController : NetworkBehaviour
         // If you want only Dopples to do this, check isDopple here:
         // if (!isDopple) return;
 
-        if (context.performed && canAttack)
+        if (context.performed && canAttack && IsOwner)
         {
             // Start the cooldown
             canAttack = false;
