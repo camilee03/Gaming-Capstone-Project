@@ -14,6 +14,8 @@ GameObject:
   - component: {fileID: 7854146006491320387}
   - component: {fileID: 5273622244777202}
   - component: {fileID: 7843316225880752643}
+  - component: {fileID: 6757427336724844059}
+  - component: {fileID: 8520993107504177655}
   m_Layer: 0
   m_Name: RoomGenerationManager
   m_TagString: Untagged
@@ -48,8 +50,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3963467507
-  InScenePlacedSourceGlobalObjectIdHash: 0
+  GlobalObjectIdHash: 1801350900
+  InScenePlacedSourceGlobalObjectIdHash: 3963467507
   DeferredDespawnTick: 0
   Ownership: 8
   AlwaysReplicateAsRoot: 0
@@ -84,7 +86,6 @@ MonoBehaviour:
   doors: {fileID: 6134351026715822803, guid: a994d680f6c5eb04c8672c8f631d0985, type: 3}
   roomObject: {fileID: 2285477099221996806, guid: d58f024f93c3440409d8f1fbd4886452, type: 3}
   roomParentObject: {fileID: 3124901466514758790, guid: e1a3d920a00decf499ed1cb9e43b642f, type: 3}
-  networkManager: {fileID: 0}
 --- !u!114 &7854146006491320387
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -150,3 +151,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rooms: []
   spawnPoints: []
+--- !u!114 &6757427336724844059
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4306520903681108259}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ff8d9d4dc9e2c74a85dbd6c9c26da42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8520993107504177655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4306520903681108259}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6855b6a728479c04cb049b1b9dbde180, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jsonFile: {fileID: 4900000, guid: 5a0851dda89435849b7252177a4dfe7d, type: 3}

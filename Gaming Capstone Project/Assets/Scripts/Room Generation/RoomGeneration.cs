@@ -33,6 +33,7 @@ public class RoomGeneration : NetworkBehaviour
     [SerializeField] GameObject roomParentObject;
     List<(GameObject door, int pos, GameObject room)> doorAndRoom;
     ObjectGeneration objectGen;
+    TaskManager taskManager;
 
 
     [Header("Collision Data")]
@@ -41,11 +42,9 @@ public class RoomGeneration : NetworkBehaviour
 
     private void Start()
     {
-        if (IsOwner && IsHost)
-        {
-            objectGen = GetComponent<ObjectGeneration>();
-            StartGeneration();
-        }
+        objectGen = GetComponent<ObjectGeneration>();
+        taskManager = GetComponent<TaskManager>();
+        StartGeneration();
     }
 
 
@@ -57,6 +56,8 @@ public class RoomGeneration : NetworkBehaviour
         else { if (seed != -1) { Random.InitState(seed); } }
 
         GenerateMultipleRooms();
+        RoomManager.Instance.InitializeSpawnPoints();
+        taskManager.CreateTasks();
     }
 
     /// <summary> Use the room procedure to create multiple rooms </summary>
@@ -163,6 +164,7 @@ public class RoomGeneration : NetworkBehaviour
         // replace wall with door
         Destroy(wallParent.transform.GetChild(index).gameObject);
         GameObject newDoor = SpawnNetworkedObject(wallParent.transform, doors, wallPosition, wallRotation);
+        newDoor.name = "Door" + direction;
 
         doorAndRoom.Add((newDoor, direction, room));
     }
@@ -171,23 +173,25 @@ public class RoomGeneration : NetworkBehaviour
     GameObject RotateRooms()
     {
         (GameObject door, int pos, GameObject room) dar1 = doorAndRoom[0]; // door1
+        dar1.pos = FindDoorDirection(doorAndRoom[0].door, doorAndRoom[0].room);
         (GameObject door, int pos, GameObject room) dar2 = doorAndRoom[1]; // door2
+        dar2.pos = FindDoorDirection(doorAndRoom[1].door, doorAndRoom[1].room);
 
         // try to pair doors
-        GameObject newRoomParent = PairDoors(dar2, dar1);
+        GameObject newRoomParent = PairDoors(dar1, dar2);
 
         if (newRoomParent != null) { return newRoomParent; }
         else
         {
             // rerotate dar to attempt to fit
-            // Debug.Log("Rotating room");
+            Debug.Log("Rotating room");
 
             if (dar1.pos > 1) { dar1.pos -= 2; }
             else { dar1.pos += 2; }
             dar1.room.transform.Rotate(new Vector3(0, 180, 0));
 
             // try to pair doors again
-            newRoomParent = PairDoors(dar2, dar1);
+            newRoomParent = PairDoors(dar1, dar2);
             if (newRoomParent != null)
             {
                 return newRoomParent;
@@ -197,10 +201,31 @@ public class RoomGeneration : NetworkBehaviour
         }
     }
 
-    /// <summary> Assigns old rooms and hallway to new room and returns new room </summary>
-    GameObject PairDoors((GameObject door, int pos, GameObject room) dar2, (GameObject door, int pos, GameObject room) dar1)
+    int FindDoorDirection(GameObject door, GameObject room)
     {
-        float roomDistance = 2 * scale;
+        if (door.transform.rotation.eulerAngles.y % 180 == 90)
+        {
+            // Direction 0 (left)
+            if (door.transform.position.x < room.transform.position.x) { return 0; }
+
+            // Direction 2 (right)
+            return 2;
+        }
+        else
+        {
+            // Direction 1 (below)
+            if (door.transform.position.z < room.transform.position.z) { return 1; }
+
+            // Direction 3 (above)
+            return 3;
+        }
+    }
+
+
+    /// <summary> Assigns old rooms and hallway to new room and returns new room </summary>
+    GameObject PairDoors((GameObject door, int pos, GameObject room) dar1, (GameObject door, int pos, GameObject room) dar2)
+    {
+        float roomDistance = scale;
         GameObject newRoomParent = null;
 
         if (dar1.pos != dar2.pos) // if the doors face different directions
@@ -228,27 +253,34 @@ public class RoomGeneration : NetworkBehaviour
     {
         Vector3[] directions = { Vector3.left, Vector3.back, Vector3.right, Vector3.forward };
 
-        Vector3 tile1 = dar1.door.transform.position + directions[dar1.pos] * scale / 2;
-        Vector3 tile2 = dar2.door.transform.position + directions[dar2.pos] * scale / 2;
-
+        // Find tile next to door
+        Vector3 tile1 = dar1.door.transform.position + dar1.room.transform.TransformDirection(directions[dar1.pos]) * (scale / 2);
+        Vector3 tile2 = dar2.door.transform.position + dar2.room.transform.TransformDirection(directions[dar2.pos]) * (scale / 2);
         Vector3 doorDisplacement = tile1 - tile2; // start at same place
 
 
-        // move room based on door displacement
-        doorDisplacement += roomDistance * directions[dar1.pos];
+        // move room in certain direction
+        Vector3 directionDisplacement = dar1.room.transform.TransformDirection(directions[dar1.pos]) * roomDistance;
         if (dar1.pos + 2 != dar2.pos && dar1.pos - 2 != dar2.pos)
         {
-            doorDisplacement -= roomDistance * directions[dar2.pos];
+            directionDisplacement -= dar2.room.transform.TransformDirection(directions[dar2.pos]) * roomDistance;
         }
 
         // move room if too close
         int debugInt = 0;
         collided = true;
+        doorDisplacement += directionDisplacement;
 
         while (collided && debugInt < 100)
         {
+            // Move room
+            Debug.Log($"Moved {dar2.room.name} by {doorDisplacement}");
             dar2.room.transform.Translate(doorDisplacement);
+            doorDisplacement = directionDisplacement;
+
+            // Check for collisions
             collided = RoomFunctions.CheckForCollisions(dar2.room, scale);
+
             debugInt++;
         }
 
@@ -256,8 +288,8 @@ public class RoomGeneration : NetworkBehaviour
         // Debug.Log("Dir: " + dar2.pos + " Pos: " + dar2.door.transform.position);
 
         // recheck tile positions
-        tile1 = dar1.door.transform.position + directions[dar1.pos] * scale / 2;
-        tile2 = dar2.door.transform.position + directions[dar2.pos] * scale / 2;
+        tile1 = dar1.door.transform.position + dar1.room.transform.TransformDirection(directions[dar1.pos]) * (scale / 2);
+        tile2 = dar2.door.transform.position + dar1.room.transform.TransformDirection(directions[dar2.pos]) * (scale / 2);
 
         // Create a path in between doors
         List<Vector3> hallwayPath = GeneralFunctions.FindShortestAvoidingTiles(tile1, tile2, scale);
@@ -265,6 +297,7 @@ public class RoomGeneration : NetworkBehaviour
         if (hallwayPath != null) { hallwayPath.Insert(0, tile1); hallwayPath.Insert(hallwayPath.Count - 1, tile2); }
         else { Debug.Log("A* couldn't find a path"); if (debug) { DebugGen.Instance.seed++; SceneManager.LoadScene(0); return null; } }
 
+        // Spawn hallway
         GameObject hallwayParent = new GameObject("Hallway");
         Vector3 prevPos = dar1.door.transform.position;
         for (int i = 0; i < hallwayPath.Count - 1; i++)

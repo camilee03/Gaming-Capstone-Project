@@ -295,17 +295,17 @@ public class Room : NetworkBehaviour
     GameObject SpawnNetworkedObject(Transform parent, GameObject child, Vector3 position, Quaternion rotation)
     {
         GameObject instance = null;
-        if (position != null)
+        if (position != new Vector3())
         {
-            instance = Instantiate(NetworkManager.Singleton.GetNetworkPrefabOverride(child), position, rotation, parent);
+            instance = Instantiate(NetworkManager.Singleton.GetNetworkPrefabOverride(child), position, rotation);
         }
         else
         {
-            instance = Instantiate(NetworkManager.Singleton.GetNetworkPrefabOverride(child));
+            instance = Instantiate(child);
         }
         var instanceNetworkObject = instance.GetComponent<NetworkObject>();
         instanceNetworkObject.Spawn(true);
-        if (parent != null) {  instanceNetworkObject.TrySetParent(parent); }
+        if (parent != null) { instanceNetworkObject.TrySetParent(parent); }
 
         return instance;
     }

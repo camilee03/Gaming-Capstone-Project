@@ -17,32 +17,31 @@ public class TaskManager : MonoBehaviour
     public List<RoomTask> taskList;
 
     [Header("Paper Task")]
-    TextAsset[] documents; 
+    TextAsset[] documents;
 
-    private void Start()
-    {
-        CreateTasks();
-    }
+    [Header("Types of Tasks")]
 
-    void CreateTasks()
+    GameObject[] selectables;
+    GameObject[] buttons;
+    GameObject[] terminals;
+    GameObject[] useables;
+
+    public void CreateTasks()
     {
+        selectables = GameObject.FindGameObjectsWithTag("Selectable");
+        buttons = GameObject.FindGameObjectsWithTag("Button");
+        terminals = GameObject.FindGameObjectsWithTag("DOS Terminal");
+        useables = GameObject.FindGameObjectsWithTag("Useable");
+        //papers = GameObject.FindGameObjectsWithTag("Paper");
+
         taskList = new List<RoomTask>();
-
-        GameObject[] selectables = GameObject.FindGameObjectsWithTag("Selectable");
-        GameObject[] buttons = GameObject.FindGameObjectsWithTag("Button");
-        GameObject[] terminals = GameObject.FindGameObjectsWithTag("DOS Terminal");
-        GameObject[] useables = GameObject.FindGameObjectsWithTag("Useable");
-        //GameObject[] papers = GameObject.FindGameObjectsWithTag("Paper");
         rooms = RoomManager.Instance.rooms;
-
-        Debug.Log(selectables.Length + buttons.Length + terminals.Length);
 
         CreateInteractTasks(useables, buttons);
         CreatePickupTasks(selectables);
         CreateTerminalTasks();
         CreatePaperTasks();
         
-
         Debug.Log("NUM TASKS: " + taskList.Count);
     }
 

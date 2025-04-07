@@ -13,9 +13,14 @@ public class TaskAssigner : MonoBehaviour
     // Task display
     [SerializeField] TMP_Text goalText;
     [SerializeField] TMP_Text tasksCompleted;
+    TaskManager taskManager;
 
-    bool start = true;
+    public bool start = false; // toggle through another function
     bool donow = false;
+
+    private void Start()
+    {
+    }
 
 
     private void Update()
@@ -24,34 +29,41 @@ public class TaskAssigner : MonoBehaviour
         {
             AssignTasks();
             start = false;
+            donow = true;
         }
-        else
+        else if (donow)
         {
-            int numTasksFinished = 0;
-
-            for (int i = 0; i < assignedTasks.Count; i++)
-            {
-                if (!finishedTasks[i])
-                {
-                    switch (assignedTasks[i].type)
-                    {
-                        case TaskType.None: break;
-                        case TaskType.Interact: if (InteractTask(assignedTasks[i])) { finishedTasks[i] = true; } break;
-                        case TaskType.Terminal: if (TerminalTask(assignedTasks[i])) { finishedTasks[i] = true; } break;
-                        case TaskType.Pickup: if (PickupTask(assignedTasks[i])) { finishedTasks[i] = true; } break;
-                        case TaskType.Paper: break;
-                    }
-                }
-                else { numTasksFinished++; }
-            }
-
-            tasksCompleted.text = numTasksFinished + "/" + numTasks;
+            UpdateTasks();   
         }
+    }
+
+    void UpdateTasks()
+    {
+        int numTasksFinished = 0;
+
+        for (int i = 0; i < assignedTasks.Count; i++)
+        {
+            if (!finishedTasks[i])
+            {
+                switch (assignedTasks[i].type)
+                {
+                    case TaskType.None: break;
+                    case TaskType.Interact: if (InteractTask(assignedTasks[i])) { finishedTasks[i] = true; } break;
+                    case TaskType.Terminal: if (TerminalTask(assignedTasks[i])) { finishedTasks[i] = true; } break;
+                    case TaskType.Pickup: if (PickupTask(assignedTasks[i])) { finishedTasks[i] = true; } break;
+                    case TaskType.Paper: break;
+                }
+            }
+            else { numTasksFinished++; }
+        }
+
+        tasksCompleted.text = numTasksFinished + "/" + numTasks;
     }
 
     void AssignTasks()
     {
-        taskList = GameObject.Find("TaskManager").GetComponent<TaskManager>().taskList;
+        taskManager = GameObject.Find("RoomGenerationManager").GetComponent<TaskManager>();
+        taskList = taskManager.taskList;
         string goalTextResult = "";
 
         for (int i = 0; i < numTasks; i++)
