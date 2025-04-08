@@ -351,7 +351,10 @@ public class PlayerController : NetworkBehaviour
     {
         canMove = input;
     }
-
+    public void ToggleInput(bool input)
+    {
+        playerInput.enabled = input;    
+    }
     public void UpdateTeam(bool Dopple)
     {
         isDopple = Dopple;
