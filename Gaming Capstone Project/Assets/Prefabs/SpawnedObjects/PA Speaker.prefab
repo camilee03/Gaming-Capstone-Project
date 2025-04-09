@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 570129940815663261}
   - component: {fileID: 7859676109644367101}
   - component: {fileID: 6169179499323443445}
+  - component: {fileID: 6762639569960837267}
   m_Layer: 0
   m_Name: PA Speaker
   m_TagString: Untagged
@@ -108,3 +109,28 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.021621598, y: 0.017999995, z: 0.017297277}
   m_Center: {x: 0, y: -0.006749999, z: 0}
+--- !u!114 &6762639569960837267
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1070109190271503186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 227915934
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0

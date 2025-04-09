@@ -290,7 +290,7 @@ MonoBehaviour:
   DeferredDespawnTick: 0
   Ownership: 1
   AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 0
+  SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 1
   SpawnWithObservers: 1
@@ -326,6 +326,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0998947c705450a4397342875f03f3f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lowerBound: 0.8
+  upperBound: 1.2
   soundEffects:
   - name: Open
     clips:
