@@ -4,6 +4,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
+using Unity.Netcode.Components;
 
 public class PlayerController : NetworkBehaviour
 {
@@ -62,6 +63,8 @@ public class PlayerController : NetworkBehaviour
     public bool canMove = true;
     public bool useAnimator = true;
     public GameObject PlayerDisplay;
+    public NetworkVariable<Vector3> LastAssignedSpawnPos = new NetworkVariable<Vector3>();
+
     public override void OnNetworkSpawn()
     {
         playerInput = GetComponent<PlayerInput>();
@@ -94,7 +97,27 @@ public class PlayerController : NetworkBehaviour
         }
 
     }
+
     [ClientRpc]
+    public void TeleportClientRpc(Vector3 position, Quaternion rotation)
+    {
+        if (IsOwner)
+        {
+            var netTransform = GetComponent<NetworkTransform>();
+            if (netTransform != null)
+            {
+                netTransform.Teleport(position, rotation, Vector3.one);
+            }
+            else
+            {
+                transform.position = position;
+                transform.rotation = rotation;
+            }
+
+            LastAssignedSpawnPos.Value = position;
+        }
+    }
+        [ClientRpc]
     public void SetDoppleClientRpc(bool newIsDopple)
     {
         isDopple = newIsDopple;
