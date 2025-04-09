@@ -94,6 +94,8 @@ public class Interact : NetworkBehaviour
                     }
                     break;
                 case "Button": // Press button / lever
+                    toggleAnimatedObject(highlightedObject);
+                    break;
                 case "Door": // Open / close door
                     toggleAnimatedObject(highlightedObject);
                     break;
