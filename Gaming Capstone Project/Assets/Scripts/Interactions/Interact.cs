@@ -152,6 +152,7 @@ public class Interact : NetworkBehaviour
 
     public void EnableHighlight(GameObject newObject)
     {
+        Debug.Log("Enabling highlight on " + newObject.name);
         // Highlights the raycast object
         materials = newObject.GetComponent<Renderer>().materials.ToList();
 
@@ -166,9 +167,11 @@ public class Interact : NetworkBehaviour
 
     public void DisableHighlight()
     {
+        Debug.Log("Disabling highlight on " + highlightedObject.name);
         foreach (var material in materials)
         {
             material.DisableKeyword("_EMISSION");
+            material.SetColor("_EmissionColor", Color.black);
         }
         highlightedObject = null;
     }
