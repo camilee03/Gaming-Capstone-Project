@@ -305,7 +305,9 @@ public class RoomGeneration : NetworkBehaviour
         else { Debug.Log("A* couldn't find a path"); if (debug) { DebugGen.Instance.seed++; SceneManager.LoadScene(0); return null; } }
 
         // Spawn hallway
-        GameObject hallwayParent = new GameObject("Hallway");
+        GameObject hallwayParent = SpawnNetworkedObject(null, roomParentObject, Vector3.zero, Quaternion.identity);
+        hallwayParent.name = "Hallway";
+
         Vector3 prevPos = dar1.door.transform.position;
         for (int i = 0; i < hallwayPath.Count - 1; i++)
         {

@@ -3,6 +3,7 @@ using NUnit.Framework.Internal;
 using System.Collections.Generic;
 using System.Runtime.ConstrainedExecution;
 using System.Xml.Serialization;
+using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -11,7 +12,7 @@ using static Unity.Burst.Intrinsics.X86.Avx;
 using static UnityEngine.Rendering.DebugUI;
 
 
-public class ObjectGeneration : MonoBehaviour
+public class ObjectGeneration : NetworkBehaviour
 {
     List<Vector3> tilePositions = new();
     List<Vector3> wallPositions = new();
@@ -28,8 +29,8 @@ public class ObjectGeneration : MonoBehaviour
     SerializableDict dictionary;
     Dictionary<string, GameObject> objects;
 
-    char[] objectIdentifiers = new char[] { 'b', 'C', 'c', 'f', 'L', 'l', 's', 'T', 't', 'v' };
-
+    GameObject roomObject;
+    GameObject roomParentObject;
 
     enum ItemType { Box, Button, Lever, Light, Table, Chair, 
         Doors, BulletinBoard, Radio, Terminal, Fan, Wires, 
@@ -70,6 +71,8 @@ public class ObjectGeneration : MonoBehaviour
         preDescripterTiles = room.objectLocations;
         roomParent = room.parent;
         firstTile = room.tileParent.transform.GetChild(0).position;
+        roomObject = room.roomObject;
+        roomParentObject = room.roomParentObject;
 
         // Create viable locations lists
         wallPositions = new();
@@ -122,8 +125,8 @@ public class ObjectGeneration : MonoBehaviour
 
 
         // Spawn assigned objects
-        GameObject objectParent = new GameObject("ObjectParent");
-        objectParent.transform.parent = roomParent.transform;
+        GameObject objectParent = SpawnNetworkedObject(roomParent.transform, roomParentObject, Vector3.zero, Quaternion.identity);
+        objectParent.name = "ObjectParent";
 
         foreach (Object newObject in assignedObjects)
         {
@@ -209,56 +212,56 @@ public class ObjectGeneration : MonoBehaviour
         switch (type)
         {
             case 'b': // bulletin board
-                newObject = GameObject.Instantiate(objects["bulletin board"], parent.transform);
+                newObject = SpawnNetworkedObject(parent.transform, objects["bulletin board"], Vector3.zero, Quaternion.identity);
                 newObject.transform.position = tilePos;
                 newObject.transform.localRotation = Quaternion.identity;
                 break;
             case 'C': // Chair
-                newObject = GameObject.Instantiate(objects["chair"], parent.transform);
+                newObject = SpawnNetworkedObject(parent.transform, objects["chair"], Vector3.zero, Quaternion.identity);
                 newObject.transform.localScale *= 2;
                 newObject.transform.position = tilePos;
                 newObject.transform.localRotation = Quaternion.identity;
                 break;
             case 'c': // Chute
-                newObject = GameObject.Instantiate(objects["chute"], parent.transform);
+                newObject = SpawnNetworkedObject(parent.transform, objects["chute"], Vector3.zero, Quaternion.identity);
                 newObject.transform.localScale *= 2;
                 newObject.transform.position = tilePos + Vector3.up * 5;
                 newObject.transform.localRotation = Quaternion.identity;
                 break;
             case 'f': // fan
-                newObject = GameObject.Instantiate(objects["fan"], parent.transform);
+                newObject = SpawnNetworkedObject(parent.transform, objects["fan"], Vector3.zero, Quaternion.identity);
                 newObject.transform.position = tilePos + Vector3.up * 3;
                 newObject.transform.localRotation = Quaternion.identity;
                 break;
             case 'L': // light
-                newObject = GameObject.Instantiate(objects["light"], parent.transform);
+                newObject = SpawnNetworkedObject(parent.transform, objects["light"], Vector3.zero, Quaternion.identity);
                 newObject.transform.position = tilePos + ceilingHeight;
                 newObject.transform.localRotation = Quaternion.Euler(-90, 0, 0);
                 break;
             case 'l': // lever
-                newObject = GameObject.Instantiate(objects["lever"], parent.transform);
+                newObject = SpawnNetworkedObject(parent.transform, objects["lever"], Vector3.zero, Quaternion.identity);
                 newObject.transform.position = tilePos + Vector3.up * 3;
                 newObject.transform.localRotation = Quaternion.identity;
                 break;
             case 's': // speaker
-                newObject = GameObject.Instantiate(objects["speaker"], parent.transform);
+                newObject = SpawnNetworkedObject(parent.transform, objects["speaker"], Vector3.zero, Quaternion.identity);
                 newObject.transform.position = tilePos + Vector3.up * 3;
                 newObject.transform.localRotation = Quaternion.identity;
                 break;
             case 'T': // Table
-                newObject = GameObject.Instantiate(objects["table"], parent.transform);
+                newObject = SpawnNetworkedObject(parent.transform, objects["table"], Vector3.zero, Quaternion.identity);
                 newObject.transform.localScale /= 1.1f;
                 newObject.transform.position = tilePos;
                 newObject.transform.localRotation = Quaternion.Euler(-90, 0, 0);
                 break;
             case 't': // DOS terminal
-                newObject = GameObject.Instantiate(objects["DOS terminal"], parent.transform);
+                newObject = SpawnNetworkedObject(parent.transform, objects["DOS terminal"], Vector3.zero, Quaternion.identity);
                 newObject.transform.localScale /= 1.1f;
                 newObject.transform.position = tilePos;
                 newObject.transform.localRotation = Quaternion.Euler(-90, 0, 0);
                 break;
             case 'v': // vent
-                newObject = GameObject.Instantiate(objects["vent"], parent.transform);
+                newObject = SpawnNetworkedObject(parent.transform, objects["vent"], Vector3.zero, Quaternion.identity);
                 newObject.transform.position = tilePos + Vector3.up * 1;
                 newObject.transform.localRotation = Quaternion.Euler(-90, 0, 0);
                 break;
@@ -394,6 +397,20 @@ public class ObjectGeneration : MonoBehaviour
     {
         public string name;
         public char[] objects;
+    }
+
+    GameObject SpawnNetworkedObject(Transform parent, GameObject child, Vector3 position, Quaternion rotation)
+    {
+        GameObject instance = null;
+
+        instance = Instantiate(child, position, rotation);
+        NetworkObject instanceNetworkObject = instance.GetComponent<NetworkObject>();
+        if (instanceNetworkObject == null) { Debug.LogError(child.name + " needs a NetworkObject"); }
+        instanceNetworkObject.Spawn(true);
+
+        if (parent != null) { instanceNetworkObject.TrySetParent(parent); }
+
+        return instance;
     }
 }
 

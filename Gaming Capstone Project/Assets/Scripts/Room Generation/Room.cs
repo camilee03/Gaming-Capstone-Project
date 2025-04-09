@@ -30,8 +30,8 @@ public class Room : NetworkBehaviour
     [Header("Spawn Type")]
     GameObject tile;
     GameObject wall;
-    GameObject roomObject;
-    GameObject roomParentObject;
+    public GameObject roomObject;
+    public GameObject roomParentObject;
 
 
     // -- Public Functions -- //
