@@ -14,6 +14,7 @@ public class GameController : NetworkBehaviour
     [Header("Spawn Points")]
     public Transform LobbySpawnPoint;
     public Transform GameSpawnPoint;
+    private HashSet<int> usedColors = new HashSet<int>();
 
 
     public List<Transform> Spawnpoints = new List<Transform>();
@@ -78,6 +79,16 @@ public class GameController : NetworkBehaviour
             Debug.Log($"[Server] Player disconnected => ClientId {clientId}, {Players[clientId].name}");
             Players.Remove(clientId);
         }
+        if (Players.TryGetValue(clientId, out var player))
+        {
+            var pc = player.GetComponent<PlayerController>();
+            if (pc != null && pc.ColorID.Value >= 1)
+            {
+                UnlockColor(pc.ColorID.Value);
+            }
+        }
+
+        Players.Remove(clientId);
     }
 
     // -------------------------------------------------------
@@ -136,28 +147,23 @@ public class GameController : NetworkBehaviour
 
     }
 
-
-
-
-
-    // Example: a single player respawn method
-    public void RespawnInLobby(GameObject player)
+    public bool IsColorAvailable(int colorIndex)
     {
-        var netTransform = player.GetComponent<NetworkTransform>();
-        if (netTransform != null)
-        {
-            netTransform.Teleport(
-                LobbySpawnPoint.position,
-                LobbySpawnPoint.rotation,
-                new Vector3(0.75f, 0.75f, 0.75f) // example scale
-            );
-        }
-        else
-        {
-            player.transform.position = LobbySpawnPoint.position;
-            player.transform.rotation = LobbySpawnPoint.rotation;
-        }
+        return !usedColors.Contains(colorIndex);
     }
+
+    public void LockColor(int colorIndex)
+    {
+        usedColors.Add(colorIndex);
+    }
+
+    public void UnlockColor(int colorIndex)
+    {
+        usedColors.Remove(colorIndex);
+    }
+
+
+
 
     private void SpawnPlayersAtRandomPoints()
     {
