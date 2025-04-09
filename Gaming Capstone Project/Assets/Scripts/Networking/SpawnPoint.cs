@@ -1,14 +1,13 @@
+using Unity.Netcode;
 using UnityEngine;
 
-public class SpawnPoint : MonoBehaviour
+public class SpawnPoint : NetworkBehaviour
 {
-    public bool IsLobbySpawnPoint = false;
-
-    private void Start()
+    public override void OnNetworkSpawn()
     {
-        if (IsLobbySpawnPoint)
-            GameController.Instance.LobbySpawnPoint = transform;
-        else
-            GameController.Instance.GameSpawnPoint = transform;
+        if (IsServer)
+        {
+            GameController.Instance.RegisterSpawnPoint(this.transform);
+        }
     }
 }

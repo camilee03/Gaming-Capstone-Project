@@ -22,7 +22,6 @@ public class Interact : NetworkBehaviour
     string[] tags = { "Selectable", "Button", "Door", "DOS Terminal" };
 
     PlayerController player;
-    bool onInteract = false;
     public Transform rightHand;
     public Animator anim;
     public Vector3 offset;
@@ -35,37 +34,31 @@ public class Interact : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (IsOwner)
-            HitScan();
+        HitScan();
     }
 
     private void Update()
     {
-        if (IsOwner)
+        if (Input.GetKeyDown(KeyCode.E)) { OnClick(); }
+
+        // Shows the pickedup object in hand
+        if (!canPickup && pickedupObject != null)
         {
-            if (Input.GetKeyDown(KeyCode.E)) { OnClick(); }
-
-            // Shows the pickedup object in hand
-            if (!canPickup && pickedupObject != null)
-            {
-                pickedupObject.transform.position = rightHand.position + (rightHand.forward * offset.x) + (rightHand.up * offset.y) + (rightHand.right * offset.z);
-                pickedupObject.transform.rotation = rightHand.rotation;
-            }
-
-            //Check for Doppel Transform, must drop if transformed.
-            if (anim.GetBool("Transformed"))
-            {
-                Place();
-                canPickup = false;
-            }
-            else if (pickedupObject == null) //reenable picking up if untransformed.
-            {
-                canPickup = true;
-            }
-
-            if (onInteract) { player.enabled = false; }
-            else { player.enabled = true; }
+            pickedupObject.transform.position = rightHand.position + (rightHand.forward * offset.x) + (rightHand.up * offset.y) + (rightHand.right * offset.z);
+            pickedupObject.transform.rotation = rightHand.rotation;
         }
+        
+        //Check for Doppel Transform, must drop if transformed.
+        if (anim.GetBool("Transformed"))
+        {
+            Place();
+            canPickup = false;
+        }
+        else if (pickedupObject == null) //reenable picking up if untransformed.
+        {
+            canPickup = true;
+        }
+
     }
 
     public void OnClick()
@@ -100,11 +93,9 @@ public class Interact : NetworkBehaviour
                     toggleAnimatedObject(highlightedObject);
                     break;
                 case "DOS Terminal": // access object and perform action
-                    highlightedObject.GetComponent<DOSInteraction>().SetInteract(gameObject.GetComponent<Interact>(), player);
+                    highlightedObject.GetComponent<DOSInteraction>().SetInteract(gameObject.GetComponent<Interact>());
                     highlightedObject.GetComponent<DOSInteraction>().ToggleInteraction();
-
-                    Debug.Log("DOS Opened!");
-                    onInteract = !onInteract;
+                    highlightedObject.GetComponent<DOSInteraction>().SetCam(gameObject);
                     break;
             }
         }

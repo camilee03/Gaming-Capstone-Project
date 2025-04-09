@@ -588,7 +588,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6507024408640692211
 Transform:
   m_ObjectHideFlags: 0
@@ -986,7 +986,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1772910116491687248
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1033,7 +1033,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -1
   m_TargetDisplay: 0
 --- !u!114 &7463933564463535583
 MonoBehaviour:
@@ -1082,12 +1082,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1322819696661344264}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6f4fc5dcb3b99a34dbd2e6ea0765a203, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RenderPixelationEffect: 1
+  RenderPixelationEffect: 0
   PlayerRenderTexture: {fileID: 8400000, guid: ef7759d825f41ed498f507c92673d1bb, type: 2}
   scaling: 3
   ViewPort: {fileID: 189842282529580835}
@@ -1379,6 +1379,7 @@ MonoBehaviour:
   debugOffline: 1
   canMove: 1
   useAnimator: 1
+  PlayerDisplay: {fileID: 1322819696661344264}
 --- !u!114 &6024289853012604093
 MonoBehaviour:
   m_ObjectHideFlags: 0
