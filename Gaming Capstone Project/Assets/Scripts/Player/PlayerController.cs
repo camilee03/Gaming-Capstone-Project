@@ -40,6 +40,7 @@ public class PlayerController : NetworkBehaviour
     public float AttackDelay = 20f;        // Cooldown time (in seconds) before you can attack again
     public Transform shootingPoint;
     public LayerMask playerLayerMask;
+    public Renderer otherrenderer, otherrenderer2, selfrenderer;
 
     // Private variables
     private float currentStamina;
@@ -59,23 +60,35 @@ public class PlayerController : NetworkBehaviour
     public bool isGrounded;
     public bool debugOffline = false;
     public bool canMove = true;
+    public bool useAnimator = true;
 
     public override void OnNetworkSpawn()
     {
         playerInput = GetComponent<PlayerInput>();
         camMovement = cam.GetComponent<CameraMovement>();
+        AudioListener al = cam.GetComponent<AudioListener>();
 
         if (IsOwner)
         {
+            otherrenderer.enabled = false;
+            otherrenderer2.enabled = false;
+            selfrenderer.enabled = true;
+            useAnimator = true;
             playerInput.enabled = true;
             cam.enabled = true;
             camMovement.enabled = true;
+            al.enabled = true;
         }
         else
         {
+            otherrenderer.enabled = true;
+            otherrenderer2.enabled = true;
+            selfrenderer.enabled = false;
+            useAnimator = false;
             playerInput.enabled = false;
             cam.enabled = false;
             camMovement.enabled = false;
+            al.enabled = false;
         }
 
     }
@@ -127,24 +140,26 @@ public class PlayerController : NetworkBehaviour
 
         // Check if on the ground
         isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayer);
-        animator.SetBool("Grounded", isGrounded);
-        animator.SetBool("Transformed", isTransformed);
-        animator.SetFloat("YVelocity", rgd.linearVelocity.y);
+        if (useAnimator)
+        {
+            animator.SetBool("Grounded", isGrounded);
+            animator.SetBool("Transformed", isTransformed);
+            animator.SetFloat("YVelocity", rgd.linearVelocity.y);
+        }
 
         // Handle movement (if allowed)
         if (canMove)
         {
             // Calculate forward/right movement based on camera's transform
-            Vector3 forwardMovement = cam.transform.forward * z * velocity;
-            Vector3 rightMovement = cam.transform.right * x * velocity;
+            Vector3 forwardMovement = new Vector3(cam.transform.forward.x, 0, cam.transform.forward.z) * z * velocity;
+            Vector3 rightMovement = new Vector3(cam.transform.right.x, 0, cam.transform.right.z) * x * velocity;
             Vector3 linearVelocity = forwardMovement + rightMovement - rgd.linearVelocity;
 
             // Apply horizontal movement (ignore existing vertical velocity to prevent messing up jumps)
             rgd.linearVelocity += new Vector3(linearVelocity.x, 0f, linearVelocity.z);
 
             // Update animator (walking state)
-
-            animator.SetFloat("Speed", new Vector2(Mathf.Abs(x), Mathf.Abs(z)).magnitude);
+            if (useAnimator) animator.SetFloat("Speed", new Vector3(rgd.linearVelocity.x, 0, rgd.linearVelocity.z).magnitude);
 
             // Handle rotation with mouse movement
             yaw += HorizontalSensitivity * Input.GetAxis("Mouse X");
@@ -191,13 +206,15 @@ public class PlayerController : NetworkBehaviour
             // Stop all movement if can't move
             rgd.linearVelocity = Vector3.zero;
             rgd.angularVelocity = Vector3.zero;
-            animator.SetFloat("Speed", 0);
+            if (useAnimator)
+                animator.SetFloat("Speed", 0);
         }
 
         // Handle attack cooldown
         if (!canAttack)
         {
-            animator.SetBool("Attacking", attackTimer > AttackDelay - 0.3f);
+            if (useAnimator)
+                animator.SetBool("Attacking", attackTimer > AttackDelay - 0.3f);
             attackTimer -= Time.deltaTime;
             if (attackTimer <= 0f)
             {
@@ -255,7 +272,8 @@ public class PlayerController : NetworkBehaviour
                 StartCoroutine(Morph());
             }
             else isTransformed = false;
-            animator.SetBool("Transformed", isTransformed);
+            if (useAnimator)
+                animator.SetBool("Transformed", isTransformed);
         }
     }
 
@@ -319,8 +337,6 @@ public class PlayerController : NetworkBehaviour
         Debug.Log($"[ClientRpc] KillClientRpc => Player {OwnerClientId} is now dead.");
         // The next Update() will show the death screen and disable movement.
     }
-
-
 
     // Helper method to cleanly stop sprinting logic
     private void StopSprinting()

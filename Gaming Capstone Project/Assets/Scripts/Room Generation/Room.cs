@@ -1,15 +1,18 @@
 using System.Collections.Generic;
 using System.Drawing;
+using Unity.Netcode;
 using UnityEngine;
 
-public class Room 
+public class Room : NetworkBehaviour
 {
 
     [Header("Public variables")]
     public GameObject parent;
-    public GameObject wallParent;
-    public GameObject tileParent;
-    public List<Vector2> finalRoomTiles;
+    public GameObject wallParent; // children = all walls & doors
+    public List<GameObject> spawnedWalls = new();
+    public GameObject tileParent; // children = all floor tiles
+    public GameObject objectParent; // children = all objects
+    public string roomName;
     public char[,] objectLocations;
 
 
@@ -19,26 +22,31 @@ public class Room
 
 
     List<GameObject> spawnedTiles = new();
-    List<GameObject> spawnedOutline = new();
     List<int> outlineDirections = new();
 
     int size;
     float scale;
+
+    [Header("Spawn Type")]
     GameObject tile;
     GameObject wall;
+    GameObject roomObject;
+    GameObject roomParentObject;
 
 
     // -- Public Functions -- //
 
-    public Room(float scale, GameObject tile, GameObject wall)
+    public Room(float scale, GameObject tile, GameObject wall, GameObject roomObject, GameObject roomParentObject)
     {
         this.scale = scale;
         this.tile = tile;
         this.wall = wall;
+        this.roomObject = roomObject;
+        this.roomParentObject = roomParentObject;
     }
 
     /// <summary> Starts the room generation </summary>
-    public void RoomProcedure(int roomNum)
+    public void RoomProcedure(int roomNum, ObjectGeneration objectSpawner)
     {
         GameObject newRoom = null;
         GenerateNewRoom(); // create the array for the new room
@@ -53,6 +61,7 @@ public class Room
         }
 
         newRoom.name = "Room" + roomNum;
+        roomName = newRoom.name;
         newRoom.tag = "Room";
 
         parent = newRoom;
@@ -72,11 +81,13 @@ public class Room
     GameObject DrawRoom()
     {
         // Create parenting objects which will store room
-        GameObject newRoom = new GameObject("RoomTempName");
-        wallParent = new GameObject("WallParent");
-        wallParent.transform.SetParent(newRoom.transform, false);
-        tileParent = new GameObject("TileParent");
-        tileParent.transform.SetParent(newRoom.transform, false);
+        GameObject newRoom = SpawnNetworkedObject(null, roomObject, new(), new());
+
+        wallParent = SpawnNetworkedObject(newRoom.transform, roomParentObject, new(), new());
+        wallParent.name = "WallParent";
+
+        tileParent = SpawnNetworkedObject(newRoom.transform, roomParentObject, new(), new());
+        tileParent.name = "TileParent";
 
         for (int x = 0; x < size; x++)
         {
@@ -90,8 +101,6 @@ public class Room
                     Vector3 position = new Vector3(x * scale, 2.5f, y * scale);
                     newObject.transform.position = position;
                     spawnedTiles.Add(newObject);
-
-                    finalRoomTiles.Add(new Vector2(x, y));
                 }
                 else if (objectLocations[x, y] == 'w') // spawn wall
                 {
@@ -109,7 +118,6 @@ public class Room
     {
         size = Random.Range(10, 20);
         objectLocations = new char[size, size]; // set random room size
-        finalRoomTiles = new(); // reset filled room tiles
 
         int numSquares = Random.Range(1, 5); // determine how many squares will be generated
 
@@ -149,12 +157,10 @@ public class Room
                 newObject.transform.localRotation = Quaternion.Euler(-90, ((i + 1) % 2) * 90, 0);
                 newObject.name = "Wall" + i;
 
-                spawnedOutline.Add(newObject);
+                spawnedWalls.Add(newObject);
                 outlineDirections.Add(i);
             }
         }
-
-        finalRoomTiles.Add(new Vector2(x, y));
 
     }
 
@@ -227,7 +233,6 @@ public class Room
     }
 
 
-
     // -- TILE GENERATION -- //
 
     /// <summary> Adds the generated room to the array </summary>
@@ -287,4 +292,21 @@ public class Room
     }
 
 
+    GameObject SpawnNetworkedObject(Transform parent, GameObject child, Vector3 position, Quaternion rotation)
+    {
+        GameObject instance = null;
+        if (position != new Vector3())
+        {
+            instance = Instantiate(NetworkManager.Singleton.GetNetworkPrefabOverride(child), position, rotation);
+        }
+        else
+        {
+            instance = Instantiate(child);
+        }
+        var instanceNetworkObject = instance.GetComponent<NetworkObject>();
+        instanceNetworkObject.Spawn(true);
+        if (parent != null) { instanceNetworkObject.TrySetParent(parent); }
+
+        return instance;
+    }
 }

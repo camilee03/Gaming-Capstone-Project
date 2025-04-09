@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1648707409762468445}
   m_Layer: 0
   m_Name: Sock
-  m_TagString: Untagged
+  m_TagString: Selectable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 3488418947271272566, guid: 707da9bdc709b1b4789bae3ae3f8d5ac, type: 3}
+  - {fileID: 2100000, guid: 9a957ccf53fc99043af36da722d615fe, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
