@@ -60,22 +60,29 @@ public class PlayerController : NetworkBehaviour
     public bool debugOffline = false;
     public bool canMove = true;
 
+    [Header("Death Visuals")]
+    public GameObject playerModel; // Assign in Inspector: this should be the mesh or object representing the visible character
+
+
     public override void OnNetworkSpawn()
     {
         playerInput = GetComponent<PlayerInput>();
         camMovement = cam.GetComponent<CameraMovement>();
+        AudioListener al = cam.GetComponent<AudioListener>();
 
         if (IsOwner)
         {
             playerInput.enabled = true;
             cam.enabled = true;
             camMovement.enabled = true;
+            al.enabled = true;
         }
         else
         {
             playerInput.enabled = false;
             cam.enabled = false;
             camMovement.enabled = false;
+            al.enabled = false;
         }
 
     }
@@ -318,6 +325,13 @@ public class PlayerController : NetworkBehaviour
         isDead = true;
         Debug.Log($"[ClientRpc] KillClientRpc => Player {OwnerClientId} is now dead.");
         // The next Update() will show the death screen and disable movement.
+        if (playerModel != null)
+            playerModel.SetActive(false);
+
+        // Optional: disable collider if needed
+        Collider col = GetComponent<Collider>();
+        if (col != null)
+            col.enabled = false;
     }
 
 
