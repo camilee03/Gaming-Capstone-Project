@@ -17,7 +17,7 @@ public class GameController : NetworkBehaviour
 
     // Number of Doppleganger players to assign
     private int numberOfDopples = 1;
-
+    public GameObject LobbyCanvas;
     // -------------------------------------------------------
     // Initialization / Singleton
     // -------------------------------------------------------
@@ -195,6 +195,24 @@ public class GameController : NetworkBehaviour
         {
             HostSelectsStart();
         }
+    }
+
+    public void setLobby(GameObject obj)
+    {
+        LobbyCanvas = obj;
+
+    }
+
+    [ClientRpc]
+    public void DisableLobbyCanvasClientRpc()
+    {
+        bool success = false;
+
+            LobbyCanvas.SetActive(false);
+            success = true;
+        
+        Debug.Log($"[ClientRpc] Player {OwnerClientId} => Successfully deleted canvas: {success}");
+
     }
 
 }

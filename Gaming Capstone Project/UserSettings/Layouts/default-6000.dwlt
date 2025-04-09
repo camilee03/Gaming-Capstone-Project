@@ -2317,7 +2317,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 113}
     m_SelectedIDs: c8700100
     m_LastClickedID: 94408
-    m_ExpandedIDs: 000000002cf50000
+    m_ExpandedIDs: 000000002af500002cf500002ef5000030f5000032f5000034f50000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -2346,7 +2346,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 000000002cf50000
+    m_ExpandedIDs: 000000002af500002cf500002ef5000030f5000032f5000034f50000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -3132,7 +3132,7 @@ MonoBehaviour:
   m_WindowGUID: cc27987af1a868c49b0894db9c0f5429
   m_Gizmos: 1
   m_OverrideSceneCullingMask: 6917529027641081856
-  m_SceneIsLit: 0
+  m_SceneIsLit: 1
   m_SceneLighting: 1
   m_2DMode: 0
   m_isRotationLocked: 0
@@ -3140,9 +3140,9 @@ MonoBehaviour:
   m_AudioPlay: 0
   m_DebugDrawModesUseInteractiveLightBakingData: 0
   m_Position:
-    m_Target: {x: 0, y: 0, z: 0}
+    m_Target: {x: -3.4996278, y: 1.8448265, z: 2.0609212}
     speed: 2
-    m_Value: {x: -142.50352, y: 8.259353, z: -12.3938}
+    m_Value: {x: 0, y: 0, z: 0}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -3151,7 +3151,7 @@ MonoBehaviour:
   m_ValidateTrueMetals: 0
   m_DoValidateTrueMetals: 0
   m_SceneViewState:
-    m_AlwaysRefresh: 0
+    m_AlwaysRefresh: 1
     showFog: 1
     showSkybox: 1
     showFlares: 1
@@ -3188,15 +3188,15 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: -0.17673261, y: -0.6024912, z: 0.1390307, w: -0.7658149}
+    m_Target: {x: 0.24216707, y: -0.4412291, z: 0.12496802, w: 0.8550218}
     speed: 2
-    m_Value: {x: -0.11455595, y: 0.36680058, z: -0.0455682, w: -0.92210084}
+    m_Value: {x: 0.17673261, y: 0.6024912, z: -0.1390307, w: 0.7658149}
   m_Size:
-    m_Target: 10
+    m_Target: 1.4527209
     speed: 2
-    m_Value: 3.368608
+    m_Value: 10
   m_Ortho:
-    m_Target: 1
+    m_Target: 0
     speed: 2
     m_Value: 1
   m_CameraSettings:

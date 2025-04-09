@@ -1,7 +1,8 @@
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 
-public class GetNumberOfPlayers : MonoBehaviour
+public class GetNumberOfPlayers : NetworkBehaviour
 {
     TMP_Text m_Text;
     GameController gameController;
@@ -13,5 +14,6 @@ public class GetNumberOfPlayers : MonoBehaviour
     private void Update()
     {
         m_Text.text = gameController.GetNumberOfPlayers().ToString();
+        m_Text.text = NetworkManager.ConnectedClients.Count.ToString();
     }
 }

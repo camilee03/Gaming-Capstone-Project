@@ -61,7 +61,7 @@ public class PlayerController : NetworkBehaviour
     public bool debugOffline = false;
     public bool canMove = true;
     public bool useAnimator = true;
-
+    public GameObject PlayerDisplay;
     public override void OnNetworkSpawn()
     {
         playerInput = GetComponent<PlayerInput>();
@@ -75,9 +75,11 @@ public class PlayerController : NetworkBehaviour
             selfrenderer.enabled = true;
             useAnimator = true;
             playerInput.enabled = true;
-            cam.enabled = true;
+            cam.gameObject.SetActive(true);
             camMovement.enabled = true;
             al.enabled = true;
+            PlayerDisplay.SetActive(true);
+
         }
         else
         {

@@ -13,12 +13,21 @@ public class HostHittingEnter : NetworkBehaviour
     public Canvas LobbyMenu;
 
     public TMP_Text text;
-    void Start()
+
+    private void Update()
     {
+        if (StartButton != null)
+        {
+            StartButton.onClick.RemoveAllListeners();
+            StartButton.onClick.AddListener(ButtonPressed);
+
+
+
+        }
+
         controller = GameController.Instance;
-        StartButton.onClick.AddListener(ButtonPressed);
 
-
+        controller.setLobby(LobbyMenu.gameObject);
     }
     private void LateUpdate()
     {
@@ -27,13 +36,12 @@ public class HostHittingEnter : NetworkBehaviour
     }
 
 
-
     void ButtonPressed()
     {
         if(IsHost)
         {
             controller.HostSelectsStart();
-            LobbyMenu.gameObject.SetActive(false);
+            controller.DisableLobbyCanvasClientRpc();
         }
         else
         {
