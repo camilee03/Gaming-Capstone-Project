@@ -22,6 +22,7 @@ public class ObjectGeneration : MonoBehaviour
     Vector3 firstTile;
 
     RoomGeneration roomGenerator;
+    RoomTypeJSON roomTypeJSON;
     List<GameObject> spawnedObjects = new List<GameObject>();
 
     SerializableDict dictionary;
@@ -44,6 +45,7 @@ public class ObjectGeneration : MonoBehaviour
     private void Awake()
     {
         roomGenerator = GetComponent<RoomGeneration>();
+        roomTypeJSON = GetComponent<RoomTypeJSON>();
         dictionary = GetComponent<SerializableDict>();
         objects = dictionary.dictionary;
 
@@ -51,15 +53,23 @@ public class ObjectGeneration : MonoBehaviour
         if (roomGenerator.seed != -1) { Random.InitState(roomGenerator.seed); }
     }
 
-    public void GenerationProcedure(Room room, char[] objectsToSpawn)
+    public void GenerationProcedure(Room room)
     {
         //CleanRoom(); // get rid of old objects and reset room
 
-        // Goes through each room and spawns objects for each
+        // Figure out what objects to spawn
+        List<string[]> objectList = roomTypeJSON.objectList;
+        int randomList = Random.Range(0, objectList.Count - 1);
+        string[] objectsToSpawn = objectList[randomList];
+        foreach (string obj in objectsToSpawn)
+        {
+            Debug.Log(obj);
+        }
+
+        // Goes through room and spawns objects
         preDescripterTiles = room.objectLocations;
         roomParent = room.parent;
         firstTile = room.tileParent.transform.GetChild(0).position;
-
 
         // Create viable locations lists
         wallPositions = new();
@@ -73,33 +83,11 @@ public class ObjectGeneration : MonoBehaviour
             tilePositions.Add(room.tileParent.transform.GetChild(i).position);
         }
 
+        // Spawn objects
         room.objectParent = BacktrackingSearch(objectsToSpawn);
     }
-
-    private bool SpawnObject(char newTileCode, char oldTileCode, Vector2 location) // determines if objects can be spawned according to constraints
-    {
-        char leftTile = descripterTiles[(int)location.x - 1, (int)location.y];
-        char rightTile = descripterTiles[(int)location.x + 1, (int)location.y];
-        char upTile = descripterTiles[(int)location.x, (int)location.y - 1];
-        char downTile = descripterTiles[(int)location.x, (int)location.y + 1];
-
-        switch (newTileCode)
-        {
-            case 't': // table
-            case 'T': // terminal
-                if (oldTileCode == 'f' && leftTile == 'f' && rightTile == 'f' && upTile == 'f' && downTile == 'f') 
-                    { return true; } break;
-            case 'b': // bulletin board
-                if (oldTileCode == 'w') { return true; } break;
-            default:
-                if (oldTileCode == 'f') { return true; }
-                break;
-
-        }
-        return false;
-    }
     
-    private GameObject BacktrackingSearch(char[] objectList)
+    private GameObject BacktrackingSearch(string[] objectList)
     {
         int scale = 10;
         descripterTiles = (char[,])preDescripterTiles.Clone();
@@ -107,11 +95,27 @@ public class ObjectGeneration : MonoBehaviour
 
         List<Object> unassignedObjects = new();
 
+        // Spawn in a set number of new objects
+        int numTilePositions = tilePositions.Count;
+        int numWallPositions = wallPositions.Count;
 
-        foreach (char identifier in objectList)
+        foreach (string identifier in objectList)
         {
-            Object newObject = new Object() { identifier = identifier, domains = tilePositions, constraint = Constraints.None };
-            unassignedObjects.Add(newObject);
+            (Object newObject, int amount) = DetermineObjectNum(identifier.ToCharArray()[0]);
+
+            for (int i=0; i<amount; i++)
+            {
+                if (newObject.constraint == Constraints.None && numTilePositions > 0) // check that can still place on tiles
+                {
+                    unassignedObjects.Add(newObject); 
+                    numTilePositions--; 
+                }
+                if (newObject.constraint == Constraints.Wall && numWallPositions > 0) // check that can still places on walls
+                { 
+                    numWallPositions--;
+                    unassignedObjects.Add(newObject);
+                }
+            }
         }
 
         List<Object> assignedObjects = RecursiveBacktracking(new List<Object>(), unassignedObjects, unassignedObjects.Count);
@@ -221,7 +225,7 @@ public class ObjectGeneration : MonoBehaviour
                 newObject.transform.position = tilePos + Vector3.up * 5;
                 newObject.transform.localRotation = Quaternion.identity;
                 break;
-            case 'F': // fan
+            case 'f': // fan
                 newObject = GameObject.Instantiate(objects["fan"], parent.transform);
                 newObject.transform.position = tilePos + Vector3.up * 3;
                 newObject.transform.localRotation = Quaternion.identity;
@@ -259,7 +263,7 @@ public class ObjectGeneration : MonoBehaviour
                 newObject.transform.localRotation = Quaternion.Euler(-90, 0, 0);
                 break;
 
-            default: Debug.Log("No such character found"); break;
+            default: Debug.Log($"{type} character not found"); break;
 
         }
 
@@ -267,6 +271,51 @@ public class ObjectGeneration : MonoBehaviour
         spawnedObjects.Add(newObject);
     }
 
+
+    private (Object newObject, int numObjects) DetermineObjectNum(char identifier)
+    {
+        Object newObject = new Object();
+        int amount = 0;
+
+        switch (identifier)
+        {
+            // --  Scarce -- //
+
+            case 't': // DOS terminal
+                newObject = new Object() { identifier = identifier, domains = tilePositions, constraint = Constraints.None };
+                amount = 1;
+                break;
+
+            // -- Plentiful -- //
+
+            case 'L': // light
+                newObject = new Object() { identifier = identifier, domains = tilePositions, constraint = Constraints.Ceiling };
+                amount = Random.Range(2, 10);
+                break;
+
+            // -- Normal -- //
+
+            case 'c': // Chute
+            case 'l': // lever
+            case 's': // speaker
+            case 'v': // vent
+                newObject = new Object() { identifier = identifier, domains = wallPositions, constraint = Constraints.Wall };
+                amount = Random.Range(1, 5);
+                break;
+            case 'C': // Chair
+            case 'f': // fan
+            case 'T': // Table
+                newObject = new Object() { identifier = identifier, domains = tilePositions, constraint = Constraints.None };
+                amount = Random.Range(1, 5);
+                break;
+
+
+            default: Debug.Log($"{identifier} character not found"); break;
+
+        }
+
+        return (newObject, amount);
+    }
 
     private void DetermineTheme() // determine task type and theme based on GPT
     {

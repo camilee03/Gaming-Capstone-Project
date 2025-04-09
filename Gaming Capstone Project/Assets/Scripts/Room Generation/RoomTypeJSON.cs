@@ -1,29 +1,34 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 public class RoomTypeJSON : MonoBehaviour
 {
     [SerializeField] TextAsset jsonFile;
+    public List<string[]> objectList = new List<string[]>();
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void Awake()
     {
         Rooms rooms = JsonUtility.FromJson<Rooms>(jsonFile.text);
 
-        foreach (ObjectStructure room in rooms.room)
+        foreach (Room room in rooms.room)
         {
-            Debug.Log(room);
+            objectList.Add(room.objects);
         }
+
     }
 
-    public struct Rooms
+    [System.Serializable]
+    public class Rooms
     {
-        public List<ObjectStructure> room;
+        public Room[] room;
     }
 
-    public struct ObjectStructure
+    [System.Serializable]
+    public class Room
     {
         public string name;
-        public List<char> objects;
+        public string[] objects;
     }
 }

@@ -42,9 +42,16 @@ public class RoomGeneration : NetworkBehaviour
 
     private void Start()
     {
-        objectGen = GetComponent<ObjectGeneration>();
-        taskManager = GetComponent<TaskManager>();
-        StartGeneration();
+        if (IsServer)
+        {
+            objectGen = GetComponent<ObjectGeneration>();
+            taskManager = GetComponent<TaskManager>();
+            StartGeneration();
+        }
+        else
+        {
+            Debug.Log("Not generated");
+        }
     }
 
 
@@ -106,7 +113,7 @@ public class RoomGeneration : NetworkBehaviour
         // Spawn Objects for each room
         foreach (Room room in RoomManager.Instance.rooms)
         {
-            objectGen.GenerationProcedure(room, new char[8] { 'T', 't', 'C', 'l', 'L', 'v' , 'f', 's'});
+            objectGen.GenerationProcedure(room);
         }
 
     }
@@ -235,7 +242,7 @@ public class RoomGeneration : NetworkBehaviour
             if (newHallway == null) { Debug.Log("Couldn't find a path"); return null; }
 
             // change room parent to new gameobject
-            newRoomParent = SpawnNetworkedObject(null, roomParentObject, new(), new());
+            newRoomParent = SpawnNetworkedObject(null, roomParentObject, Vector3.zero, Quaternion.identity);
             newRoomParent.name = "Room" + dar1.room.name.Remove(0, 4) + dar2.room.name.Remove(0, 4);
             newRoomParent.tag = "Room";
 
@@ -274,7 +281,7 @@ public class RoomGeneration : NetworkBehaviour
         while (collided && debugInt < 100)
         {
             // Move room
-            Debug.Log($"Moved {dar2.room.name} by {doorDisplacement}");
+            //Debug.Log($"Moved {dar2.room.name} by {doorDisplacement}");
             dar2.room.transform.Translate(doorDisplacement);
             doorDisplacement = directionDisplacement;
 
@@ -302,7 +309,7 @@ public class RoomGeneration : NetworkBehaviour
         Vector3 prevPos = dar1.door.transform.position;
         for (int i = 0; i < hallwayPath.Count - 1; i++)
         {
-            GameObject.Instantiate(tiles, hallwayPath[i], Quaternion.identity, hallwayParent.transform);
+            SpawnNetworkedObject(hallwayParent.transform, tiles, hallwayPath[i], Quaternion.identity);
             DrawWallsAroundDoors(prevPos, hallwayPath[i], hallwayPath[i + 1], hallwayParent, new Vector3[] { dar1.door.transform.position, dar2.door.transform.position});
             prevPos = hallwayPath[i];
         }
@@ -326,7 +333,7 @@ public class RoomGeneration : NetworkBehaviour
         {
             if (!doors.Contains(spawnPos[i]) && positions[i] != prevPos && positions[i] != nextPos)
             {
-                GameObject newObject = GameObject.Instantiate(walls, parent.transform, true);
+                GameObject newObject = SpawnNetworkedObject(parent.transform, walls, Vector3.zero, Quaternion.identity);
                 newObject.transform.position = spawnPos[i];
                 newObject.transform.localRotation = Quaternion.Euler(-90, ((i + 1) % 2) * 90, 0);
             }
@@ -334,19 +341,16 @@ public class RoomGeneration : NetworkBehaviour
     }
 
     /// <summary> Spawns a network object </summary>
+    
     GameObject SpawnNetworkedObject(Transform parent, GameObject child, Vector3 position, Quaternion rotation)
     {
         GameObject instance = null;
-        if (position != new Vector3())
-        {
-            instance = Instantiate(NetworkManager.Singleton.GetNetworkPrefabOverride(child), position, rotation);
-        }
-        else
-        {
-            instance = Instantiate(NetworkManager.Singleton.GetNetworkPrefabOverride(child));
-        }
-        var instanceNetworkObject = instance.GetComponent<NetworkObject>();
+
+        instance = Instantiate(child, position, rotation);
+        NetworkObject instanceNetworkObject = instance.GetComponent<NetworkObject>();
+        if (instanceNetworkObject == null) { Debug.LogError(child.name + " needs a NetworkObject"); }
         instanceNetworkObject.Spawn(true);
+
         if (parent != null) { instanceNetworkObject.TrySetParent(parent); }
 
         return instance;

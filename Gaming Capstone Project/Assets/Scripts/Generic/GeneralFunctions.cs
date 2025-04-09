@@ -141,7 +141,7 @@ public class GeneralFunctions : ScriptableObject
 
     public static List<Vector3> FindShortestAvoidingTiles(Vector3 pos1, Vector3 pos2, float tileScale)
     {
-        Debug.Log($"Position 1: {pos1} Position 2: {pos2} Tile scale: {tileScale}");
+        //Debug.Log($"Position 1: {pos1} Position 2: {pos2} Tile scale: {tileScale}");
 
         DataStructures.PriorityQueue<(Vector3, int)> fringe = new();
         Dictionary<Vector3, Vector3> parentMap = new();

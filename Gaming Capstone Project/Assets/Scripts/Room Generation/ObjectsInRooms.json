@@ -86,7 +86,7 @@
     },
     {
       "name": "Quarantine Room",
-      "objects": [ "T", "L", "b", "v", "F" ]
+      "objects": [ "T", "L", "b", "v", "f" ]
     },
     {
       "name": "Laboratory",
@@ -194,11 +194,11 @@
     },
     {
       "name": "Air Filtration Room",
-      "objects": [ "T", "L", "b", "F" ]
+      "objects": [ "T", "L", "b", "f" ]
     },
     {
       "name": "Decontamination Room",
-      "objects": [ "T", "L", "b", "v", "F" ]
+      "objects": [ "T", "L", "b", "v", "f" ]
     }
   ]
 }

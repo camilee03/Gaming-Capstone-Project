@@ -81,12 +81,12 @@ public class Room : NetworkBehaviour
     GameObject DrawRoom()
     {
         // Create parenting objects which will store room
-        GameObject newRoom = SpawnNetworkedObject(null, roomObject, new(), new());
+        GameObject newRoom = SpawnNetworkedObject(null, roomObject, Vector3.zero, Quaternion.identity);
 
-        wallParent = SpawnNetworkedObject(newRoom.transform, roomParentObject, new(), new());
+        wallParent = SpawnNetworkedObject(newRoom.transform, roomParentObject, Vector3.zero, Quaternion.identity);
         wallParent.name = "WallParent";
 
-        tileParent = SpawnNetworkedObject(newRoom.transform, roomParentObject, new(), new());
+        tileParent = SpawnNetworkedObject(newRoom.transform, roomParentObject, Vector3.zero, Quaternion.identity);
         tileParent.name = "TileParent";
 
         for (int x = 0; x < size; x++)
@@ -95,7 +95,7 @@ public class Room : NetworkBehaviour
             {
                 if (objectLocations[x, y] == 'f') // spawn floor
                 {
-                    GameObject newObject = Object.Instantiate(tile, tileParent.transform, true);
+                    GameObject newObject = SpawnNetworkedObject(tileParent.transform, tile, Vector3.zero, Quaternion.identity);
                     newObject.name = "Tile" + x + "" + y;
 
                     Vector3 position = new Vector3(x * scale, 2.5f, y * scale);
@@ -152,7 +152,7 @@ public class Room : NetworkBehaviour
         {
             if (locations[i]) // if can spawn
             {
-                newObject = GameObject.Instantiate(child, parent, true);
+                newObject = SpawnNetworkedObject(parent, child, Vector3.zero, Quaternion.identity);
                 newObject.transform.position = RoomFunctions.ConvertTileToPos(x, y, i, true, scale);
                 newObject.transform.localRotation = Quaternion.Euler(-90, ((i + 1) % 2) * 90, 0);
                 newObject.name = "Wall" + i;
@@ -295,16 +295,12 @@ public class Room : NetworkBehaviour
     GameObject SpawnNetworkedObject(Transform parent, GameObject child, Vector3 position, Quaternion rotation)
     {
         GameObject instance = null;
-        if (position != new Vector3())
-        {
-            instance = Instantiate(NetworkManager.Singleton.GetNetworkPrefabOverride(child), position, rotation);
-        }
-        else
-        {
-            instance = Instantiate(child);
-        }
-        var instanceNetworkObject = instance.GetComponent<NetworkObject>();
+
+        instance = Instantiate(child, position, rotation);
+        NetworkObject instanceNetworkObject = instance.GetComponent<NetworkObject>();
+        if (instanceNetworkObject == null) { Debug.LogError(child.name + " needs a NetworkObject"); }
         instanceNetworkObject.Spawn(true);
+
         if (parent != null) { instanceNetworkObject.TrySetParent(parent); }
 
         return instance;

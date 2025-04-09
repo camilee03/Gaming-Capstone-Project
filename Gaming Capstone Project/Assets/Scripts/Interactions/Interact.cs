@@ -14,8 +14,8 @@ public class Interact : NetworkBehaviour
     [Header("Highlight Variables")]
     private Color highlightColor = new Color(0.01f, 0.02f, 0f, 1f);
     private List<Material> materials;
-    private GameObject highlightedObject;
-    private GameObject pickedupObject;
+    public GameObject highlightedObject;
+    public GameObject pickedupObject;
     private Rigidbody pickedupRigidBody;
 
     [Header("Interactable Variables")]
@@ -84,14 +84,16 @@ public class Interact : NetworkBehaviour
                             pickedupRigidBody = pickedupObject.GetComponent<Rigidbody>();
                             pickedupRigidBody.useGravity = false;
                         }
-                        pickedupObject.GetComponent<Collider>().enabled = false;
+                        Collider[] colliders = pickedupObject.GetComponents<Collider>();
+                        foreach (Collider collider in colliders)
+                        {
+                            collider.enabled = false;
+                        }
                         anim.SetLayerWeight(1, 1);
                         highlightedObject = null;
                     }
                     break;
                 case "Button": // Press button / lever
-                    toggleAnimatedObject(highlightedObject);
-                    break;
                 case "Door": // Open / close door
                     toggleAnimatedObject(highlightedObject);
                     break;
@@ -112,7 +114,12 @@ public class Interact : NetworkBehaviour
         if (pickedupObject != null)
         {
             pickedupObject.transform.position = rightHand.position + rightHand.forward * offset.x + rightHand.up * offset.y + rightHand.right * offset.z;
-            pickedupObject.GetComponent<Collider>().enabled = true;
+
+            Collider[] colliders = pickedupObject.GetComponents<Collider>();
+            foreach (Collider collider in colliders)
+            {
+                collider.enabled = true;
+            }
             anim.SetLayerWeight(1, 0);
             if (pickedupRigidBody != null)
             {

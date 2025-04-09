@@ -1,27 +1,34 @@
 using UnityEngine;
 using System.Collections.Generic;
 using TMPro;
+using System.Linq;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class TaskAssigner : MonoBehaviour
 {
     // Task containers
     List<RoomTask> taskList;
     List<RoomTask> assignedTasks = new List<RoomTask>();
-    bool[] finishedTasks;
+    Dictionary<RoomTask, bool> finishedTasks;
     int numTasks = 3;
 
     // Task display
-    [SerializeField] TMP_Text goalText;
     [SerializeField] TMP_Text tasksCompleted;
+    [SerializeField] GameObject notebook;
+    [SerializeField] Interact interactManager;
     TaskManager taskManager;
 
     public bool start = false; // toggle through another function
     bool donow = false;
 
-    private void Start()
-    {
-    }
-
+    // Show task
+    RoomTask currentTask;
+    int currentTaskIndex;
+    [SerializeField] TaskPointer taskPointer;
+    [SerializeField] GameObject defaultToggle;
+    ToggleGroup toggleGroup;
+    List<Toggle> toggles = new List<Toggle>();
 
     private void Update()
     {
@@ -33,28 +40,31 @@ public class TaskAssigner : MonoBehaviour
         }
         else if (donow)
         {
-            UpdateTasks();   
+            UpdateTasks();
+            CheckCheckboxes();
         }
     }
 
     void UpdateTasks()
     {
         int numTasksFinished = 0;
+        int index = 0;
 
-        for (int i = 0; i < assignedTasks.Count; i++)
+        foreach (RoomTask task in assignedTasks)
         {
-            if (!finishedTasks[i])
+            if (!finishedTasks.Keys.Contains(task) || !finishedTasks[task])
             {
-                switch (assignedTasks[i].type)
+                switch (task.type)
                 {
                     case TaskType.None: break;
-                    case TaskType.Interact: if (InteractTask(assignedTasks[i])) { finishedTasks[i] = true; } break;
-                    case TaskType.Terminal: if (TerminalTask(assignedTasks[i])) { finishedTasks[i] = true; } break;
-                    case TaskType.Pickup: if (PickupTask(assignedTasks[i])) { finishedTasks[i] = true; } break;
+                    case TaskType.Interact: if (InteractTask(task, index)) { finishedTasks[task] = true; } break;
+                    case TaskType.Terminal: if (TerminalTask(task, index)) { finishedTasks[task] = true; } break;
+                    case TaskType.Pickup: if (PickupTask(task, index)) { finishedTasks[task] = true; } break;
                     case TaskType.Paper: break;
                 }
             }
             else { numTasksFinished++; }
+            index++;
         }
 
         tasksCompleted.text = numTasksFinished + "/" + numTasks;
@@ -62,6 +72,9 @@ public class TaskAssigner : MonoBehaviour
 
     void AssignTasks()
     {
+        // Should try to assign tasks that aren't the same as anyone else
+
+
         taskManager = GameObject.Find("RoomGenerationManager").GetComponent<TaskManager>();
         taskList = taskManager.taskList;
         string goalTextResult = "";
@@ -70,28 +83,90 @@ public class TaskAssigner : MonoBehaviour
         {
             // Add random tasks from total tasks in task manager
             int newTask = Random.Range(0, taskList.Count - 1);
-            Debug.Log(newTask);
             //while (assignedTasks.Contains(taskList[newTask])) { newTask = Random.Range(0, taskList.Count - 1); }
 
             assignedTasks.Add(taskList[newTask]);
 
-            // Add to goalTextResult
-            goalTextResult += "Task " + i + ": " + DisplayText(taskList[newTask]) + "\n";
+            // Add new task checkbox
+            goalTextResult = "Task " + i + ": " + DisplayText(taskList[newTask]) + "\n";
+            CreateCheckboxes(new Vector3(0, 400 - i * 100, 0), i, goalTextResult);
         }
 
-        finishedTasks = new bool[assignedTasks.Count];
+        finishedTasks = new Dictionary<RoomTask, bool>();
 
         // set initial UI
-        goalText.text = goalTextResult;
         tasksCompleted.text = "0/" + numTasks;
     }
 
+
+    //-- Check if current task is completed --//
+    bool PickupTask(RoomTask task, int index)
+    {
+        foreach (GameObject trigger in task.triggerGameObject)
+        {
+            if (trigger.transform.position != task.position)
+            {
+                return false;
+            }
+        }
+
+        toggles[index].GetComponentInChildren<TMP_Text>().color = Color.green;
+
+        return true;
+    }
+
+    bool InteractTask(RoomTask task, int index)
+    {
+        bool isComplete = true;
+        for (int i=0; i < task.data1.Length; i++)
+        {
+            if (!task.data1[i].GetActiveAnimationState())
+            {
+                isComplete = false;
+            }
+            else
+            {
+                task.data2[i].SetActiveAnimationState(true);
+            }
+        }
+
+        if (isComplete) { toggles[index].GetComponentInChildren<TMP_Text>().color = Color.green; }
+
+        return isComplete;
+    }
+
+    bool PaperTask(RoomTask task, int index)
+    {
+        // on completion, display UI to put pieces of paper together
+        return true;
+    }
+
+    bool TerminalTask(RoomTask task, int index)
+    {
+        bool isComplete = false;
+        if (interactManager.highlightedObject == task.triggerGameObject[0]) // If currently interacting with the DOS
+        {
+            isComplete = true;
+            for (int i = 0; i < task.data1.Length; i++)
+            {
+                // Might need to change for the lights
+                if (!task.data1[i].GetActiveAnimationState()) { isComplete = false; }
+            }
+        }
+
+
+        if (isComplete) { toggles[index].GetComponentInChildren<TMP_Text>().color = Color.green; }
+        return isComplete; 
+    }
+
+
+    // -- UI --//
     string DisplayText(RoomTask task)
     {
         string triggers = "";
         foreach (GameObject trigger in task.triggerGameObject)
         {
-            triggers += " " + trigger.name;
+            triggers += " " + trigger.name.Replace("(Clone)", "");
         }
 
         string triggerRooms = "";
@@ -105,7 +180,7 @@ public class TaskAssigner : MonoBehaviour
         {
             foreach (GameObject result in task.resultGameObject)
             {
-                results += " " + result.name;
+                results += " " + result.name.Replace("(Clone)", "");
             }
         }
 
@@ -125,43 +200,57 @@ public class TaskAssigner : MonoBehaviour
         }
     }
 
-
-    bool PickupTask(RoomTask task)
+    public void OpenTaskMenu(InputAction.CallbackContext context)
     {
-        foreach (GameObject trigger in task.triggerGameObject)
+        notebook.SetActive(!notebook.activeSelf);
+    }
+
+    void ShowCurrentTask()
+    {
+        // If player is holding a task item
+        if (interactManager.pickedupObject != null && currentTask.triggerGameObject.Contains(interactManager.pickedupObject))
         {
-            if (trigger.transform.position != task.position)
-            {
-                return false;
-            }
+            // set location to where that task item needs to be placed
+            taskPointer.SetTarget(currentTask.position);
         }
 
-        return true;
-    }
-
-    bool InteractTask(RoomTask task)
-    {
-        foreach (ObjectData data in task.data1)
+        else
         {
-            if (!data.GetActiveAnimationState())
+            foreach (GameObject trigger in currentTask.triggerGameObject)
             {
-                return false;
+                // set location to first trigger object if not already finished (check condition based on task?)
+                taskPointer.SetTarget(trigger.transform.position);
+                break;
             }
         }
-
-        //task.data2.SetActiveAnimationState(true);
-        return true;
     }
 
-    bool PaperTask(RoomTask task)
+    void CreateCheckboxes(Vector3 position, int number, string description)
     {
-        // on completion, display UI to put pieces of paper together
-        return true;
+        // Instantiate toggle
+        GameObject newToggleObject = GameObject.Instantiate(defaultToggle);
+        newToggleObject.name = number.ToString();
+        newToggleObject.transform.parent = notebook.transform;
+        newToggleObject.transform.localPosition = position;
+
+        // Get & set components
+        Toggle newToggle = newToggleObject.GetComponent<Toggle>();
+        newToggleObject.GetComponentInChildren<Text>().text = description;
+        toggles.Add(newToggle);
+
+        // Set toggle to a group
+        if (toggleGroup == null) { toggleGroup = notebook.AddComponent<ToggleGroup>(); toggleGroup.allowSwitchOff = true; }
+        newToggle.group = toggleGroup;
     }
 
-    bool TerminalTask(RoomTask task)
+    void CheckCheckboxes()
     {
-        return true; // idk change
-    }
+        if (toggleGroup.AnyTogglesOn())
+        {
+            currentTask = assignedTasks[int.Parse(toggleGroup.GetFirstActiveToggle().name)];
+            ShowCurrentTask();
 
+            // something to move the toggle if task already completed?
+        }
+    }
 }

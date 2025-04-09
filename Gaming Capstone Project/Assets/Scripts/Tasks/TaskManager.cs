@@ -101,7 +101,6 @@ public class TaskManager : MonoBehaviour
     {
         foreach (GameObject obj in selectables)
         {
-            Debug.Log("HERE");
             taskList.Add(CreateTask(TaskType.Pickup, new GameObject[1] { obj }, null));
         }
     }
@@ -111,13 +110,30 @@ public class TaskManager : MonoBehaviour
         // Create a series of terminal tasks for each room
         foreach (Room room in rooms)
         {
-            // set terminal as triggergameobject
+            // set terminal
+            GameObject terminal = room.objectParent.transform.GetChild(0).gameObject;
 
             // Create light task
 
-            // Create fan task if there is a fan in the room
+            for (int i = 1; i < room.objectParent.transform.childCount; i++)
+            {
+                // Find all lights
+            }
 
-            // Others
+
+            for (int i=1; i<room.objectParent.transform.childCount; i++)
+            {
+                Transform objectTransform = room.objectParent.transform.GetChild(i);
+
+                // Create fan task
+                if (objectTransform.name.Replace("(Clone)", "") == "Fan")
+                {
+                    taskList.Add(CreateTask(TaskType.Terminal, new GameObject[1] { terminal }, new GameObject[1] { objectTransform.gameObject }));
+                }
+
+                // Others (single)
+            }
+
         }
     }
 
