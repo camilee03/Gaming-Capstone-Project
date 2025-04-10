@@ -92,4 +92,32 @@ public class RoomFunctions : ScriptableObject
 
         return false;
     }
+
+    public static (float minX, float  minZ, float maxX, float maxZ) FindMapBoundaries()
+    {
+        float minX = 1000000;
+        float minZ = 1000000;
+        float maxX = -1000000;
+        float maxZ = -1000000;
+
+        float deviation = 100;
+
+        foreach (Room room in RoomManager.Instance.rooms)
+        {
+            if (room.parent.transform.position.x - deviation < minX || room.parent.transform.position.z - deviation < minZ ||
+                room.parent.transform.position.x + deviation > maxX || room.parent.transform.position.z + deviation > maxZ)
+            {
+                for (int i = 0; i < room.tileParent.transform.childCount; i++)
+                {
+                    Vector3 tilePos = room.tileParent.transform.GetChild(i).position;
+                    if (tilePos.x < minX) { minX = tilePos.x; }
+                    if (tilePos.z < minZ) { minZ = tilePos.z; }
+                    if (tilePos.x > maxX) { maxX = tilePos.z; }
+                    if (tilePos.z > maxZ) { maxZ = tilePos.z; }
+                }
+            }
+        }
+
+        return (minX, minZ, maxX, maxZ);
+    }
 }

@@ -120,6 +120,16 @@ public class GameController : NetworkBehaviour
         }
     }
 
+    private void AssignTasks()
+    {
+        // Reset all to Scientist
+        foreach (var kvp in Players)
+        {
+            var pc = kvp.Value.GetComponent<TaskAssigner>();
+            pc.start = true;
+        }
+    }
+
 
     // -------------------------------------------------------
     // Start of Game
@@ -132,6 +142,7 @@ public class GameController : NetworkBehaviour
         Debug.Log("[Server] HostSelectsStart() => AssignTeams()");
         SpawnPlayersAtRandomPoints();
         AssignTeams();
+        AssignTasks();
         DisableLobbyCanvasClientRpc();
 
     }

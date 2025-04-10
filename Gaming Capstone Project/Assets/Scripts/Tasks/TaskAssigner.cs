@@ -5,6 +5,10 @@ using System.Linq;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
+
+
+// MENTAL NOTE: MAKE SURE TASK POSITION SPAWNS > 50 AWAY FROM THE CURRENT OBJECT
+
 public class TaskAssigner : MonoBehaviour
 {
     // Task containers
@@ -83,13 +87,13 @@ public class TaskAssigner : MonoBehaviour
         {
             // Add random tasks from total tasks in task manager
             int newTask = Random.Range(0, taskList.Count - 1);
-            //while (assignedTasks.Contains(taskList[newTask])) { newTask = Random.Range(0, taskList.Count - 1); }
 
             assignedTasks.Add(taskList[newTask]);
+            taskList.Remove(taskList[newTask]); // make sure other players can't get this task
 
             // Add new task checkbox
             goalTextResult = "Task " + i + ": " + DisplayText(taskList[newTask]) + "\n";
-            CreateCheckboxes(new Vector3(0, 400 - i * 100, 0), i, goalTextResult);
+            CreateCheckboxes(new Vector3(-200, 400 - i * 100, 0), i, goalTextResult);
         }
 
         finishedTasks = new Dictionary<RoomTask, bool>();
@@ -104,13 +108,13 @@ public class TaskAssigner : MonoBehaviour
     {
         foreach (GameObject trigger in task.triggerGameObject)
         {
-            if (trigger.transform.position != task.position)
+            if (Vector3.Distance(trigger.transform.position, task.position) > 30)
             {
                 return false;
             }
         }
 
-        toggles[index].GetComponentInChildren<TMP_Text>().color = Color.green;
+        toggles[index].GetComponentInChildren<Text>().color = Color.green;
 
         return true;
     }

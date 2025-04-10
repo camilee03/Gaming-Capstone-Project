@@ -54,6 +54,14 @@ public class RoomGeneration : NetworkBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            RoomFunctions.FindMapBoundaries();
+        }
+    }
+
 
     // -- ROOM GENERATION -- //
 

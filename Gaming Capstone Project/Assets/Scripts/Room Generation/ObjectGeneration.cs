@@ -16,6 +16,7 @@ public class ObjectGeneration : NetworkBehaviour
 {
     List<Vector3> tilePositions = new();
     List<Vector3> wallPositions = new();
+    Dictionary<Vector3, Quaternion> wallRotations = new();
 
     char[,] descripterTiles; // what each tile has on it
     char[,] preDescripterTiles;
@@ -76,9 +77,11 @@ public class ObjectGeneration : NetworkBehaviour
 
         // Create viable locations lists
         wallPositions = new();
+        wallRotations = new();
         for (int i = 0; i < room.wallParent.transform.childCount - 1; i++)
         {
             wallPositions.Add(room.wallParent.transform.GetChild(i).position);
+            wallRotations[room.wallParent.transform.GetChild(i).position] = room.wallParent.transform.GetChild(i).rotation;
         }
         tilePositions = new();
         for (int i = 0; i < room.tileParent.transform.childCount - 1; ++i)
@@ -214,19 +217,18 @@ public class ObjectGeneration : NetworkBehaviour
             case 'b': // bulletin board
                 newObject = SpawnNetworkedObject(parent.transform, objects["bulletin board"], Vector3.zero, Quaternion.identity);
                 newObject.transform.position = tilePos;
-                newObject.transform.localRotation = Quaternion.identity;
+                newObject.transform.localRotation = wallRotations[tilePos];
                 break;
             case 'C': // Chair
                 newObject = SpawnNetworkedObject(parent.transform, objects["chair"], Vector3.zero, Quaternion.identity);
-                newObject.transform.localScale *= 2;
                 newObject.transform.position = tilePos;
-                newObject.transform.localRotation = Quaternion.identity;
+                newObject.transform.localRotation = Quaternion.Euler(-90, 0, 0);
                 break;
             case 'c': // Chute
                 newObject = SpawnNetworkedObject(parent.transform, objects["chute"], Vector3.zero, Quaternion.identity);
                 newObject.transform.localScale *= 2;
                 newObject.transform.position = tilePos + Vector3.up * 5;
-                newObject.transform.localRotation = Quaternion.identity;
+                newObject.transform.localRotation = wallRotations[tilePos];
                 break;
             case 'f': // fan
                 newObject = SpawnNetworkedObject(parent.transform, objects["fan"], Vector3.zero, Quaternion.identity);
@@ -241,12 +243,12 @@ public class ObjectGeneration : NetworkBehaviour
             case 'l': // lever
                 newObject = SpawnNetworkedObject(parent.transform, objects["lever"], Vector3.zero, Quaternion.identity);
                 newObject.transform.position = tilePos + Vector3.up * 3;
-                newObject.transform.localRotation = Quaternion.identity;
+                newObject.transform.localRotation = wallRotations[tilePos];
                 break;
             case 's': // speaker
                 newObject = SpawnNetworkedObject(parent.transform, objects["speaker"], Vector3.zero, Quaternion.identity);
                 newObject.transform.position = tilePos + Vector3.up * 3;
-                newObject.transform.localRotation = Quaternion.identity;
+                newObject.transform.localRotation = wallRotations[tilePos];
                 break;
             case 'T': // Table
                 newObject = SpawnNetworkedObject(parent.transform, objects["table"], Vector3.zero, Quaternion.identity);
@@ -263,7 +265,7 @@ public class ObjectGeneration : NetworkBehaviour
             case 'v': // vent
                 newObject = SpawnNetworkedObject(parent.transform, objects["vent"], Vector3.zero, Quaternion.identity);
                 newObject.transform.position = tilePos + Vector3.up * 1;
-                newObject.transform.localRotation = Quaternion.Euler(-90, 0, 0);
+                newObject.transform.localRotation = wallRotations[tilePos]; //+ Quaternion.Euler(-90, 0, 0)
                 break;
 
             default: Debug.Log($"{type} character not found"); break;
