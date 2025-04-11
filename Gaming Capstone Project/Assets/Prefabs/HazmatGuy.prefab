@@ -1177,6 +1177,7 @@ GameObject:
   - component: {fileID: 730179910265013865}
   - component: {fileID: 8940150618810314082}
   - component: {fileID: 3410276990868744084}
+  - component: {fileID: 1745752595029454861}
   - component: {fileID: 4034896462899514786}
   - component: {fileID: 954252232085227257}
   m_Layer: 3
@@ -1380,6 +1381,10 @@ MonoBehaviour:
   canMove: 1
   useAnimator: 1
   PlayerDisplay: {fileID: 1322819696661344264}
+  LastAssignedSpawnPos:
+    m_InternalValue: {x: 0, y: 0, z: 0}
+  ColorID:
+    m_InternalValue: -1
 --- !u!114 &6024289853012604093
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1718,6 +1723,20 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 4eee34ad6c118cc4ab62ed03537ba9d6, type: 3}
     - {fileID: 8300000, guid: 72d6b770d3615a943b99cea118dda862, type: 3}
   source: {fileID: 7112098199070255151}
+--- !u!114 &1745752595029454861
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1640891303535538884}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7322fd6738aa28f4c848fe232f421c81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hazmatSuit1: {fileID: 4961185174936972770}
+  hazmatSuit2: {fileID: 1364953303101327658}
 --- !u!114 &954252232085227257
 MonoBehaviour:
   m_ObjectHideFlags: 0
