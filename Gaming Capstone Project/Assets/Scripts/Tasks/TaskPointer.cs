@@ -18,15 +18,13 @@ public class TaskPointer : MonoBehaviour
 
     private void Update()
     {
-        if (gameObject.activeSelf) { UpdateArrowLocation(); }
+        UpdateArrowLocation();
     }
 
     private void UpdateArrowLocation()
     {
-        // Update camera position
+        // Update vector direction
         Vector3 finalPosition = taskPosition;
-
-        // Update location vector points to
         Vector3 pointerDirection = finalPosition - Camera.main.transform.position; // vector from camera to object
 
         // Find where to point at
@@ -45,7 +43,7 @@ public class TaskPointer : MonoBehaviour
             targetPosScreenPoint.y <= borderSize || targetPosScreenPoint.y >= Screen.height - borderSize);
 
         // Move arrow based on location
-        if (Vector3.Distance(Camera.main.transform.position, taskPosition) > 50) { taskPointer.position = new Vector3(Screen.width - borderSize, borderSize, 0); }
+        if (Vector3.Distance(Camera.main.transform.position, taskPosition) > 50) { taskPointer.localPosition = new Vector3(860, -440, 0); }
         else if (offscreen) { BorderOutline(targetPosScreenPoint, borderSize, dotProduct); }
         else { PointAtTarget(targetPosScreenPoint); }
     }
