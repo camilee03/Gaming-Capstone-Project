@@ -1,6 +1,8 @@
 using DG.Tweening;
 using NUnit.Framework.Internal;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.Sockets;
 using System.Runtime.ConstrainedExecution;
 using System.Xml.Serialization;
 using Unity.Netcode;
@@ -14,35 +16,29 @@ using static UnityEngine.Rendering.DebugUI;
 
 public class ObjectGeneration : NetworkBehaviour
 {
+    [Header("Domains")]
     List<Vector3> tilePositions = new();
     List<Vector3> wallPositions = new();
     Dictionary<Vector3, Quaternion> wallRotations = new();
 
+    [Header("Existing Room")]
     char[,] descripterTiles; // what each tile has on it
     char[,] preDescripterTiles;
     GameObject roomParent;
-    Vector3 firstTile;
 
+    [Header("External Files")]
     RoomGeneration roomGenerator;
     RoomTypeJSON roomTypeJSON;
-    List<GameObject> spawnedObjects = new List<GameObject>();
-
     SerializableDict dictionary;
     Dictionary<string, GameObject> objects;
 
+    [Header("Spawning")]
+    List<GameObject> spawnedObjects = new List<GameObject>();
     GameObject roomObject;
     GameObject roomParentObject;
 
-    enum ItemType { Box, Button, Lever, Light, Table, Chair, 
-        Doors, BulletinBoard, Radio, Terminal, Fan, Wires, 
-        Furnace, Coal, Vent, Food, WashingMachine, Clothes, Cabinet, 
-        EnergyCore, Trash }
-
-    enum TaskCategory { Pickup, Interactable, Attack }
-
-    enum TaskType { Visual, Audio, Tactile, None }
-
     enum Constraints { None, Orientation, Wall, Ceiling, }
+    enum Properties { None, Paired }
 
     private void Awake()
     {
@@ -50,38 +46,36 @@ public class ObjectGeneration : NetworkBehaviour
         roomTypeJSON = GetComponent<RoomTypeJSON>();
         dictionary = GetComponent<SerializableDict>();
         objects = dictionary.dictionary;
-
-        // set random seed if there is one
-        if (roomGenerator.seed != -1) { Random.InitState(roomGenerator.seed); }
     }
 
+    // -- Generation Start -- //
     public void GenerationProcedure(Room room)
     {
         //CleanRoom(); // get rid of old objects and reset room
 
-        // Figure out what objects to spawn
-        List<string[]> objectList = roomTypeJSON.objectList;
-        int randomList = Random.Range(0, objectList.Count - 1);
-        string[] objectsToSpawn = objectList[randomList];
-        foreach (string obj in objectsToSpawn)
-        {
-            Debug.Log(obj);
-        }
-
-        // Goes through room and spawns objects
+        // Get room specific variables
         preDescripterTiles = room.objectLocations;
         roomParent = room.parent;
-        firstTile = room.tileParent.transform.GetChild(0).position;
         roomObject = room.roomObject;
         roomParentObject = room.roomParentObject;
+
+        // Figure out what objects to spawn
+        var roomTypeList = roomTypeJSON.rooms.room;
+        int randomList = Random.Range(0, roomTypeList.Length - 1);
+        string[] objectsToSpawn = roomTypeList[randomList].objects;
+        room.roomName = roomTypeList[randomList].name;
 
         // Create viable locations lists
         wallPositions = new();
         wallRotations = new();
         for (int i = 0; i < room.wallParent.transform.childCount - 1; i++)
         {
-            wallPositions.Add(room.wallParent.transform.GetChild(i).position);
-            wallRotations[room.wallParent.transform.GetChild(i).position] = room.wallParent.transform.GetChild(i).rotation;
+            Transform newWall = room.wallParent.transform.GetChild(i);
+            if (newWall.gameObject.name.StartsWith('W'))
+            {
+                wallPositions.Add(newWall.position);
+                wallRotations[newWall.position] = newWall.rotation;
+            }
         }
         tilePositions = new();
         for (int i = 0; i < room.tileParent.transform.childCount - 1; ++i)
@@ -93,41 +87,46 @@ public class ObjectGeneration : NetworkBehaviour
         room.objectParent = BacktrackingSearch(objectsToSpawn);
     }
     
-    private GameObject BacktrackingSearch(string[] objectList)
+
+    // -- Search Problem -- //
+    private GameObject BacktrackingSearch(string[] oldObjectList)
     {
+        // Set up initial variables
         int scale = 10;
         descripterTiles = (char[,])preDescripterTiles.Clone();
         spawnedObjects = new List<GameObject>();
-
         List<Object> unassignedObjects = new();
 
-        // Spawn in a set number of new objects
+        // Add more objects based on available tile space
+        // (leaves empty spaces if some will be on the walls, but that's intentional)
+        char[] objectList = CreateObjectList(tilePositions.Count, oldObjectList);
+
+        // Create objects & make sure there is enough space for all of them
         int numTilePositions = tilePositions.Count;
         int numWallPositions = wallPositions.Count;
 
-        foreach (string identifier in objectList)
+        foreach (char identifier in objectList)
         {
-            (Object newObject, int amount) = DetermineObjectNum(identifier.ToCharArray()[0]);
+            Object newObject = CreateObject(identifier);
+            if (newObject.domains == null) { continue; }
 
-            for (int i=0; i<amount; i++)
+            if (newObject.constraint == Constraints.None && numTilePositions > 0) // check that can still place on tiles
             {
-                if (newObject.constraint == Constraints.None && numTilePositions > 0) // check that can still place on tiles
-                {
-                    unassignedObjects.Add(newObject); 
-                    numTilePositions--; 
-                }
-                if (newObject.constraint == Constraints.Wall && numWallPositions > 0) // check that can still places on walls
-                { 
-                    numWallPositions--;
-                    unassignedObjects.Add(newObject);
-                }
+                unassignedObjects.Add(newObject);
+                numTilePositions--;
+            }
+            if (newObject.constraint == Constraints.Wall && numWallPositions > 0) // check that can still places on walls
+            {
+                numWallPositions--;
+                unassignedObjects.Add(newObject);
             }
         }
 
-        List<Object> assignedObjects = RecursiveBacktracking(new List<Object>(), unassignedObjects, unassignedObjects.Count);
+        if (numWallPositions <= 0 || numTilePositions <= 0) { Debug.Log("Not enough space to spawn"); }
 
 
         // Spawn assigned objects
+        List<Object> assignedObjects = RecursiveBacktracking(new List<Object>(), unassignedObjects, unassignedObjects.Count);
         GameObject objectParent = SpawnNetworkedObject(roomParent.transform, roomParentObject, Vector3.zero, Quaternion.identity);
         objectParent.name = "ObjectParent";
 
@@ -141,50 +140,63 @@ public class ObjectGeneration : NetworkBehaviour
 
     private List<Object> RecursiveBacktracking(List<Object> assigned, List<Object> unassigned, int numObjects)
     {
-        if (assigned.Count == numObjects) { return assigned; }
+        // no more objects to assign
+        if (assigned.Count == numObjects) { return assigned; } 
 
-        int randomTile = Random.Range(0, unassigned.Count-1); // find new unassigned tile (change)
-        List<Vector3> domains = unassigned[randomTile].domains;
+        // find new unassigned object
+        Object newObject = unassigned[0];
+        List<Vector3> domains = newObject.domains;
 
+        // Find a place for unassigned object
         bool constaintsSatisfied = false;
-
         while (!constaintsSatisfied) {
 
             // Find new possible position
+            if (domains.Count == 0) { Debug.LogError("Ran out of possible positions"); }
             int randomDomain = Random.Range(0, domains.Count-1);
             Vector3 domain = domains[randomDomain];
             domains.Remove(domain);
 
-            if (CheckConstraints(assigned, domain, 0)) // if constraints hold up
+            if (CheckConstraints(assigned, domain, newObject)) // if constraints hold up
             {
-                Object newObject = unassigned[randomTile];
                 newObject.domains = new List<Vector3>() { domain };
                 assigned.Add(newObject);
+                unassigned.RemoveAt(0);
 
                 List<Object> result = RecursiveBacktracking(assigned, unassigned, numObjects);
 
                 if (result.Count == numObjects) { return result; }
-                else { assigned.Remove(newObject); }
+                else { assigned.Remove(newObject); unassigned.Insert(0, newObject); }
             }
         }
 
         return null; // failed
     }
 
-    private bool CheckConstraints(List<Object> assigned, Vector3 domain, int type)
+    private bool CheckConstraints(List<Object> assigned, Vector3 domain, Object unassigned)
     {
-        switch (type)
-        {
-            case 0:
-                foreach (Object obj in assigned)
-                {
-                    if (obj.domains.Contains(domain)) { return false; }
-                }
-                return true;
-            default: return false;
-        }
-    }
+        if (assigned.Count == 0) { return true; }
 
+        bool hasPairing = unassigned.properties.Contains(Properties.Paired);
+        bool constraintsHold = !hasPairing;
+
+        foreach (Object obj in assigned)
+        {
+            // Check that no assigned spot has the same pos as current
+            if (obj.domains.Contains(domain)) { return false; }
+
+            // Check pairing
+            if (hasPairing && obj.identifier.Equals(unassigned.pairedIdentifier))
+            {
+                if (Vector3.Distance(domain, obj.domains[0]) <= 30)
+                {
+                    constraintsHold = true;
+                }
+            }
+        }
+
+        return constraintsHold;
+    }
 
     private void ArcConsistency(List<Object> objects)
     {
@@ -207,198 +219,172 @@ public class ObjectGeneration : NetworkBehaviour
         }
     }
 
+
+    // -- Object Creation -- //
     private void PlaceObjects2(char type, Vector3 tilePos, int scale, GameObject parent)
     {
         GameObject newObject = null;
         Vector3 ceilingHeight = Vector3.up * 12;
 
+        Vector3[] displacementVector = new Vector3[4] {Vector3.left, Vector3.up, Vector3.right, Vector3.down };
+        Vector3 disp = Vector3.zero;
+        if (wallRotations.Keys.Contains(tilePos)) { disp = displacementVector[FindWallDirection(wallRotations[tilePos], tilePos, roomParent)]; }
+
+        float[] randomRotationsY = new float[4] { 90, 0, 180, -90 };
+        int i = Random.Range(0, 4);
+
         switch (type)
         {
-            case 'b': // bulletin board
-                newObject = SpawnNetworkedObject(parent.transform, objects["bulletin board"], Vector3.zero, Quaternion.identity);
-                newObject.transform.position = tilePos;
-                newObject.transform.localRotation = wallRotations[tilePos];
+            case 'B': // button
+                newObject = SpawnNetworkedObject(parent.transform, objects["button"], tilePos + disp, wallRotations[tilePos]);
+                break;
+            case 'b': // box
+                newObject = SpawnNetworkedObject(parent.transform, objects["box"], tilePos + Vector3.up * 5, Quaternion.identity);
                 break;
             case 'C': // Chair
-                newObject = SpawnNetworkedObject(parent.transform, objects["chair"], Vector3.zero, Quaternion.identity);
-                newObject.transform.position = tilePos;
-                newObject.transform.localRotation = Quaternion.Euler(-90, 0, 0);
+                newObject = SpawnNetworkedObject(parent.transform, objects["chair"], tilePos, Quaternion.Euler(-90, randomRotationsY[i], 0));
                 break;
-            case 'c': // Chute
-                newObject = SpawnNetworkedObject(parent.transform, objects["chute"], Vector3.zero, Quaternion.identity);
-                newObject.transform.localScale *= 2;
-                newObject.transform.position = tilePos + Vector3.up * 5;
-                newObject.transform.localRotation = wallRotations[tilePos];
+            case 'c': // Coal
+                newObject = SpawnNetworkedObject(parent.transform, objects["coal"], tilePos + Vector3.up * 5, Quaternion.identity);
+                break;
+            case 'e': // EnergyCore
+                newObject = SpawnNetworkedObject(parent.transform, objects["energy core"], tilePos, Quaternion.identity);
                 break;
             case 'f': // fan
-                newObject = SpawnNetworkedObject(parent.transform, objects["fan"], Vector3.zero, Quaternion.identity);
-                newObject.transform.position = tilePos + Vector3.up * 3;
-                newObject.transform.localRotation = Quaternion.identity;
+                newObject = SpawnNetworkedObject(parent.transform, objects["fan"], tilePos + Vector3.up * 10, Quaternion.Euler(0, randomRotationsY[i], 0));
                 break;
             case 'L': // light
-                newObject = SpawnNetworkedObject(parent.transform, objects["light"], Vector3.zero, Quaternion.identity);
-                newObject.transform.position = tilePos + ceilingHeight;
-                newObject.transform.localRotation = Quaternion.Euler(-90, 0, 0);
+                newObject = SpawnNetworkedObject(parent.transform, objects["light"], tilePos + ceilingHeight, Quaternion.Euler(-90, 0, 0));
                 break;
             case 'l': // lever
-                newObject = SpawnNetworkedObject(parent.transform, objects["lever"], Vector3.zero, Quaternion.identity);
-                newObject.transform.position = tilePos + Vector3.up * 3;
-                newObject.transform.localRotation = wallRotations[tilePos];
+                newObject = SpawnNetworkedObject(parent.transform, objects["lever"], tilePos + disp + Vector3.up * 3, wallRotations[tilePos]);
+                break;
+            //case 'p': // paper
+                //newObject = SpawnNetworkedObject(parent.transform, objects["paper"], tilePos, Quaternion.identity);
+                //break;
+            case 'r': // radio
+                newObject = SpawnNetworkedObject(parent.transform, objects["radio"], tilePos, Quaternion.Euler(0, randomRotationsY[i], 0));
                 break;
             case 's': // speaker
-                newObject = SpawnNetworkedObject(parent.transform, objects["speaker"], Vector3.zero, Quaternion.identity);
-                newObject.transform.position = tilePos + Vector3.up * 3;
-                newObject.transform.localRotation = wallRotations[tilePos];
+                newObject = SpawnNetworkedObject(parent.transform, objects["speaker"], tilePos + disp + Vector3.up * 3, wallRotations[tilePos]);
                 break;
             case 'T': // Table
-                newObject = SpawnNetworkedObject(parent.transform, objects["table"], Vector3.zero, Quaternion.identity);
+                newObject = SpawnNetworkedObject(parent.transform, objects["table"], tilePos, Quaternion.Euler(-90, randomRotationsY[i], 0));
                 newObject.transform.localScale /= 1.1f;
-                newObject.transform.position = tilePos;
-                newObject.transform.localRotation = Quaternion.Euler(-90, 0, 0);
                 break;
             case 't': // DOS terminal
-                newObject = SpawnNetworkedObject(parent.transform, objects["DOS terminal"], Vector3.zero, Quaternion.identity);
+                newObject = SpawnNetworkedObject(parent.transform, objects["DOS terminal"], tilePos, Quaternion.Euler(-90, randomRotationsY[i], 0));
                 newObject.transform.localScale /= 1.1f;
-                newObject.transform.position = tilePos;
-                newObject.transform.localRotation = Quaternion.Euler(-90, 0, 0);
                 break;
             case 'v': // vent
-                newObject = SpawnNetworkedObject(parent.transform, objects["vent"], Vector3.zero, Quaternion.identity);
-                newObject.transform.position = tilePos + Vector3.up * 1;
-                newObject.transform.localRotation = wallRotations[tilePos]; //+ Quaternion.Euler(-90, 0, 0)
+                newObject = SpawnNetworkedObject(parent.transform, objects["vent"], tilePos + disp * 0.5f + Vector3.up * 1, wallRotations[tilePos]);
+                break;
+            case 'W': // Chute
+                newObject = SpawnNetworkedObject(parent.transform, objects["chute"], tilePos + disp, wallRotations[tilePos]);
+                break;
+            case 'w': // Wires
+                newObject = SpawnNetworkedObject(parent.transform, objects["wires"], tilePos + disp, wallRotations[tilePos]);
+                break;
+            case 'X': // food
+                newObject = SpawnNetworkedObject(parent.transform, objects["food"], tilePos, Quaternion.Euler(0, randomRotationsY[i], 0));
+                break;
+            case 'x': // clothes
+                newObject = SpawnNetworkedObject(parent.transform, objects["glove"], tilePos, Quaternion.Euler(0, randomRotationsY[i], 0));
+                break;
+            case 'z': // trash
+                newObject = SpawnNetworkedObject(parent.transform, objects["trash"], tilePos, Quaternion.Euler(0, randomRotationsY[i], 0));
                 break;
 
-            default: Debug.Log($"{type} character not found"); break;
-
+            default:
+                Debug.Log($"{type} character not found");
+                break;
         }
 
-        //newObject.transform.position += firstTile;
+
         spawnedObjects.Add(newObject);
     }
 
+    int FindWallDirection(Quaternion rotation, Vector3 position, GameObject room)
+    {
+        if (rotation.eulerAngles.y % 180 == 90)
+        {
+            // Direction 0 (left)
+            if (position.x < room.transform.position.x) { return 0; }
 
-    private (Object newObject, int numObjects) DetermineObjectNum(char identifier)
+            // Direction 2 (right)
+            return 2;
+        }
+        else
+        {
+            // Direction 1 (below)
+            if (position.z < room.transform.position.z) { return 1; }
+
+            // Direction 3 (above)
+            return 3;
+        }
+    }
+
+    private Object CreateObject(char identifier)
     {
         Object newObject = new Object();
-        int amount = 0;
 
+        // Figure out constraints
         switch (identifier)
         {
-            // --  Scarce -- //
-
-            case 't': // DOS terminal
-                newObject = new Object() { identifier = identifier, domains = tilePositions, constraint = Constraints.None };
-                amount = 1;
-                break;
-
-            // -- Plentiful -- //
-
-            case 'L': // light
-                newObject = new Object() { identifier = identifier, domains = tilePositions, constraint = Constraints.Ceiling };
-                amount = Random.Range(2, 10);
-                break;
-
-            // -- Normal -- //
-
-            case 'c': // Chute
-            case 'l': // lever
-            case 's': // speaker
-            case 'v': // vent
-                newObject = new Object() { identifier = identifier, domains = wallPositions, constraint = Constraints.Wall };
-                amount = Random.Range(1, 5);
-                break;
-            case 'C': // Chair
-            case 'f': // fan
-            case 'T': // Table
-                newObject = new Object() { identifier = identifier, domains = tilePositions, constraint = Constraints.None };
-                amount = Random.Range(1, 5);
-                break;
-
-
-            default: Debug.Log($"{identifier} character not found"); break;
-
-        }
-
-        return (newObject, amount);
-    }
-
-    private void DetermineTheme() // determine task type and theme based on GPT
-    {
-
-    }
-
-
-
-
-    private char[] CreateObjectList(int numTiles, RoomType roomType) 
-    {
-        if (2 * roomType.objects.Length > numTiles) { Debug.Log("ERROR: More objects than space"); }
-
-        char[] roomObjectList = new char[numTiles-2];
-        int wiggleRoom = Mathf.Max((numTiles - roomType.objects.Length * 2) - 5, 0);
-        int index = 0;
-
-        foreach (char obj in roomType.objects)
-        {
-            int numObjs = NumberOfObjectsToSpawn(obj, wiggleRoom);
-            for (int i = 0; i < numObjs; i++)
-            {
-                roomObjectList[index++] = obj;
-            }
-
-        }
-
-        return roomObjectList;
-    }
-
-    private int NumberOfObjectsToSpawn(char obj, int wiggleRoom)
-    {
-        switch (obj)
-        {
-            // Plentiful objects
-            case 'x': // Clothes
-            case 'c': // Coal
-            case 'X': // Food
-            case 'L': // Light
-            case 'p': // Paper
-                return 1;
-
-            // Scarce objects
+            // -- No Constraints -- //
             case 'B': // Button
-            case 'F': // Fan
             case 'f': // Furnace
-            case 't': // Table
+            case 'F': // Fan
             case 'T': // Terminal
-                return Mathf.Min(Random.Range(5, 5 + wiggleRoom), 10);
+            case 'e': // Energy Core
+            case 'b': // Box
+            // case 'p': // Paper
+            case 'X': // Food
+            case 'c': // Coal
+            case 'x': // Clothes
+            case 'C': // Chair
+            case 't': // Table
+            case 'r': // Radio
+                newObject = new Object() { identifier = identifier, domains = tilePositions, constraint = Constraints.None };
+                break;
 
-            // Default for objects without these properties
+            // -- Wall Constraints -- //
+            case 'W': // Chute
+            case 'l': // Lever
+            case 's': // Speaker
+            case 'v': // Vent
+            case 'w': // Wires
+                newObject = new Object() { identifier = identifier, domains = wallPositions, constraint = Constraints.Wall };
+                break;
+
+            // -- Ceiling Constraints -- //
+            case 'L': // Light
+                newObject = new Object() { identifier = identifier, domains = tilePositions, constraint = Constraints.Ceiling };
+                break;
+
+            // -- Default -- //
             default:
-                return Mathf.Min(Random.Range(1, 1 + wiggleRoom), 5);
+                Debug.Log($"{identifier} character not found");
+                break;
         }
 
-    }
+        // Figure out properties
+        Dictionary<char, char> pairedValues = new() { { 'C', 't'}, { 'c', 'f' }, { 'f', 'c' }, { 'X', 't' }, { 'W', 'C' } };
 
-    // Each object has a value x,y that determines where it is on the graph
-    // For every x,y certain functions must be applied to make each scenario true
-    // Trim borders to make it easier?
+        newObject.properties = new();
 
-    // Step 1: Choose random point inside room that hasn't been assigned yet (maybe keep a list for simplicity?)
-    // Step 2: Choose an object to place in point that fufills constraints (decide on ordering --> maybe place big items first?)
-    // Step 3: Repeat until no objects are left
+        if (pairedValues.Keys.Contains(identifier))
+        {
+            newObject.properties.Add(Properties.Paired);
+            newObject.pairedIdentifier = pairedValues[identifier];
+        }
 
-    // Some global constraints: objects must be inside room / on wall, objects cannot be assigned to same place as another
+        if (newObject.properties.Count == 0)
+        {
+            newObject.properties.Add(Properties.None);
+        }
 
-    struct Object
-    {
-        public char identifier;
-        public List<Vector3> domains; // all the locations this object can be
-        public Constraints constraint;
-    };
-
-    struct RoomType
-    {
-        public string name;
-        public char[] objects;
+        return newObject;
     }
 
     GameObject SpawnNetworkedObject(Transform parent, GameObject child, Vector3 position, Quaternion rotation)
@@ -414,6 +400,79 @@ public class ObjectGeneration : NetworkBehaviour
 
         return instance;
     }
+
+
+    // -- Object Type Creation -- //
+    private char[] CreateObjectList(int numTiles, string[] objects) 
+    {
+        if (2 * objects.Length > numTiles) { Debug.Log("ERROR: More objects than space"); }
+
+        char[] roomObjectList = new char[numTiles-1];
+        int wiggleRoom = Mathf.Max((numTiles - objects.Length * 2) - 5, 0);
+        int index = 0;
+
+        foreach (string obj in objects)
+        {
+            int numObjs = NumberOfObjectsToSpawn(obj.ToCharArray()[0], wiggleRoom);
+            for (int i = 0; i < numObjs; i++)
+            {
+                if (obj == "") { continue; }
+                if (index >= roomObjectList.Length) { Debug.Log("Too many spawned objects. Breaking."); continue; }
+                roomObjectList[index++] = obj.ToCharArray()[0];
+            }
+        }
+
+        return roomObjectList;
+    }
+
+    private int NumberOfObjectsToSpawn(char obj, int wiggleRoom)
+    {
+        switch (obj)
+        {
+            // Plentiful objects
+            case 'x': // Clothes
+            case 'c': // Coal
+            case 'X': // Food
+            case 'L': // Light
+                      //case 'p': // Paper
+                return Mathf.Min(Random.Range(5, 5 + wiggleRoom), 10);
+
+            // Scarce objects
+            case 'B': // Button
+            case 'F': // Fan
+            case 'f': // Furnace
+            case 't': // Table
+            case 'T': // Terminal
+            case 'e': // Energy Core
+                return 1;
+
+            // Default for objects without these properties
+            default:
+                return Mathf.Min(Random.Range(1, 1 + wiggleRoom), 5);
+        }
+
+    }
+
+   
+    
+    // Each object has a value x,y that determines where it is on the graph
+    // For every x,y certain functions must be applied to make each scenario true
+    // Trim borders to make it easier?
+
+    // Step 1: Choose random point inside room that hasn't been assigned yet (maybe keep a list for simplicity?)
+    // Step 2: Choose an object to place in point that fufills constraints (decide on ordering --> maybe place big items first?)
+    // Step 3: Repeat until no objects are left
+
+    // Some global constraints: objects must be inside room / on wall, objects cannot be assigned to same place as another
+
+    struct Object
+    {
+        public char identifier;
+        public List<Vector3> domains; // all the locations this object can be
+        public Constraints constraint;
+        public List<Properties> properties;
+        public char pairedIdentifier;
+    };
 }
 
 

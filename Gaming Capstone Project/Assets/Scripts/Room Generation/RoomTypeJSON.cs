@@ -5,18 +5,12 @@ using Newtonsoft.Json;
 public class RoomTypeJSON : MonoBehaviour
 {
     [SerializeField] TextAsset jsonFile;
-    public List<string[]> objectList = new List<string[]>();
+    public Rooms rooms;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
-        Rooms rooms = JsonUtility.FromJson<Rooms>(jsonFile.text);
-
-        foreach (Room room in rooms.room)
-        {
-            objectList.Add(room.objects);
-        }
-
+        rooms = JsonUtility.FromJson<Rooms>(jsonFile.text);
     }
 
     [System.Serializable]
