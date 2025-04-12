@@ -9,23 +9,28 @@ public class NetMic2 : NetworkBehaviour
     public int sampleLength = 1024;
     private float[] sampleBuffer;
     private byte[] byteBuffer;
-    public AudioStreamPlayer audioStreamPlayer;
     public AudioSource source;
     private float sendTimer = 0f;
     public float sendInterval = 0.1f;
     public float noiseThreshold = 0.002f;
-    bool bufferingAudio;
-    //public float refreshSpeed = 2;
-    //float refresh;
-    Queue<float[]> audioBufferQueue = new Queue<float[]>();
+    public bool playback;
+    bool playable;
+
     void Start()
     {
+        if (!IsOwner || playback)
+        {
+            playable = true;
+        }
+        else playable = false;
+        source.enabled = playable;
+
         if (IsOwner)
         {
             micClip = Microphone.Start(null, true, 1, sampleRate);
             sampleBuffer = new float[sampleLength];
         }
-        sendInterval = (float)sampleLength / (float)sampleRate;
+        sendInterval = (float)sampleLength / (float)sampleRate / 2;
     }
     void Update()
     {
@@ -66,10 +71,6 @@ public class NetMic2 : NetworkBehaviour
     {
         float[] floats = ByteArrayToFloatArray(audioBytes);
         PlayReceivedAudio(ApplyNoiseGate(floats,noiseThreshold));
-        /*if (audioStreamPlayer != null)
-        {
-            audioStreamPlayer.AddSamples(floats);
-        }*/
     }
     private byte[] FloatArrayToByteArray(float[] floats)
     {
@@ -92,30 +93,6 @@ public class NetMic2 : NetworkBehaviour
         return floats;
     }
 
-    void PlayReceivedAudio(float[] floats)
-    {
-        AudioClip clip = AudioClip.Create("Received", floats.Length, 1, sampleRate, false);
-        clip.SetData(floats, 0);
-        source.clip = clip;
-        source.Play();
-        
-    }
-    void PlayBufferedAudio()
-    {
-        Debug.Log("Playing Buffered Audio");
-        bufferingAudio = true;
-        List<float> combined = new List<float>();
-        while (audioBufferQueue.Count > 0)
-        {
-            combined.AddRange(audioBufferQueue.Dequeue());
-        }
-        AudioClip clip = AudioClip.Create("Buffered", combined.ToArray().Length, 1, sampleRate, false);
-        clip.SetData(combined.ToArray(), 0);
-        source.clip = clip;
-        source.Play();
-        bufferingAudio = false;
-    }
-
     float[] ApplyNoiseGate(float[] input, float threshold)
     {
         float[] output = new float[input.Length];
@@ -125,4 +102,14 @@ public class NetMic2 : NetworkBehaviour
         }
         return output;
     }
+
+    void PlayReceivedAudio(float[] floats)
+    {
+        AudioClip clip = AudioClip.Create("Received", floats.Length, 1, sampleRate, false);
+        clip.SetData(floats, 0);
+        source.clip = clip;
+        source.Play();
+        
+    }
+
 }

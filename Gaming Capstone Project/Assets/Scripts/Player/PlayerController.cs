@@ -4,7 +4,6 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
-using FMODUnity;
 
 public class PlayerController : NetworkBehaviour
 {
@@ -54,8 +53,6 @@ public class PlayerController : NetworkBehaviour
     private PlayerInput playerInput;
     private CameraMovement camMovement;
 
-    public NetworkMic voiceNetworker;
-
     private bool isTransformed = false;
     private bool canAttack = true;
     private float staminaRegenTimer;
@@ -69,7 +66,7 @@ public class PlayerController : NetworkBehaviour
     {
         playerInput = GetComponent<PlayerInput>();
         camMovement = cam.GetComponent<CameraMovement>();
-        StudioListener sl = cam.GetComponent<StudioListener>();
+        AudioListener al = cam.GetComponent<AudioListener>();
 
         if (IsOwner)
         {
@@ -80,7 +77,7 @@ public class PlayerController : NetworkBehaviour
             playerInput.enabled = true;
             cam.enabled = true;
             camMovement.enabled = true;
-            sl.enabled = true;
+            al.enabled = true;
         }
         else
         {
@@ -91,7 +88,7 @@ public class PlayerController : NetworkBehaviour
             playerInput.enabled = false;
             cam.enabled = false;
             camMovement.enabled = false;
-            sl.enabled = false;
+            al.enabled = false;
         }
 
     }
