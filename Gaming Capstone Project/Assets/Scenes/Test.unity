@@ -248,9 +248,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 704750425392214912, guid: 2d2617aaf1d7cb149bc33a836408dbc0, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1640891303535538884, guid: 2d2617aaf1d7cb149bc33a836408dbc0, type: 3}
       propertyPath: m_Name
       value: HazmatGuy
+      objectReference: {fileID: 0}
+    - target: {fileID: 1798345643795257330, guid: 2d2617aaf1d7cb149bc33a836408dbc0, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2382224101158354578, guid: 2d2617aaf1d7cb149bc33a836408dbc0, type: 3}
       propertyPath: m_LocalPosition.x
@@ -295,6 +303,14 @@ PrefabInstance:
     - target: {fileID: 2406209254573417112, guid: 2d2617aaf1d7cb149bc33a836408dbc0, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 3048151523
+      objectReference: {fileID: 0}
+    - target: {fileID: 4336253441243198395, guid: 2d2617aaf1d7cb149bc33a836408dbc0, type: 3}
+      propertyPath: PlayAndPause
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7808869209682092556, guid: 2d2617aaf1d7cb149bc33a836408dbc0, type: 3}
+      propertyPath: _playbackOwnVoice
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

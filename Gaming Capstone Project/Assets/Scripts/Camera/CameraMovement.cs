@@ -46,7 +46,6 @@ public class CameraMovement : NetworkBehaviour
         pitch -= mouseY;
 
         pitch = Mathf.Clamp(pitch, -60f, 60f);
-
         Anchor.rotation = Quaternion.Euler(pitch, yaw, Anchor.rotation.z);
 
         if (transform.position != Anchor.position)
