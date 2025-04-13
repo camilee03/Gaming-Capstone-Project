@@ -66,7 +66,7 @@
     },
     {
       "name": "Ammunition Depot",
-      "objects": [ "T", "L", "f", "c", "b", "v" ]
+      "objects": [ "T", "L", "F", "c", "b", "v" ]
     },
     {
       "name": "Equipment Room",
@@ -118,7 +118,7 @@
     },
     {
       "name": "Fuel Storage",
-      "objects": [ "T", "L", "f", "c", "b", "v" ]
+      "objects": [ "T", "L", "F", "c", "b", "v" ]
     },
     {
       "name": "Water Treatment Room",
