@@ -14,10 +14,13 @@ public class GameController : NetworkBehaviour
     [Header("Spawn Points")]
     public Transform LobbySpawnPoint;
     public Transform GameSpawnPoint;
+    private HashSet<int> usedColors = new HashSet<int>();
 
+
+    public List<Transform> Spawnpoints = new List<Transform>();
     // Number of Doppleganger players to assign
     private int numberOfDopples = 1;
-
+    public GameObject LobbyCanvas;
     // -------------------------------------------------------
     // Initialization / Singleton
     // -------------------------------------------------------
@@ -33,6 +36,7 @@ public class GameController : NetworkBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    #region Listeners
     public override void OnNetworkSpawn()
     {
         if (IsServer)
@@ -50,6 +54,7 @@ public class GameController : NetworkBehaviour
             NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
         }
     }
+    #endregion
 
     // -------------------------------------------------------
     // Client (Player) Connect / Disconnect
@@ -74,6 +79,16 @@ public class GameController : NetworkBehaviour
             Debug.Log($"[Server] Player disconnected => ClientId {clientId}, {Players[clientId].name}");
             Players.Remove(clientId);
         }
+        if (Players.TryGetValue(clientId, out var player))
+        {
+            var pc = player.GetComponent<PlayerController>();
+            if (pc != null && pc.ColorID.Value >= 1)
+            {
+                UnlockColor(pc.ColorID.Value);
+            }
+        }
+
+        Players.Remove(clientId);
     }
 
     // -------------------------------------------------------
@@ -116,6 +131,16 @@ public class GameController : NetworkBehaviour
         }
     }
 
+    private void AssignTasks()
+    {
+        // Reset all to Scientist
+        foreach (var kvp in Players)
+        {
+            var pc = kvp.Value.GetComponent<TaskAssigner>();
+            pc.start = true;
+        }
+    }
+
 
     // -------------------------------------------------------
     // Start of Game
@@ -126,63 +151,59 @@ public class GameController : NetworkBehaviour
         if (!IsServer) return; // only the server/host does team assignment
 
         Debug.Log("[Server] HostSelectsStart() => AssignTeams()");
+        SpawnPlayersAtRandomPoints();
         AssignTeams();
+        AssignTasks();
+        DisableLobbyCanvasClientRpc();
+
     }
 
-    // Teleports players back to the Lobby
-    public void SpawnInLobby()
+    public bool IsColorAvailable(int colorIndex)
     {
-        SpawnAtPoints(LobbySpawnPoint);
+        return !usedColors.Contains(colorIndex);
     }
 
-    // Teleports players to the game spawn point
-    private void SpawnInGame()
+    public void LockColor(int colorIndex)
     {
-        SpawnAtPoints(GameSpawnPoint);
+        usedColors.Add(colorIndex);
     }
 
-    // Example: a single player respawn method
-    public void RespawnInLobby(GameObject player)
+    public void UnlockColor(int colorIndex)
     {
-        var netTransform = player.GetComponent<NetworkTransform>();
-        if (netTransform != null)
+        usedColors.Remove(colorIndex);
+    }
+
+
+
+
+    private void SpawnPlayersAtRandomPoints()
+    {
+        if (Spawnpoints.Count == 0)
         {
-            netTransform.Teleport(
-                LobbySpawnPoint.position,
-                LobbySpawnPoint.rotation,
-                new Vector3(0.75f, 0.75f, 0.75f) // example scale
-            );
+            Debug.LogWarning("No spawn points available.");
+            return;
         }
-        else
-        {
-            player.transform.position = LobbySpawnPoint.position;
-            player.transform.rotation = LobbySpawnPoint.rotation;
-        }
-    }
 
-    // -------------------------------------------------------
-    // Helper Functions
-    // -------------------------------------------------------
-    private void SpawnAtPoints(Transform spawnPoint)
-    {
-        // Teleport every player in the dictionary
-        foreach (var player in Players.Values)
-        {
-            Debug.Log($"Teleporting: {player.name} to {spawnPoint.name}");
+        var shuffledSpawnpoints = Spawnpoints.OrderBy(x => Random.value).ToList();
+        int i = 0;
 
-            var netTransform = player.GetComponent<NetworkTransform>();
-            if (netTransform != null)
+        foreach (var kvp in Players)
+        {
+            GameObject player = kvp.Value;
+            Transform spawn = shuffledSpawnpoints[i % shuffledSpawnpoints.Count];
+            i++;
+
+            var pc = player.GetComponent<PlayerController>();
+            if (pc != null)
             {
-                netTransform.Teleport(spawnPoint.position, spawnPoint.rotation, new Vector3(0.75f, 0.75f, 0.75f));
+                pc.TeleportClientRpc(spawn.position, spawn.rotation);
             }
-            else
-            {
-                // fallback
-                player.transform.position = spawnPoint.position;
-                player.transform.rotation = spawnPoint.rotation;
-            }
+
+            Debug.Log($"[Server] Assigned {player.name} to spawn at {spawn.position}");
         }
     }
+
+
 
     public int GetNumberOfPlayers()
     {
@@ -191,9 +212,32 @@ public class GameController : NetworkBehaviour
 
     private void Update()
     {
-        if (IsServer && Input.GetKeyDown(KeyCode.Return))
-        {
-            HostSelectsStart();
-        }
+
     }
+
+
+    public void RegisterSpawnPoint(Transform t)
+    {
+        if (!Spawnpoints.Contains(t))
+            Spawnpoints.Add(t);
+    }
+    #region Lobby
+
+    public void setLobby(GameObject obj)
+    {
+        LobbyCanvas = obj;
+
+    }
+
+    [ClientRpc]
+    public void DisableLobbyCanvasClientRpc()
+    {
+            LobbyCanvas.SetActive(false);
+        
+        
+        Debug.Log($"[ClientRpc] Player {OwnerClientId} => Successfully deleted canvas");
+
+    }
+    #endregion
+
 }

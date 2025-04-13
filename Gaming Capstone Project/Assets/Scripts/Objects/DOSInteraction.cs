@@ -3,55 +3,83 @@ using System.Collections;
 using TMPro;
 using UnityEngine.UI;
 using System;
-using Unity.VisualScripting;
+using UnityEngine.EventSystems;
 
 public class DOSInteraction : MonoBehaviour
 {
     public Transform cameraMovementPoint;
     public CameraMovement CameraMovementScript;
+    public PlayerController playerController;
     private GameObject camera;
     private Vector3 originalPosition;
     private Quaternion originalRotation;
     public bool InInteraction = false;
     public Interact interact;
-    PlayerController playerController;
 
     private Coroutine interactionCoroutine;
 
     public TMP_Text[] PreviousLines;
     public TMP_InputField WritingLine;
-    public int maxCharacters = 9;
+    public int maxCharacters = 20;
+
+    private DOSCommandController DOSController;
 
     void Start()
     {
+
+        DOSController = DOSCommandController.Instance;
+
+
+
+    }
+
+    public void SetCam(GameObject cam)
+    {
+        camera = cam;
         camera = Camera.main.gameObject;
         CameraMovementScript = camera.GetComponent<CameraMovement>();
+        playerController = camera.transform.parent.parent.parent.parent.parent.parent.GetComponent<PlayerController>();
+
     }
 
     private void Update()
     {
-        if(InInteraction)
+        if (InInteraction)
         {
             if (Input.GetKeyDown(KeyCode.Return))
             {
                 //send current line to seperate method
-                UpdatePreviousLines();
+                DOSController.HandleCommand(WritingLine.text);
+                UpdatingCommandLine();
 
             }
-            WritingLine.ActivateInputField();
-            WritingLine.Select();
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                EndInteraction();
+            }
+
         }
     }
 
-    private void UpdatePreviousLines()
+    public void InsertNewLine(string line)
     {
-        for(int i = PreviousLines.Length-1; i > 0 ; i--)
+        for (int i = PreviousLines.Length - 1; i > 0; i--)
         {
-            Debug.Log(i + " " + (i - 1));
-            PreviousLines[i].text = PreviousLines[i-1].text;
+            PreviousLines[i].text = PreviousLines[i - 1].text;
+        }
+    }
+
+    private void UpdatingCommandLine()
+    {
+        for (int i = PreviousLines.Length - 1; i > 0; i--)
+        {
+            PreviousLines[i].text = PreviousLines[i - 1].text;
         }
         PreviousLines[0].text = WritingLine.text;
         WritingLine.text = "";
+        WritingLine.interactable = true;
+        WritingLine.ActivateInputField();
+        WritingLine.Select();
     }
 
 
@@ -60,21 +88,19 @@ public class DOSInteraction : MonoBehaviour
     public void ToggleInteraction()
     {
 
-            if (!InInteraction)
-                StartInteraction();
-            else
-                EndInteraction();
-        
+        if (!InInteraction)
+            StartInteraction();
     }
-    public void SetInteract(Interact input, PlayerController player)
+    public void SetInteract(Interact input)
     {
         interact = input;
-        playerController = player;
     }
     public void StartInteraction()
     {
         if (interactionCoroutine != null)
             StopCoroutine(interactionCoroutine);
+
+        playerController.ToggleInput(false);
 
         InInteraction = true;
         originalPosition = camera.transform.position;
@@ -82,8 +108,9 @@ public class DOSInteraction : MonoBehaviour
 
 
         interactionCoroutine = StartCoroutine(LerpCamera(cameraMovementPoint.position, cameraMovementPoint.rotation, 1f, false));
-
-        playerController.enabled = false;
+        WritingLine.interactable = true;
+        WritingLine.ActivateInputField();
+        WritingLine.Select();
     }
 
     public void EndInteraction()
@@ -92,26 +119,27 @@ public class DOSInteraction : MonoBehaviour
         if (interactionCoroutine != null)
             StopCoroutine(interactionCoroutine);
 
+        playerController.ToggleInput(true);
+
         InInteraction = false;
         interactionCoroutine = StartCoroutine(LerpCamera(originalPosition, originalRotation, 1f, true));
+        WritingLine.DeactivateInputField(false);
+        //EventSystem.current.SetSelectedGameObject(null);
+        WritingLine.interactable = false;
 
-        playerController.enabled = true;
-        playerController = null;
+
     }
 
     private IEnumerator LerpCamera(Vector3 targetPosition, Quaternion targetRotation, float duration, bool enableCameraMovement)
     {
-        if (!enableCameraMovement) //if movement is disabled call before lerp
-        {
-            CameraMovementScript.canMove = enableCameraMovement;
-            CameraMovementScript.playerController.ToggleMovement(enableCameraMovement);
-
-        }
-
         float timeElapsed = 0f;
         Vector3 startPosition = camera.transform.position;
         Quaternion startRotation = camera.transform.rotation;
-
+        if (!enableCameraMovement)
+        {
+            playerController.canMove = enableCameraMovement;
+            CameraMovementScript.canMove = enableCameraMovement;
+        }
         while (timeElapsed < duration)
         {
             camera.transform.position = Vector3.Lerp(startPosition, targetPosition, timeElapsed / duration);
@@ -124,9 +152,12 @@ public class DOSInteraction : MonoBehaviour
         camera.transform.rotation = targetRotation;
         if (enableCameraMovement)
         {
+            playerController.canMove = enableCameraMovement;
             CameraMovementScript.canMove = enableCameraMovement;
-            CameraMovementScript.playerController.ToggleMovement(enableCameraMovement);
         }
+
+
+
     }
     #endregion
 }

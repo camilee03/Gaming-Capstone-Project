@@ -1,0 +1,204 @@
+{
+  "room": [
+    {
+      "name": "Command Center",
+      "objects": [ "T", "L", "t", "C", "r", "v", "b" ]
+    },
+    {
+      "name": "Communication Room",
+      "objects": [ "T", "L", "t", "C", "r", "w", "b" ]
+    },
+    {
+      "name": "Operations Room",
+      "objects": [ "T", "L", "t", "C", "r", "b" ]
+    },
+    {
+      "name": "Briefing Room",
+      "objects": [ "T", "L", "t", "C", "p", "b" ]
+    },
+    {
+      "name": "War Room",
+      "objects": [ "T", "L", "t", "C", "r", "v", "b" ]
+    },
+    {
+      "name": "Control Room",
+      "objects": [ "T", "L", "t", "C", "r", "w", "b" ]
+    },
+    {
+      "name": "Surveillance Room",
+      "objects": [ "T", "L", "t", "C", "v", "r", "b" ]
+    },
+    {
+      "name": "Intelligence Room",
+      "objects": [ "T", "L", "t", "C", "v", "p", "b" ]
+    },
+    {
+      "name": "Strategy Room",
+      "objects": [ "T", "L", "t", "C", "v", "b" ]
+    },
+    {
+      "name": "Map Room",
+      "objects": [ "T", "L", "t", "C", "p", "b" ]
+    },
+    {
+      "name": "Situation Room",
+      "objects": [ "T", "L", "t", "C", "v", "b" ]
+    },
+    {
+      "name": "Planning Room",
+      "objects": [ "T", "L", "t", "C", "p", "b" ]
+    },
+    {
+      "name": "Conference Room",
+      "objects": [ "T", "L", "t", "C", "p", "b" ]
+    },
+    {
+      "name": "Security Room",
+      "objects": [ "T", "L", "r", "v", "C", "b" ]
+    },
+    {
+      "name": "Armory",
+      "objects": [ "T", "L", "b", "r", "v" ]
+    },
+    {
+      "name": "Weapons Storage",
+      "objects": [ "T", "L", "b", "v" ]
+    },
+    {
+      "name": "Ammunition Depot",
+      "objects": [ "T", "L", "f", "c", "b", "v" ]
+    },
+    {
+      "name": "Equipment Room",
+      "objects": [ "T", "L", "t", "b", "v" ]
+    },
+    {
+      "name": "Supply Room",
+      "objects": [ "T", "L", "t", "C", "b", "v" ]
+    },
+    {
+      "name": "Medical Bay",
+      "objects": [ "T", "L", "b", "v", "p" ]
+    },
+    {
+      "name": "Infirmary",
+      "objects": [ "T", "L", "b", "v", "p" ]
+    },
+    {
+      "name": "Quarantine Room",
+      "objects": [ "T", "L", "f", "b", "v" ]
+    },
+    {
+      "name": "Laboratory",
+      "objects": [ "T", "L", "e", "b", "v" ]
+    },
+    {
+      "name": "Research Room",
+      "objects": [ "T", "L", "b", "v", "p" ]
+    },
+    {
+      "name": "Engineering Room",
+      "objects": [ "T", "L", "b", "v", "w" ]
+    },
+    {
+      "name": "Maintenance Room",
+      "objects": [ "T", "L", "t", "b", "v" ]
+    },
+    {
+      "name": "Workshop",
+      "objects": [ "T", "L", "t", "b", "v" ]
+    },
+    {
+      "name": "Power Room",
+      "objects": [ "T", "L", "e", "b", "v" ]
+    },
+    {
+      "name": "Generator Room",
+      "objects": [ "T", "L", "e", "b", "v" ]
+    },
+    {
+      "name": "Fuel Storage",
+      "objects": [ "T", "L", "f", "c", "b", "v" ]
+    },
+    {
+      "name": "Water Treatment Room",
+      "objects": [ "T", "L", "b", "v" ]
+    },
+    {
+      "name": "Food Storage",
+      "objects": [ "T", "L", "X", "b", "v" ]
+    },
+    {
+      "name": "Kitchen",
+      "objects": [ "T", "L", "t", "X", "b", "v" ]
+    },
+    {
+      "name": "Dining Hall",
+      "objects": [ "T", "L", "t", "C", "X", "b" ]
+    },
+    {
+      "name": "Living Quarters",
+      "objects": [ "T", "L", "t", "C", "b" ]
+    },
+    {
+      "name": "Sleeping Quarters",
+      "objects": [ "T", "L", "C", "b" ]
+    },
+    {
+      "name": "Officer's Quarters",
+      "objects": [ "T", "L", "t", "C", "b" ]
+    },
+    {
+      "name": "Barracks",
+      "objects": [ "T", "L", "t", "C", "b" ]
+    },
+    {
+      "name": "Recreation Room",
+      "objects": [ "T", "L", "t", "C", "b" ]
+    },
+    {
+      "name": "Gym",
+      "objects": [ "T", "L", "C", "b" ]
+    },
+    {
+      "name": "Training Room",
+      "objects": [ "T", "L", "t", "C", "b" ]
+    },
+    {
+      "name": "Library",
+      "objects": [ "T", "L", "t", "C", "p", "b" ]
+    },
+    {
+      "name": "Archive Room",
+      "objects": [ "T", "L", "p", "b" ]
+    },
+    {
+      "name": "Storage Room",
+      "objects": [ "T", "L", "b", "v" ]
+    },
+    {
+      "name": "Laundry Room",
+      "objects": [ "T", "L", "W", "x", "b" ]
+    },
+    {
+      "name": "Shower Room",
+      "objects": [ "T", "L", "b", "v" ]
+    },
+    {
+      "name": "Restroom",
+      "objects": [ "T", "L", "b", "v" ]
+    },
+    {
+      "name": "Escape Tunnel",
+      "objects": [ "T", "L", "b", "v" ]
+    },
+    {
+      "name": "Air Filtration Room",
+      "objects": [ "T", "L", "f", "b" ]
+    },
+    {
+      "name": "Decontamination Room",
+      "objects": [ "T", "L", "f", "b", "v" ]
+    }
+  ]
+}
