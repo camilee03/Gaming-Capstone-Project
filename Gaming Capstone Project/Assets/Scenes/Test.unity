@@ -252,6 +252,14 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 772185668066212194, guid: 2d2617aaf1d7cb149bc33a836408dbc0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1322819696661344264, guid: 2d2617aaf1d7cb149bc33a836408dbc0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1640891303535538884, guid: 2d2617aaf1d7cb149bc33a836408dbc0, type: 3}
       propertyPath: m_Name
       value: HazmatGuy
@@ -307,6 +315,10 @@ PrefabInstance:
     - target: {fileID: 4336253441243198395, guid: 2d2617aaf1d7cb149bc33a836408dbc0, type: 3}
       propertyPath: PlayAndPause
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4553004158340130695, guid: 2d2617aaf1d7cb149bc33a836408dbc0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7808869209682092556, guid: 2d2617aaf1d7cb149bc33a836408dbc0, type: 3}
       propertyPath: _playbackOwnVoice
