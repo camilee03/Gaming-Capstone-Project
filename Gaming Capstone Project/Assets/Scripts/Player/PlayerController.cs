@@ -66,11 +66,12 @@ public class PlayerController : NetworkBehaviour
     public GameObject PlayerDisplay;
     public NetworkVariable<Vector3> LastAssignedSpawnPos = new NetworkVariable<Vector3>();
     public NetworkVariable<int> ColorID = new NetworkVariable<int>(-1);
+
     public override void OnNetworkSpawn()
     {
         playerInput = GetComponent<PlayerInput>();
         camMovement = cam.GetComponent<CameraMovement>();
-        AudioListener al = cam.GetComponent<AudioListener>();
+        AudioListener al = cam.GetComponent<AudioListener>();        
 
         if (IsOwner)
         {
@@ -83,7 +84,6 @@ public class PlayerController : NetworkBehaviour
             camMovement.enabled = true;
             al.enabled = true;
             PlayerDisplay.SetActive(true);
-
         }
         else
         {
@@ -96,7 +96,6 @@ public class PlayerController : NetworkBehaviour
             camMovement.enabled = false;
             al.enabled = false;
         }
-
     }
 
     [ClientRpc]
