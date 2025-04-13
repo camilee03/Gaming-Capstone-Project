@@ -244,6 +244,7 @@ public class TaskAssigner : MonoBehaviour
         newToggleObject.name = number.ToString();
         newToggleObject.transform.parent = this.transform.GetChild(0); // gets canvas
         newToggleObject.transform.localPosition = position;
+        newToggleObject.transform.localScale = new Vector3(6, 2, 2);
 
         // Get & set components
         Toggle newToggle = newToggleObject.GetComponent<Toggle>();

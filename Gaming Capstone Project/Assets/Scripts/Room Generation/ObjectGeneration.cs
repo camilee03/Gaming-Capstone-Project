@@ -110,16 +110,17 @@ public class ObjectGeneration : NetworkBehaviour
             Object newObject = CreateObject(identifier);
             if (newObject.domains == null) { continue; }
 
-            if (newObject.constraint == Constraints.None && numTilePositions > 0) // check that can still place on tiles
+            else if (newObject.constraint == Constraints.None && numTilePositions > 0) // check that can still place on tiles
             {
                 unassignedObjects.Add(newObject);
                 numTilePositions--;
             }
-            if (newObject.constraint == Constraints.Wall && numWallPositions > 0) // check that can still places on walls
+            else if (newObject.constraint == Constraints.Wall && numWallPositions > 0) // check that can still places on walls
             {
                 numWallPositions--;
                 unassignedObjects.Add(newObject);
             }
+            else { unassignedObjects.Add(newObject); }
         }
 
         if (numWallPositions <= 0 || numTilePositions <= 0) { Debug.Log("Not enough space to spawn"); }
@@ -245,10 +246,14 @@ public class ObjectGeneration : NetworkBehaviour
                 newObject = SpawnNetworkedObject(parent.transform, objects["chair"], tilePos, Quaternion.Euler(-90, randomRotationsY[i], 0));
                 break;
             case 'c': // Coal
-                newObject = SpawnNetworkedObject(parent.transform, objects["coal"], tilePos + Vector3.up * 5, Quaternion.identity);
+                int chooseRandomObject = Random.Range(0, 3);
+                newObject = SpawnNetworkedObject(parent.transform, objects["coal" + chooseRandomObject], tilePos, Quaternion.identity);
                 break;
             case 'e': // EnergyCore
                 newObject = SpawnNetworkedObject(parent.transform, objects["energy core"], tilePos, Quaternion.identity);
+                break;
+            case 'F': // Furnace
+                newObject = SpawnNetworkedObject(parent.transform, objects["furnace"], tilePos, Quaternion.Euler(-90, randomRotationsY[i], 0));
                 break;
             case 'f': // fan
                 newObject = SpawnNetworkedObject(parent.transform, objects["fan"], tilePos + Vector3.up * 10, Quaternion.Euler(0, randomRotationsY[i], 0));
@@ -259,9 +264,9 @@ public class ObjectGeneration : NetworkBehaviour
             case 'l': // lever
                 newObject = SpawnNetworkedObject(parent.transform, objects["lever"], tilePos + disp + Vector3.up * 3, wallRotations[tilePos]);
                 break;
-            //case 'p': // paper
-                //newObject = SpawnNetworkedObject(parent.transform, objects["paper"], tilePos, Quaternion.identity);
-                //break;
+            case 'p': // paper
+                newObject = SpawnNetworkedObject(parent.transform, objects["paper"], tilePos, Quaternion.identity);
+                break;
             case 'r': // radio
                 newObject = SpawnNetworkedObject(parent.transform, objects["radio"], tilePos, Quaternion.Euler(0, randomRotationsY[i], 0));
                 break;
@@ -338,7 +343,7 @@ public class ObjectGeneration : NetworkBehaviour
             case 'T': // Terminal
             case 'e': // Energy Core
             case 'b': // Box
-            // case 'p': // Paper
+            case 'p': // Paper
             case 'X': // Food
             case 'c': // Coal
             case 'x': // Clothes
@@ -433,9 +438,11 @@ public class ObjectGeneration : NetworkBehaviour
             case 'x': // Clothes
             case 'c': // Coal
             case 'X': // Food
-            case 'L': // Light
-                      //case 'p': // Paper
+            case 'p': // Paper
                 return Mathf.Min(Random.Range(5, 5 + wiggleRoom), 10);
+
+            case 'L': // Light
+                return Random.Range(5, 10);
 
             // Scarce objects
             case 'B': // Button

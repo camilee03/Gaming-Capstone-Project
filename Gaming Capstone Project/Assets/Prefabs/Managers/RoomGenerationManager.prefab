@@ -86,6 +86,7 @@ MonoBehaviour:
   doors: {fileID: 6134351026715822803, guid: a994d680f6c5eb04c8672c8f631d0985, type: 3}
   roomObject: {fileID: 2285477099221996806, guid: d58f024f93c3440409d8f1fbd4886452, type: 3}
   roomParentObject: {fileID: 3124901466514758790, guid: e1a3d920a00decf499ed1cb9e43b642f, type: 3}
+  mcam: {fileID: 0}
 --- !u!114 &7854146006491320387
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -113,15 +114,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dictionaryHolder:
   - name: box
-    obj: {fileID: 7378980975851388449, guid: 548016657dcbe6a448425ceac9f0bd99, type: 3}
+    obj: {fileID: 975355757099521476, guid: 4d5f2f0c63193ca48b2fcfb2e7ff7150, type: 3}
   - name: button
     obj: {fileID: 5988851583360643876, guid: b99184644990b3e48823fdc0903f4fe7, type: 3}
   - name: chair
     obj: {fileID: 7529755492870161400, guid: d78c8a751fc85e448ade30fd5f6e4f8b, type: 3}
   - name: chute
     obj: {fileID: 6290924418242524118, guid: 48df6bdd34cf45c4692b271bbeb6d913, type: 3}
-  - name: coal
-    obj: {fileID: 7378980975851388449, guid: 548016657dcbe6a448425ceac9f0bd99, type: 3}
+  - name: coal0
+    obj: {fileID: 3495261194569041075, guid: cd5be066774f535469440f41fff22e24, type: 3}
+  - name: coal1
+    obj: {fileID: 3340297179492575713, guid: a222e52cf10d31d42a2f1102cc137f80, type: 3}
+  - name: coal2
+    obj: {fileID: 998483663221219533, guid: e321c28ef0f24414dbf6457e1ccb6357, type: 3}
   - name: energy core
     obj: {fileID: 7378980975851388449, guid: 548016657dcbe6a448425ceac9f0bd99, type: 3}
   - name: fan
@@ -129,13 +134,15 @@ MonoBehaviour:
   - name: food
     obj: {fileID: 7378980975851388449, guid: 548016657dcbe6a448425ceac9f0bd99, type: 3}
   - name: furnace
-    obj: {fileID: 7378980975851388449, guid: 548016657dcbe6a448425ceac9f0bd99, type: 3}
+    obj: {fileID: 6625898504558348332, guid: 120b17f4460893a479e6884a2a07e719, type: 3}
   - name: glove
     obj: {fileID: 3047451380555000281, guid: 474d6c5558f44a94db91891948699adb, type: 3}
   - name: lever
     obj: {fileID: 6765364648315199141, guid: fd1ec90e4c59b8e4cb1604365c955150, type: 3}
   - name: light
     obj: {fileID: 607777774246203299, guid: 491e0b8b2ef77154e82d29005daf935f, type: 3}
+  - name: paper
+    obj: {fileID: 2340950732892518580, guid: dac31d909daca27498212ea04c1514f3, type: 3}
   - name: radio
     obj: {fileID: 7378980975851388449, guid: 548016657dcbe6a448425ceac9f0bd99, type: 3}
   - name: speaker
@@ -191,3 +198,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   jsonFile: {fileID: 4900000, guid: 5a0851dda89435849b7252177a4dfe7d, type: 3}
+  rooms:
+    room: []
