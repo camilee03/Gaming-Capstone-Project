@@ -2326,10 +2326,11 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   micClip: {fileID: 0}
   sampleRate: 16000
-  sampleLength: 1024
+  sampleLength: 16000
   source: {fileID: 8059384857542310279}
   sendInterval: 0.1
   noiseThreshold: 0.002
+  playback: 0
 --- !u!82 &8059384857542310279
 AudioSource:
   m_ObjectHideFlags: 0

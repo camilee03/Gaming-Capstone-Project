@@ -27,7 +27,7 @@ public class NetMic2 : NetworkBehaviour
 
         if (IsOwner)
         {
-            micClip = Microphone.Start(null, true, 1, sampleRate);
+            micClip = Microphone.Start(null, true, 16, sampleRate);
             sampleBuffer = new float[sampleLength];
         }
         sendInterval = (float)sampleLength / (float)sampleRate / 2;
@@ -42,6 +42,7 @@ public class NetMic2 : NetworkBehaviour
         {
             sendTimer = 0f;
             int micPos = Microphone.GetPosition(null);
+            Debug.Log(micPos);
             int startPos = micPos - sampleLength;
             if (startPos < 0) return;
 
@@ -108,8 +109,6 @@ public class NetMic2 : NetworkBehaviour
         AudioClip clip = AudioClip.Create("Received", floats.Length, 1, sampleRate, false);
         clip.SetData(floats, 0);
         source.clip = clip;
-        source.Play();
-        
+        source.Play();        
     }
-
 }
