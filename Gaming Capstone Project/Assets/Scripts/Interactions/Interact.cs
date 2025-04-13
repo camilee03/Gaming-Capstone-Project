@@ -14,15 +14,14 @@ public class Interact : NetworkBehaviour
     [Header("Highlight Variables")]
     private Color highlightColor = new Color(0.01f, 0.02f, 0f, 1f);
     private List<Material> materials;
-    private GameObject highlightedObject;
-    private GameObject pickedupObject;
+    public GameObject highlightedObject;
+    public GameObject pickedupObject;
     private Rigidbody pickedupRigidBody;
 
     [Header("Interactable Variables")]
     string[] tags = { "Selectable", "Button", "Door", "DOS Terminal" };
 
     PlayerController player;
-    bool onInteract = false;
     public Transform rightHand;
     public Animator anim;
     public Vector3 offset;
@@ -35,37 +34,31 @@ public class Interact : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (IsOwner)
-            HitScan();
+        HitScan();
     }
 
     private void Update()
     {
-        if (IsOwner)
+        if (Input.GetKeyDown(KeyCode.E)) { OnClick(); }
+
+        // Shows the pickedup object in hand
+        if (!canPickup && pickedupObject != null)
         {
-            if (Input.GetKeyDown(KeyCode.E)) { OnClick(); }
-
-            // Shows the pickedup object in hand
-            if (!canPickup && pickedupObject != null)
-            {
-                pickedupObject.transform.position = rightHand.position + (rightHand.forward * offset.x) + (rightHand.up * offset.y) + (rightHand.right * offset.z);
-                pickedupObject.transform.rotation = rightHand.rotation;
-            }
-
-            //Check for Doppel Transform, must drop if transformed.
-            if (anim.GetBool("Transformed"))
-            {
-                Place();
-                canPickup = false;
-            }
-            else if (pickedupObject == null) //reenable picking up if untransformed.
-            {
-                canPickup = true;
-            }
-
-            if (onInteract) { player.enabled = false; }
-            else { player.enabled = true; }
+            pickedupObject.transform.position = rightHand.position + (rightHand.forward * offset.x) + (rightHand.up * offset.y) + (rightHand.right * offset.z);
+            pickedupObject.transform.rotation = rightHand.rotation;
         }
+        
+        //Check for Doppel Transform, must drop if transformed.
+        if (anim.GetBool("Transformed"))
+        {
+            Place();
+            canPickup = false;
+        }
+        else if (pickedupObject == null) //reenable picking up if untransformed.
+        {
+            canPickup = true;
+        }
+
     }
 
     public void OnClick()
@@ -84,7 +77,11 @@ public class Interact : NetworkBehaviour
                             pickedupRigidBody = pickedupObject.GetComponent<Rigidbody>();
                             pickedupRigidBody.useGravity = false;
                         }
-                        pickedupObject.GetComponent<Collider>().enabled = false;
+                        Collider[] colliders = pickedupObject.GetComponents<Collider>();
+                        foreach (Collider collider in colliders)
+                        {
+                            collider.enabled = false;
+                        }
                         anim.SetLayerWeight(1, 1);
                         highlightedObject = null;
                     }
@@ -96,11 +93,9 @@ public class Interact : NetworkBehaviour
                     toggleAnimatedObject(highlightedObject);
                     break;
                 case "DOS Terminal": // access object and perform action
-                    highlightedObject.GetComponent<DOSInteraction>().SetInteract(gameObject.GetComponent<Interact>(), player);
+                    highlightedObject.GetComponent<DOSInteraction>().SetInteract(gameObject.GetComponent<Interact>());
                     highlightedObject.GetComponent<DOSInteraction>().ToggleInteraction();
-
-                    Debug.Log("DOS Opened!");
-                    onInteract = !onInteract;
+                    highlightedObject.GetComponent<DOSInteraction>().SetCam(gameObject);
                     break;
             }
         }
@@ -112,7 +107,12 @@ public class Interact : NetworkBehaviour
         if (pickedupObject != null)
         {
             pickedupObject.transform.position = rightHand.position + rightHand.forward * offset.x + rightHand.up * offset.y + rightHand.right * offset.z;
-            pickedupObject.GetComponent<Collider>().enabled = true;
+
+            Collider[] colliders = pickedupObject.GetComponents<Collider>();
+            foreach (Collider collider in colliders)
+            {
+                collider.enabled = true;
+            }
             anim.SetLayerWeight(1, 0);
             if (pickedupRigidBody != null)
             {
