@@ -21,7 +21,15 @@ public class RoomManager : MonoBehaviour
     {
         foreach (Room room in rooms)
         {
-            spawnPoints.Add(room.parent.transform.position);
+            Transform t = room.parent.transform;
+            Debug.Log(t.name);
+            Vector3 sumVector = Vector3.zero;
+            foreach(Transform child in t.GetChild(0)) //sum the walls
+            {
+                sumVector += child.position;
+            }
+            Vector3 centerVector = sumVector / t.GetChild(0).childCount;
+            spawnPoints.Add(centerVector);
         }
     }
 }

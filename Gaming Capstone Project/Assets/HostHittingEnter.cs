@@ -54,5 +54,6 @@ public class HostHittingEnter : NetworkBehaviour
             });
         }
             Debug.Log("Button has been pressed!");
+        Cursor.lockState = CursorLockMode.Locked;
     }
 }

@@ -3,27 +3,31 @@ using UnityEngine;
 
 public class ColorManager : MonoBehaviour
 {
-    Dictionary<int, Color> ColorLibrary = new Dictionary<int, Color>();
-    public Renderer hazmatSuit1, hazmatSuit2;
-    private void Start()
-    {
-        ColorLibrary.Add(1,Color.HSVToRGB(0/360f,1,1)); //red
-        ColorLibrary.Add(2, Color.HSVToRGB(25 / 360f, 1, 1));//orange
-        ColorLibrary.Add(3, Color.HSVToRGB(50 / 360f, 1, 1));//yellow
-        ColorLibrary.Add(4, Color.HSVToRGB(110 / 360f, 1, 1));//green
-        ColorLibrary.Add(5, Color.HSVToRGB(180 / 360f, 1, 1));//teal
-        ColorLibrary.Add(6, Color.HSVToRGB(210 / 360f, 1, 1));//blue
-        ColorLibrary.Add(7, Color.HSVToRGB(280 / 360f, 1, 1));//purple
-        ColorLibrary.Add(8, Color.HSVToRGB(310 / 360f, 1, 1));//pink
-        ColorLibrary.Add(9, Color.HSVToRGB(0,0, 1));//white
-        ColorLibrary.Add(10, Color.HSVToRGB(0,0, 0.5f));//gray
-        ColorLibrary.Add(11, Color.HSVToRGB(0,0, 0.1f));//black
-        ColorLibrary.Add(12, Color.HSVToRGB(30 / 360f, 0.9f, 4f));//brown
-    }
+
+    Color[] colors = {
+        Color.HSVToRGB(0/360f,1,1), //Red
+        Color.HSVToRGB(25/360f,1,1), //Orange
+        Color.HSVToRGB(50/360f,1,1), //Yellow
+        Color.HSVToRGB(110/360f,1,1), //Green
+        Color.HSVToRGB(180/360f,1,1), //Teal
+        Color.HSVToRGB(210/360f,1,1), //Blue
+        Color.HSVToRGB(280/360f,1,1), //Purple
+        Color.HSVToRGB(310/360f,.8f,1), //Pink
+        Color.HSVToRGB(0,0,1), //White
+        Color.HSVToRGB(0,0,.5f), //Gray
+        Color.HSVToRGB(0,0,.1f), //Black
+        Color.HSVToRGB(30/360f,.9f,.4f), //Brown
+    };
+    public Renderer hazmatSuit1, hazmatSuit2, indicator;
 
     public void ChangeSuitColor(int index)
     {
-        hazmatSuit1.material.SetColor("_Color", ColorLibrary[index]);
-        hazmatSuit2.material.SetColor("_Color", ColorLibrary[index]);
+        hazmatSuit1.material.SetColor("_Color", colors[index]);
+        hazmatSuit2.material.SetColor("_Color", colors[index]);
+        if (indicator != null)
+        {
+            Debug.Log("Changing Color of Indicator");
+            indicator.material.SetColor("_BaseColor", colors[index]);
+        }
     }
 }

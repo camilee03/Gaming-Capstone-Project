@@ -34,6 +34,7 @@ public class RoomGeneration : NetworkBehaviour
     List<(GameObject door, int pos, GameObject room)> doorAndRoom;
     ObjectGeneration objectGen;
     TaskManager taskManager;
+    public MapCam mcam;
 
 
     [Header("Collision Data")]
@@ -65,6 +66,7 @@ public class RoomGeneration : NetworkBehaviour
         GenerateMultipleRooms();
         RoomManager.Instance.InitializeSpawnPoints();
         taskManager.CreateTasks();
+        mcam.Setup();
     }
 
     /// <summary> Use the room procedure to create multiple rooms </summary>
@@ -115,7 +117,6 @@ public class RoomGeneration : NetworkBehaviour
         {
             objectGen.GenerationProcedure(room);
         }
-
     }
 
 
