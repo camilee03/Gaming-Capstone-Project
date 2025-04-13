@@ -4,6 +4,7 @@ using TMPro;
 using System.Linq;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 
 
@@ -79,9 +80,6 @@ public class TaskAssigner : MonoBehaviour
 
     void AssignTasks()
     {
-        // Should try to assign tasks that aren't the same as anyone else
-
-
         taskManager = GameObject.Find("RoomGenerationManager").GetComponent<TaskManager>();
         taskList = taskManager.taskList;
         string goalTextResult = "";
@@ -215,6 +213,7 @@ public class TaskAssigner : MonoBehaviour
 
     public void OpenTaskMenu(InputAction.CallbackContext context)
     {
+        this.transform.GetChild(0).gameObject.SetActive(!notebook.activeSelf);
         notebook.SetActive(!notebook.activeSelf);
     }
 
@@ -243,7 +242,7 @@ public class TaskAssigner : MonoBehaviour
         // Instantiate toggle
         GameObject newToggleObject = GameObject.Instantiate(defaultToggle);
         newToggleObject.name = number.ToString();
-        newToggleObject.transform.parent = notebook.transform;
+        newToggleObject.transform.parent = this.transform.GetChild(0); // gets canvas
         newToggleObject.transform.localPosition = position;
 
         // Get & set components
@@ -254,6 +253,8 @@ public class TaskAssigner : MonoBehaviour
         // Set toggle to a group
         if (toggleGroup == null) { toggleGroup = notebook.AddComponent<ToggleGroup>(); toggleGroup.allowSwitchOff = true; }
         newToggle.group = toggleGroup;
+
+        //EventSystem.current.firstSelectedGameObject = newToggleObject;
     }
 
     void CheckCheckboxes()

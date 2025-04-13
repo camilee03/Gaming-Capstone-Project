@@ -42,7 +42,6 @@ public class NetMic2 : NetworkBehaviour
         {
             sendTimer = 0f;
             int micPos = Microphone.GetPosition(null);
-            Debug.Log(micPos);
             int startPos = micPos - sampleLength;
             if (startPos < 0) return;
 
