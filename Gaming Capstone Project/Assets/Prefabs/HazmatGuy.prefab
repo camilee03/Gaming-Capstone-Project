@@ -1570,7 +1570,7 @@ MonoBehaviour:
     m_ActionName: 'Player/Morph[/Keyboard/q]'
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 4034896462899514786}
         m_TargetAssemblyTypeName: TaskAssigner, Assembly-CSharp
         m_MethodName: OpenTaskMenu
         m_Mode: 0
