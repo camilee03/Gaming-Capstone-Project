@@ -34,6 +34,9 @@ public class TaskAssigner : MonoBehaviour
     ToggleGroup toggleGroup;
     List<Toggle> toggles = new List<Toggle>();
 
+    const string STRIKE_START = "<s>";
+    const string STRIKE_END = "</s>";
+
     private void Update()
     {
         if (start)
@@ -114,7 +117,9 @@ public class TaskAssigner : MonoBehaviour
             }
         }
 
-        toggles[index].GetComponentInChildren<Text>().color = Color.green;
+        TMP_Text toggleText = toggles[index].GetComponentInChildren<TMP_Text>();
+        toggleText.richText = true;
+        if (!toggleText.text.StartsWith("<")) { toggleText.text = STRIKE_START + toggleText.text + STRIKE_END; }
 
         return true;
     }
@@ -134,7 +139,9 @@ public class TaskAssigner : MonoBehaviour
             }
         }
 
-        if (isComplete) { toggles[index].GetComponentInChildren<TMP_Text>().color = Color.green; }
+        TMP_Text toggleText = toggles[index].GetComponentInChildren<TMP_Text>();
+        toggleText.richText = true;
+        if (!toggleText.text.StartsWith("<")) { toggleText.text = STRIKE_START + toggleText.text + STRIKE_END; }
 
         return isComplete;
     }
@@ -158,8 +165,10 @@ public class TaskAssigner : MonoBehaviour
             }
         }
 
+        TMP_Text toggleText = toggles[index].GetComponentInChildren<TMP_Text>();
+        toggleText.richText = true;
+        if (!toggleText.text.StartsWith("<")) { toggleText.text = STRIKE_START + toggleText.text + STRIKE_END; }
 
-        if (isComplete) { toggles[index].GetComponentInChildren<TMP_Text>().color = Color.green; }
         return isComplete; 
     }
 
@@ -239,7 +248,7 @@ public class TaskAssigner : MonoBehaviour
 
         // Get & set components
         Toggle newToggle = newToggleObject.GetComponent<Toggle>();
-        newToggleObject.GetComponentInChildren<Text>().text = description;
+        newToggleObject.GetComponentInChildren<TMP_Text>().text = description;
         toggles.Add(newToggle);
 
         // Set toggle to a group
