@@ -1376,10 +1376,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1139918006}
   - component: {fileID: 1139918005}
-  - component: {fileID: 1139918004}
   - component: {fileID: 1139918003}
   m_Layer: 0
-  m_Name: MapCamera
+  m_Name: DepthCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1429,14 +1428,6 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!81 &1139918004
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1139918002}
-  m_Enabled: 1
 --- !u!20 &1139918005
 Camera:
   m_ObjectHideFlags: 0
@@ -1468,15 +1459,15 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
-  far clip plane: 1000
+  near clip plane: 10
+  far clip plane: 30
   field of view: 60
-  orthographic: 0
+  orthographic: 1
   orthographic size: 5
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 1
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: fead6d42e7790724e9bc6d9c4fda6e39, type: 2}
   m_TargetDisplay: 0
@@ -1496,13 +1487,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1139918002}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7059937, y: -0, z: -0, w: 0.7082182}
-  m_LocalPosition: {x: -7.924347, y: 549, z: 16}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 89.823, y: 0, z: 0}
+  m_Father: {fileID: 142136372}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!1 &1182016703
 GameObject:
   m_ObjectHideFlags: 0
@@ -1648,7 +1639,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7f0439011870bd4aa907b70affa9064, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1 &1463502611
 GameObject:
   m_ObjectHideFlags: 0
@@ -2194,6 +2184,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RoomGenerationManager
       objectReference: {fileID: 0}
+    - target: {fileID: 6970827077181135502, guid: 6fd500387efb0554a8b8cee9d31b95ad, type: 3}
+      propertyPath: mcam
+      value: 
+      objectReference: {fileID: 142136371}
     - target: {fileID: 8959854856453251929, guid: 6fd500387efb0554a8b8cee9d31b95ad, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -2261,4 +2255,4 @@ SceneRoots:
   - {fileID: 789141502}
   - {fileID: 423859018}
   - {fileID: 939037920}
-  - {fileID: 1139918006}
+  - {fileID: 142136372}
