@@ -106,7 +106,7 @@ public class PlayerController : NetworkBehaviour
             var netTransform = GetComponent<NetworkTransform>();
             if (netTransform != null)
             {
-                netTransform.Teleport(position, rotation, Vector3.one);
+                netTransform.Teleport(position, rotation, Vector3.one * 0.75f);
             }
             else
             {

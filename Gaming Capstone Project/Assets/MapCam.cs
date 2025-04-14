@@ -14,10 +14,11 @@ public class MapCam : MonoBehaviour
         RoomManager rm = RoomManager.Instance;
         for(int i = 0; i < rm.spawnPoints.Count; i++)
         {
+
             Vector3 pt = rm.spawnPoints[i];
             GameObject newObject = GameObject.Instantiate(textPrefab, new Vector3(pt.x, 10, pt.z), Quaternion.EulerAngles(new Vector3(Mathf.Deg2Rad * 90, 0, 0)));
             newObject.name = "RoomText" + i;
-            newObject.GetComponent<TextMesh>().text = "Room " + i;
+            newObject.GetComponent<TextMesh>().text = rm.rooms[i].roomName;
         }
     }
 }
