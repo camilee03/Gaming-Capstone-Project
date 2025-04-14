@@ -22,7 +22,6 @@ public class RoomManager : MonoBehaviour
         foreach (Room room in rooms)
         {
             Transform t = room.parent.transform;
-            Debug.Log(t.name);
             Vector3 sumVector = Vector3.zero;
             foreach(Transform child in t.GetChild(0)) //sum the walls
             {

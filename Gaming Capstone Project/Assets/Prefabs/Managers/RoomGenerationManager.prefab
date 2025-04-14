@@ -76,10 +76,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  numPlayers: 4
   debug: 0
   scale: 10
-  seed: 69
+  seed: -1
   numRooms: 4
   tiles: {fileID: 6140652643369139530, guid: d1ec0aef85ae9ad4b866c5705f6f3262, type: 3}
   walls: {fileID: 5069348235013271274, guid: 79a355e1f88fadc4d8d20744de239d25, type: 3}

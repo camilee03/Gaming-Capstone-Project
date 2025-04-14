@@ -42,7 +42,7 @@ public class TaskManager : MonoBehaviour
         CreateTerminalTasks();
         CreatePaperTasks();
         
-        Debug.Log("NUM TASKS: " + taskList.Count);
+        //Debug.Log("NUM TASKS: " + taskList.Count);
     }
 
     void CreateInteractTasks(GameObject[] useables, GameObject[] buttons)
@@ -150,15 +150,16 @@ public class TaskManager : MonoBehaviour
         List<Room> rooms2 = new List<Room>();
         if (taskType == TaskType.Pickup || taskType == TaskType.Paper)
         {
-            int randomRoom = Random.Range(0, rooms.Count - 1);
-            rooms2.Add(rooms[randomRoom]);
-
             bool keepLooking = true;
             int debugInt = 0;
             while (keepLooking && debugInt < 100) // find a location far enough away from current object
             {
+                int randomRoom = Random.Range(0, rooms.Count - 1);
+                rooms2.Add(rooms[randomRoom]);
+
                 int randomTile = Random.Range(0, rooms[randomRoom].tileParent.transform.childCount - 1);
                 position = rooms[randomRoom].tileParent.transform.GetChild(randomTile).position;
+
                 keepLooking = Vector3.Distance(position, gameObject1[0].transform.position) < 50;
                 debugInt++;
             }

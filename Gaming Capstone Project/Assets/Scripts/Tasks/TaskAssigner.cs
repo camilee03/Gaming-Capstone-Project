@@ -242,7 +242,7 @@ public class TaskAssigner : MonoBehaviour
         // Instantiate toggle
         GameObject newToggleObject = GameObject.Instantiate(defaultToggle);
         newToggleObject.name = number.ToString();
-        newToggleObject.transform.parent = this.transform.GetChild(0); // gets canvas
+        newToggleObject.transform.SetParent(this.transform.GetChild(0)); // gets canvas
         newToggleObject.transform.localPosition = position;
         newToggleObject.transform.localScale = new Vector3(6, 2, 2);
 

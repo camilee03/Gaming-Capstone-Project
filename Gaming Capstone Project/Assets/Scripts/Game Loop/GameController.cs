@@ -141,6 +141,12 @@ public class GameController : NetworkBehaviour
         }
     }
 
+    private void StartRoomGeneration()
+    {
+        Debug.Log("SPAWNING");
+        GameObject.Find("RoomGenerationManager").GetComponent<RoomGeneration>().StartGeneration(numPlayers);
+    }
+
 
     // -------------------------------------------------------
     // Start of Game
@@ -151,6 +157,7 @@ public class GameController : NetworkBehaviour
         if (!IsServer) return; // only the server/host does team assignment
 
         Debug.Log("[Server] HostSelectsStart() => AssignTeams()");
+        StartRoomGeneration();
         SpawnPlayersAtRandomPoints();
         AssignTeams();
         AssignTasks();

@@ -76,6 +76,7 @@ public class ObjectGeneration : NetworkBehaviour
                 wallPositions.Add(newWall.position);
                 wallRotations[newWall.position] = newWall.rotation;
             }
+            else { Debug.Log("DOOR"); }
         }
         tilePositions = new();
         for (int i = 0; i < room.tileParent.transform.childCount - 1; ++i)
@@ -177,12 +178,15 @@ public class ObjectGeneration : NetworkBehaviour
     private bool CheckConstraints(List<Object> assigned, Vector3 domain, Object unassigned)
     {
         if (assigned.Count == 0) { return true; }
+        if (unassigned.constraint == Constraints.Ceiling) { return true; }
 
         bool hasPairing = unassigned.properties.Contains(Properties.Paired);
         bool constraintsHold = !hasPairing;
 
         foreach (Object obj in assigned)
         {
+            if (obj.constraint == Constraints.Ceiling) { continue; }
+
             // Check that no assigned spot has the same pos as current
             if (obj.domains.Contains(domain)) { return false; }
 
@@ -282,7 +286,7 @@ public class ObjectGeneration : NetworkBehaviour
                 newObject.transform.localScale /= 1.1f;
                 break;
             case 'v': // vent
-                newObject = SpawnNetworkedObject(parent.transform, objects["vent"], tilePos + disp * 0.5f + Vector3.up * 1, wallRotations[tilePos]);
+                newObject = SpawnNetworkedObject(parent.transform, objects["vent"], tilePos + disp * 0.5f + Vector3.up, wallRotations[tilePos]);
                 break;
             case 'W': // Chute
                 newObject = SpawnNetworkedObject(parent.transform, objects["chute"], tilePos + disp, wallRotations[tilePos]);

@@ -8,6 +8,7 @@ using UnityEngine.Networking;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
+using UnityEngine.SocialPlatforms.GameCenter;
 
 public class RoomGeneration : NetworkBehaviour
 {
@@ -18,7 +19,6 @@ public class RoomGeneration : NetworkBehaviour
     // f = floor
 
     [Header("Debug Values")]
-    [SerializeField] int numPlayers = 1;
     public bool debug;
 
 
@@ -47,19 +47,15 @@ public class RoomGeneration : NetworkBehaviour
         {
             objectGen = GetComponent<ObjectGeneration>();
             taskManager = GetComponent<TaskManager>();
-            StartGeneration();
-        }
-        else
-        {
-            Debug.Log("Not generated");
         }
     }
 
 
     // -- ROOM GENERATION -- //
 
-    public void StartGeneration()
+    public void StartGeneration(int numPlayers)
     {
+        numRooms = numPlayers * 2;
         if (debug) { Random.InitState(DebugGen.Instance.seed); }
         else { if (seed != -1) { Random.InitState(seed); } }
 
@@ -162,12 +158,19 @@ public class RoomGeneration : NetworkBehaviour
         // set door rotation as same as wall
         Transform wallTransform = wallParent.transform.GetChild(index);
         Vector3 wallPosition = wallTransform.position;
-        Quaternion wallRotation = wallTransform.rotation;
+
+
+        Vector3 outwardDir = -wallTransform.right; // Wall's right vector
+        Quaternion wallRotation = Quaternion.LookRotation(outwardDir, Vector3.up) * Quaternion.Euler(-90, 0, 90);
 
         // find direction based on name
         string name = wallParent.transform.GetChild(index).gameObject.name;
-        char lastChar = name[name.Length - 1];
-        int direction = (int)char.GetNumericValue(lastChar);
+        char lastChar = name[name.Length - 1]; 
+        
+        Vector3 wallForward = wallTransform.right;
+        int direction = (wallForward == Vector3.left) ? 0 :
+                        (wallForward == Vector3.back) ? 1 :
+                        (wallForward == Vector3.right) ? 2 : 3;
 
         // replace wall with door
         Destroy(wallParent.transform.GetChild(index).gameObject);
@@ -181,9 +184,7 @@ public class RoomGeneration : NetworkBehaviour
     GameObject RotateRooms()
     {
         (GameObject door, int pos, GameObject room) dar1 = doorAndRoom[0]; // door1
-        dar1.pos = FindDoorDirection(doorAndRoom[0].door, doorAndRoom[0].room);
         (GameObject door, int pos, GameObject room) dar2 = doorAndRoom[1]; // door2
-        dar2.pos = FindDoorDirection(doorAndRoom[1].door, doorAndRoom[1].room);
 
         // try to pair doors
         GameObject newRoomParent = PairDoors(dar1, dar2);
@@ -208,27 +209,6 @@ public class RoomGeneration : NetworkBehaviour
 
         }
     }
-
-    int FindDoorDirection(GameObject door, GameObject room)
-    {
-        if (door.transform.rotation.eulerAngles.y % 180 == 90)
-        {
-            // Direction 0 (left)
-            if (door.transform.position.x < room.transform.position.x) { return 0; }
-
-            // Direction 2 (right)
-            return 2;
-        }
-        else
-        {
-            // Direction 1 (below)
-            if (door.transform.position.z < room.transform.position.z) { return 1; }
-
-            // Direction 3 (above)
-            return 3;
-        }
-    }
-
 
     /// <summary> Assigns old rooms and hallway to new room and returns new room </summary>
     GameObject PairDoors((GameObject door, int pos, GameObject room) dar1, (GameObject door, int pos, GameObject room) dar2)
@@ -259,32 +239,28 @@ public class RoomGeneration : NetworkBehaviour
     /// <summary> Take two doors and tie them together </summary>
     GameObject LinkDoors((GameObject door, int pos, GameObject room) dar1, (GameObject door, int pos, GameObject room) dar2, float roomDistance)
     {
-        Vector3[] directions = { Vector3.left, Vector3.back, Vector3.right, Vector3.forward };
+        // Get a normalized vector from tile2 to tile1.
+        Vector3 tile1 = ComputeDoorTile(dar1.door);
+        Vector3 tile2 = ComputeDoorTile(dar2.door);
+        Vector3 displacement = tile1 - tile2;
 
-        // Find tile next to door
-        Vector3 tile1 = dar1.door.transform.position + dar1.room.transform.TransformDirection(directions[dar1.pos]) * (scale / 2);
-        Vector3 tile2 = dar2.door.transform.position + dar2.room.transform.TransformDirection(directions[dar2.pos]) * (scale / 2);
-        Vector3 doorDisplacement = tile1 - tile2; // start at same place
+        dar2.room.transform.Translate(displacement);
 
+        // Determine each door’s direction
+        Vector3 meetingDir1 = -dar1.door.transform.up.normalized;
+        Vector3 meetingDir2 = -dar2.door.transform.up.normalized;
 
-        // move room in certain direction
-        Vector3 directionDisplacement = dar1.room.transform.TransformDirection(directions[dar1.pos]) * roomDistance;
-        if (dar1.pos + 2 != dar2.pos && dar1.pos - 2 != dar2.pos)
-        {
-            directionDisplacement -= dar2.room.transform.TransformDirection(directions[dar2.pos]) * roomDistance;
-        }
+        // Compute ideal hallway direction
+        Vector3 idealHallwayDir = meetingDir1 - meetingDir2;
 
-        // move room if too close
+        // See if rooms collide with each other
         int debugInt = 0;
-        collided = true;
-        doorDisplacement += directionDisplacement;
+        bool collided = true;
 
         while (collided && debugInt < 100)
         {
             // Move room
-            //Debug.Log($"Moved {dar2.room.name} by {doorDisplacement}");
-            dar2.room.transform.Translate(doorDisplacement);
-            doorDisplacement = directionDisplacement;
+            dar2.room.transform.Translate(idealHallwayDir * roomDistance);
 
             // Check for collisions
             collided = RoomFunctions.CheckForCollisions(dar2.room, scale);
@@ -292,12 +268,11 @@ public class RoomGeneration : NetworkBehaviour
             debugInt++;
         }
 
-        // Debug.Log("Dir: " + dar1.pos + " Pos: " + dar1.door.transform.position);
-        // Debug.Log("Dir: " + dar2.pos + " Pos: " + dar2.door.transform.position);
+        // get new tile positions
+        tile1 = ComputeDoorTile(dar1.door);
+        tile2 = ComputeDoorTile(dar2.door);
 
-        // recheck tile positions
-        tile1 = dar1.door.transform.position + dar1.room.transform.TransformDirection(directions[dar1.pos]) * (scale / 2);
-        tile2 = dar2.door.transform.position + dar1.room.transform.TransformDirection(directions[dar2.pos]) * (scale / 2);
+        Debug.Log($"Tile1 {tile1} Tile2 {tile2}");
 
         // Create a path in between doors
         List<Vector3> hallwayPath = GeneralFunctions.FindShortestAvoidingTiles(tile1, tile2, scale);
@@ -318,8 +293,17 @@ public class RoomGeneration : NetworkBehaviour
         }
 
         return hallwayParent;
-    } 
-    
+    }
+
+    /// <summary> Compute the tile outside the given door </summary>
+    Vector3 ComputeDoorTile(GameObject door)
+    {
+        // Assume the door's down should point toward where the floor tile should be placed.
+        Vector3 doorDir = -door.transform.up.normalized;
+        Vector3 tilePos = door.transform.position + doorDir * scale/2;
+        return tilePos; 
+    }
+
     /// <summary> Outlines a hallway with walls </summary>
     void DrawWallsAroundDoors(Vector3 prevPos, Vector3 pos, Vector3 nextPos, GameObject parent, Vector3[] doors)
     {

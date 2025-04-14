@@ -22,7 +22,6 @@ public class Room : NetworkBehaviour
 
 
     List<GameObject> spawnedTiles = new();
-    List<int> outlineDirections = new();
 
     int size;
     float scale;
@@ -141,6 +140,14 @@ public class Room : NetworkBehaviour
     {
         GameObject newObject = null;
 
+        // Define outward directions for walls
+        Vector3[] outwardDirections = new Vector3[4] {
+        Vector3.left,    // Pointing West
+        Vector3.back,    // Pointing North
+        Vector3.right,   // Pointing East
+        Vector3.forward  // Pointing South
+        };
+
         bool[] locations = new bool[4] { // conditions to spawn
             x+1<size && objectLocations[x+1, y] == 'f', // floor to right (place left)
             y+1<size && objectLocations[x, y+1] == 'f', // floor down (place up)
@@ -154,11 +161,17 @@ public class Room : NetworkBehaviour
             {
                 newObject = SpawnNetworkedObject(parent, child, Vector3.zero, Quaternion.identity);
                 newObject.transform.position = RoomFunctions.ConvertTileToPos(x, y, i, true, scale);
-                newObject.transform.localRotation = Quaternion.Euler(-90, ((i + 1) % 2) * 90, 0);
+
+                // Calculate the outward direction
+                Vector3 outwardDir = outwardDirections[i];
+
+                // Combine -90 degrees on x-axis with outward direction rotation
+                Quaternion wallRotation = Quaternion.LookRotation(outwardDir, Vector3.up) * Quaternion.Euler(-90, 0, 0);
+                newObject.transform.rotation = wallRotation;
+
                 newObject.name = "Wall" + i;
 
                 spawnedWalls.Add(newObject);
-                outlineDirections.Add(i);
             }
         }
 
