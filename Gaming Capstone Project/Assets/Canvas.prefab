@@ -394,7 +394,6 @@ GameObject:
   - component: {fileID: 5997044603287801783}
   - component: {fileID: 6927330605224376322}
   - component: {fileID: 248190679464656629}
-  - component: {fileID: 5821484460528039030}
   m_Layer: 5
   m_Name: Orange
   m_TagString: Untagged
@@ -414,12 +413,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4802114299361676004}
+  m_Father: {fileID: 558794262849257378}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 50, y: 50}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5997044603287801783
 CanvasRenderer:
@@ -503,30 +502,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5821484460528039030}
+      - m_Target: {fileID: 8333185968173216322}
         m_TargetAssemblyTypeName: SelectColorButton, Assembly-CSharp
         m_MethodName: OnClick_SelectColor
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 2
+          m_IntArgument: 1
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &5821484460528039030
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 983372053520308745}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5372a353fa7fae48be0c3cf7e6d8fec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1478027795935524658
 GameObject:
   m_ObjectHideFlags: 0
@@ -793,72 +780,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!1 &1816480176486061367
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2787988382788642901}
-  - component: {fileID: 1763053305197753783}
-  m_Layer: 5
-  m_Name: ColorRows (2)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &2787988382788642901
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1816480176486061367}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 3790347757073694810}
-  - {fileID: 1048975506622937341}
-  - {fileID: 7942118971647542359}
-  - {fileID: 6374702276312662696}
-  m_Father: {fileID: 558794262849257378}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1763053305197753783
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1816480176486061367}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
-  m_ChildAlignment: 0
-  m_Spacing: 30
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
 --- !u!1 &2606965020320364729
 GameObject:
   m_ObjectHideFlags: 0
@@ -1293,7 +1214,6 @@ GameObject:
   - component: {fileID: 3273584590874102909}
   - component: {fileID: 3172346287937434314}
   - component: {fileID: 4676744258530694106}
-  - component: {fileID: 8361242548107864549}
   m_Layer: 5
   m_Name: Blue
   m_TagString: Untagged
@@ -1313,12 +1233,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 252094820750260448}
+  m_Father: {fileID: 558794262849257378}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 50, y: 50}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3273584590874102909
 CanvasRenderer:
@@ -1402,30 +1322,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8361242548107864549}
+      - m_Target: {fileID: 8333185968173216322}
         m_TargetAssemblyTypeName: SelectColorButton, Assembly-CSharp
         m_MethodName: OnClick_SelectColor
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 6
+          m_IntArgument: 5
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &8361242548107864549
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3732414497329512049}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5372a353fa7fae48be0c3cf7e6d8fec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &4019235556970519687
 GameObject:
   m_ObjectHideFlags: 0
@@ -1438,7 +1346,6 @@ GameObject:
   - component: {fileID: 118359587738335037}
   - component: {fileID: 6369174212277704330}
   - component: {fileID: 4726926532248105970}
-  - component: {fileID: 4967615262655454609}
   m_Layer: 5
   m_Name: Red
   m_TagString: Untagged
@@ -1458,12 +1365,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4802114299361676004}
+  m_Father: {fileID: 558794262849257378}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 50, y: 50}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &118359587738335037
 CanvasRenderer:
@@ -1547,30 +1454,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 4967615262655454609}
+      - m_Target: {fileID: 8333185968173216322}
         m_TargetAssemblyTypeName: SelectColorButton, Assembly-CSharp
         m_MethodName: OnClick_SelectColor
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 1
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &4967615262655454609
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4019235556970519687}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5372a353fa7fae48be0c3cf7e6d8fec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &4092230583015581193
 GameObject:
   m_ObjectHideFlags: 0
@@ -1583,7 +1478,6 @@ GameObject:
   - component: {fileID: 2180810094820664469}
   - component: {fileID: 8118575108994332334}
   - component: {fileID: 3275649864211861637}
-  - component: {fileID: 7143381414949299008}
   m_Layer: 5
   m_Name: Teal
   m_TagString: Untagged
@@ -1603,12 +1497,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 252094820750260448}
+  m_Father: {fileID: 558794262849257378}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 50, y: 50}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2180810094820664469
 CanvasRenderer:
@@ -1692,30 +1586,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7143381414949299008}
+      - m_Target: {fileID: 8333185968173216322}
         m_TargetAssemblyTypeName: SelectColorButton, Assembly-CSharp
         m_MethodName: OnClick_SelectColor
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 5
+          m_IntArgument: 4
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &7143381414949299008
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4092230583015581193}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5372a353fa7fae48be0c3cf7e6d8fec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &4367590752757247781
 GameObject:
   m_ObjectHideFlags: 0
@@ -1861,7 +1743,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 558794262849257378}
-  - component: {fileID: 7667333656130081760}
+  - component: {fileID: 1704145875146212292}
+  - component: {fileID: 8333185968173216322}
   m_Layer: 5
   m_Name: Colors
   m_TagString: Untagged
@@ -1881,17 +1764,26 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4802114299361676004}
-  - {fileID: 252094820750260448}
-  - {fileID: 2787988382788642901}
+  - {fileID: 1451918857221868366}
+  - {fileID: 7796200252962352464}
+  - {fileID: 3582348983266100335}
+  - {fileID: 5104604418199070468}
+  - {fileID: 6361064373675751870}
+  - {fileID: 4258675187419564676}
+  - {fileID: 1749364690756544966}
+  - {fileID: 4790476949745899899}
+  - {fileID: 3790347757073694810}
+  - {fileID: 1048975506622937341}
+  - {fileID: 7942118971647542359}
+  - {fileID: 6374702276312662696}
   m_Father: {fileID: 4829669661431201722}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 232.78, y: 90.8}
-  m_SizeDelta: {x: 160, y: 30}
+  m_AnchoredPosition: {x: 340, y: 0}
+  m_SizeDelta: {x: 500, y: 375}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &7667333656130081760
+--- !u!114 &1704145875146212292
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1900,7 +1792,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4460417397822828477}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
+  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
@@ -1908,15 +1800,25 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 0
-  m_Spacing: 0
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
+  m_ChildAlignment: 4
+  m_StartCorner: 0
+  m_StartAxis: 0
+  m_CellSize: {x: 100, y: 100}
+  m_Spacing: {x: 30, y: 30}
+  m_Constraint: 1
+  m_ConstraintCount: 4
+--- !u!114 &8333185968173216322
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4460417397822828477}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5372a353fa7fae48be0c3cf7e6d8fec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4626287443628041981
 GameObject:
   m_ObjectHideFlags: 0
@@ -1929,7 +1831,6 @@ GameObject:
   - component: {fileID: 5111527075748771749}
   - component: {fileID: 8840708468406760639}
   - component: {fileID: 3939838386581123468}
-  - component: {fileID: 1035716336979402301}
   m_Layer: 5
   m_Name: Brown
   m_TagString: Untagged
@@ -1949,12 +1850,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2787988382788642901}
+  m_Father: {fileID: 558794262849257378}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 50, y: 50}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5111527075748771749
 CanvasRenderer:
@@ -2038,30 +1939,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1035716336979402301}
+      - m_Target: {fileID: 8333185968173216322}
         m_TargetAssemblyTypeName: SelectColorButton, Assembly-CSharp
         m_MethodName: OnClick_SelectColor
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 12
+          m_IntArgument: 11
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &1035716336979402301
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4626287443628041981}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5372a353fa7fae48be0c3cf7e6d8fec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &4708446594226014152
 GameObject:
   m_ObjectHideFlags: 0
@@ -2074,7 +1963,6 @@ GameObject:
   - component: {fileID: 1195390153558550495}
   - component: {fileID: 8168817528880404023}
   - component: {fileID: 351278264842426211}
-  - component: {fileID: 1998041770834399753}
   m_Layer: 5
   m_Name: Purple
   m_TagString: Untagged
@@ -2094,12 +1982,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 252094820750260448}
+  m_Father: {fileID: 558794262849257378}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 50, y: 50}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1195390153558550495
 CanvasRenderer:
@@ -2183,30 +2071,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1998041770834399753}
+      - m_Target: {fileID: 8333185968173216322}
         m_TargetAssemblyTypeName: SelectColorButton, Assembly-CSharp
         m_MethodName: OnClick_SelectColor
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 7
+          m_IntArgument: 6
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &1998041770834399753
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4708446594226014152}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5372a353fa7fae48be0c3cf7e6d8fec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &5186035031247194826
 GameObject:
   m_ObjectHideFlags: 0
@@ -2244,72 +2120,6 @@ RectTransform:
   m_AnchoredPosition: {x: -243.5, y: -107.3}
   m_SizeDelta: {x: 398.33997, y: 91.54999}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &5380567280263180663
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4802114299361676004}
-  - component: {fileID: 3355296513198215754}
-  m_Layer: 5
-  m_Name: ColorRows
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &4802114299361676004
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5380567280263180663}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1451918857221868366}
-  - {fileID: 7796200252962352464}
-  - {fileID: 3582348983266100335}
-  - {fileID: 5104604418199070468}
-  m_Father: {fileID: 558794262849257378}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &3355296513198215754
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5380567280263180663}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
-  m_ChildAlignment: 0
-  m_Spacing: 30
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
 --- !u!1 &6447793349695970457
 GameObject:
   m_ObjectHideFlags: 0
@@ -2322,7 +2132,6 @@ GameObject:
   - component: {fileID: 7128196985252781172}
   - component: {fileID: 5789482169481452093}
   - component: {fileID: 8106604829810140028}
-  - component: {fileID: 5583492982940143977}
   m_Layer: 5
   m_Name: Gray
   m_TagString: Untagged
@@ -2342,12 +2151,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2787988382788642901}
+  m_Father: {fileID: 558794262849257378}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 50, y: 50}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7128196985252781172
 CanvasRenderer:
@@ -2431,30 +2240,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5583492982940143977}
+      - m_Target: {fileID: 8333185968173216322}
         m_TargetAssemblyTypeName: SelectColorButton, Assembly-CSharp
         m_MethodName: OnClick_SelectColor
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 10
+          m_IntArgument: 9
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &5583492982940143977
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6447793349695970457}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5372a353fa7fae48be0c3cf7e6d8fec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &7120453379753698231
 GameObject:
   m_ObjectHideFlags: 0
@@ -2467,7 +2264,6 @@ GameObject:
   - component: {fileID: 3234882753830796745}
   - component: {fileID: 5161752118593300675}
   - component: {fileID: 3447217193302255747}
-  - component: {fileID: 4054256581397717658}
   m_Layer: 5
   m_Name: Green
   m_TagString: Untagged
@@ -2487,12 +2283,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4802114299361676004}
+  m_Father: {fileID: 558794262849257378}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 50, y: 50}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3234882753830796745
 CanvasRenderer:
@@ -2576,30 +2372,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 4054256581397717658}
+      - m_Target: {fileID: 8333185968173216322}
         m_TargetAssemblyTypeName: SelectColorButton, Assembly-CSharp
         m_MethodName: OnClick_SelectColor
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 4
+          m_IntArgument: 3
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &4054256581397717658
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7120453379753698231}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5372a353fa7fae48be0c3cf7e6d8fec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &7361489090338265196
 GameObject:
   m_ObjectHideFlags: 0
@@ -3139,7 +2923,6 @@ GameObject:
   - component: {fileID: 8210428486434259027}
   - component: {fileID: 3477478514288115194}
   - component: {fileID: 4454439280741055517}
-  - component: {fileID: 8763577348148974606}
   m_Layer: 5
   m_Name: Pink
   m_TagString: Untagged
@@ -3159,12 +2942,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 252094820750260448}
+  m_Father: {fileID: 558794262849257378}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 50, y: 50}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8210428486434259027
 CanvasRenderer:
@@ -3248,30 +3031,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8763577348148974606}
+      - m_Target: {fileID: 8333185968173216322}
         m_TargetAssemblyTypeName: SelectColorButton, Assembly-CSharp
         m_MethodName: OnClick_SelectColor
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 8
+          m_IntArgument: 7
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &8763577348148974606
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8625250989408655625}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5372a353fa7fae48be0c3cf7e6d8fec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &8761647204377299473
 GameObject:
   m_ObjectHideFlags: 0
@@ -3284,7 +3055,6 @@ GameObject:
   - component: {fileID: 3944268927032896501}
   - component: {fileID: 7079383283431233755}
   - component: {fileID: 6769186773999309897}
-  - component: {fileID: 38809711084959472}
   m_Layer: 5
   m_Name: White
   m_TagString: Untagged
@@ -3304,12 +3074,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2787988382788642901}
+  m_Father: {fileID: 558794262849257378}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 50, y: 50}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3944268927032896501
 CanvasRenderer:
@@ -3393,30 +3163,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 38809711084959472}
+      - m_Target: {fileID: 8333185968173216322}
         m_TargetAssemblyTypeName: SelectColorButton, Assembly-CSharp
         m_MethodName: OnClick_SelectColor
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 9
+          m_IntArgument: 8
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &38809711084959472
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8761647204377299473}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5372a353fa7fae48be0c3cf7e6d8fec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &8810874384915329081
 GameObject:
   m_ObjectHideFlags: 0
@@ -3429,7 +3187,6 @@ GameObject:
   - component: {fileID: 6888994295012317885}
   - component: {fileID: 6639250594230554986}
   - component: {fileID: 3460547094158656176}
-  - component: {fileID: 1579076014690922514}
   m_Layer: 5
   m_Name: Yellow
   m_TagString: Untagged
@@ -3449,12 +3206,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4802114299361676004}
+  m_Father: {fileID: 558794262849257378}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 50, y: 50}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6888994295012317885
 CanvasRenderer:
@@ -3538,96 +3295,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1579076014690922514}
+      - m_Target: {fileID: 8333185968173216322}
         m_TargetAssemblyTypeName: SelectColorButton, Assembly-CSharp
         m_MethodName: OnClick_SelectColor
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 3
+          m_IntArgument: 2
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &1579076014690922514
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8810874384915329081}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5372a353fa7fae48be0c3cf7e6d8fec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!1 &8827310213125094013
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 252094820750260448}
-  - component: {fileID: 2110883346656370878}
-  m_Layer: 5
-  m_Name: ColorRows (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &252094820750260448
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8827310213125094013}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 6361064373675751870}
-  - {fileID: 4258675187419564676}
-  - {fileID: 1749364690756544966}
-  - {fileID: 4790476949745899899}
-  m_Father: {fileID: 558794262849257378}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2110883346656370878
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8827310213125094013}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
-  m_ChildAlignment: 0
-  m_Spacing: 30
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
 --- !u!1 &9037268553900214348
 GameObject:
   m_ObjectHideFlags: 0
@@ -3640,7 +3319,6 @@ GameObject:
   - component: {fileID: 1093978011072625461}
   - component: {fileID: 6349450696275850092}
   - component: {fileID: 976258177796556020}
-  - component: {fileID: 6825097224087531242}
   m_Layer: 5
   m_Name: Black
   m_TagString: Untagged
@@ -3660,12 +3338,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2787988382788642901}
+  m_Father: {fileID: 558794262849257378}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 50, y: 50}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1093978011072625461
 CanvasRenderer:
@@ -3749,27 +3427,15 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 6825097224087531242}
+      - m_Target: {fileID: 8333185968173216322}
         m_TargetAssemblyTypeName: SelectColorButton, Assembly-CSharp
         m_MethodName: OnClick_SelectColor
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 11
+          m_IntArgument: 10
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &6825097224087531242
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9037268553900214348}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5372a353fa7fae48be0c3cf7e6d8fec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
