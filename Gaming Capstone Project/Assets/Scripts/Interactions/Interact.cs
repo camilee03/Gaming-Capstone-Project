@@ -14,8 +14,8 @@ public class Interact : NetworkBehaviour
     [Header("Highlight Variables")]
     private Color highlightColor = new Color(0.01f, 0.02f, 0f, 1f);
     private List<Material> materials;
-    private GameObject highlightedObject;
-    private GameObject pickedupObject;
+    public GameObject highlightedObject;
+    public GameObject pickedupObject;
     private Rigidbody pickedupRigidBody;
 
     [Header("Interactable Variables")]
@@ -77,7 +77,11 @@ public class Interact : NetworkBehaviour
                             pickedupRigidBody = pickedupObject.GetComponent<Rigidbody>();
                             pickedupRigidBody.useGravity = false;
                         }
-                        pickedupObject.GetComponent<Collider>().enabled = false;
+                        Collider[] colliders = pickedupObject.GetComponents<Collider>();
+                        foreach (Collider collider in colliders)
+                        {
+                            collider.enabled = false;
+                        }
                         anim.SetLayerWeight(1, 1);
                         highlightedObject = null;
                     }
@@ -103,7 +107,12 @@ public class Interact : NetworkBehaviour
         if (pickedupObject != null)
         {
             pickedupObject.transform.position = rightHand.position + rightHand.forward * offset.x + rightHand.up * offset.y + rightHand.right * offset.z;
-            pickedupObject.GetComponent<Collider>().enabled = true;
+
+            Collider[] colliders = pickedupObject.GetComponents<Collider>();
+            foreach (Collider collider in colliders)
+            {
+                collider.enabled = true;
+            }
             anim.SetLayerWeight(1, 0);
             if (pickedupRigidBody != null)
             {
@@ -136,6 +145,7 @@ public class Interact : NetworkBehaviour
 
     public void EnableHighlight(GameObject newObject)
     {
+        Debug.Log("Enabling highlight on " + newObject.name);
         // Highlights the raycast object
         materials = newObject.GetComponent<Renderer>().materials.ToList();
 
@@ -150,9 +160,11 @@ public class Interact : NetworkBehaviour
 
     public void DisableHighlight()
     {
+        Debug.Log("Disabling highlight on " + highlightedObject.name);
         foreach (var material in materials)
         {
             material.DisableKeyword("_EMISSION");
+            material.SetColor("_EmissionColor", Color.black);
         }
         highlightedObject = null;
     }

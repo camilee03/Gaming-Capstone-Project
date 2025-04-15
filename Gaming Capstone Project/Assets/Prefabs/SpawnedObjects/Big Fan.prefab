@@ -221,7 +221,7 @@ GameObject:
   - component: {fileID: 9106260330544113149}
   m_Layer: 0
   m_Name: Big Fan
-  m_TagString: Untagged
+  m_TagString: Useable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -356,7 +356,7 @@ MonoBehaviour:
   DeferredDespawnTick: 0
   Ownership: 1
   AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 0
+  SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 1
   SpawnWithObservers: 1
