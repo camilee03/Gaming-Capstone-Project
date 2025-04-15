@@ -12,6 +12,7 @@ TagManager:
   - Door
   - Button
   - Useable
+  - Chair
   layers:
   - Default
   - TransparentFX

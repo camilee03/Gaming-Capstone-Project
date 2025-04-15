@@ -19,12 +19,14 @@ public class Interact : NetworkBehaviour
     private Rigidbody pickedupRigidBody;
 
     [Header("Interactable Variables")]
-    string[] tags = { "Selectable", "Button", "Door", "DOS Terminal" };
+    string[] tags = { "Selectable", "Button", "Door", "DOS Terminal", "Chair" };
 
     PlayerController player;
     public Transform rightHand;
     public Animator anim;
     public Vector3 offset;
+    GameObject chairSittingIn;
+    bool sitting;
 
     bool canChange = true;
     private void Start()
@@ -97,9 +99,32 @@ public class Interact : NetworkBehaviour
                     highlightedObject.GetComponent<DOSInteraction>().ToggleInteraction();
                     highlightedObject.GetComponent<DOSInteraction>().SetCam(gameObject);
                     break;
+                case "Chair":
+                    chairSittingIn = highlightedObject;
+                    chairSittingIn.GetComponent<Collider>().enabled = false;
+                    player.canMove = false;
+                    sitting = true;
+                    player.transform.position = new Vector3(chairSittingIn.transform.position.x, player.transform.position.y,chairSittingIn.transform.position.z) + chairSittingIn.transform.forward * 0.36f;
+                    player.transform.rotation = Quaternion.EulerAngles(new Vector3(0, chairSittingIn.transform.localRotation.eulerAngles.z, 0));
+                    break;
             }
         }
-        else { Place(); }
+        else {
+            if (pickedupObject != null)
+                Place();
+            else if (sitting)
+            {
+                if (sitting)
+                {
+                    sitting = false;
+                    chairSittingIn.GetComponent<Collider>().enabled = true;
+                    player.canMove = true;
+                    sitting = false;
+                    player.transform.position = new Vector3(chairSittingIn.transform.position.x, player.transform.position.y, chairSittingIn.transform.position.z) + chairSittingIn.transform.forward * 1f;
+                    chairSittingIn = null;
+                }
+            }
+        }
     }
 
     private void Place()
