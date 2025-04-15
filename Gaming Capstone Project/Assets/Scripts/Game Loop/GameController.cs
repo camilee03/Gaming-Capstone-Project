@@ -21,18 +21,21 @@ public class GameController : NetworkBehaviour
     public NetworkList<int> votesCasted = new NetworkList<int>();
 
 
+    public int TimeLeftInVoting = 0;
+    public float votingTime = 60f;
+
     public List<Transform> Spawnpoints = new List<Transform>();
     // Number of Doppleganger players to assign
     private int numberOfDopples = 1;
     public GameObject LobbyCanvas;
     [Header("Voting")]
-    private float voteStartDelay = 25f; // Total time until voting starts
+    private float voteStartDelay = 120f; // Total time until voting starts
     public int secondsRemainingUntilVote;      // Countdown shown publicly
     public Canvas VotingCanvas;
     public GameObject playerObj;
 
 
-    private Dictionary<int, int> voteCounts = new Dictionary<int, int>(); // colorIndex -> voteCount
+    private Dictionary<ulong, int> playerVotes = new Dictionary<ulong, int>(); // clientId -> colorIndex
     private bool votingInProgress = false;
 
     // -------------------------------------------------------
@@ -210,18 +213,23 @@ public class GameController : NetworkBehaviour
     }
     public void StartVote()
     {
-        voteCounts.Clear();
+        playerVotes.Clear();
         votingInProgress = true;
 
         StartVoteClientRpc();
+        TimeLeftInVoting = Mathf.CeilToInt(votingTime);
 
         // End vote in 10 seconds
-        StartCoroutine(EndVoteAfterDelay(30f));
+        StartCoroutine(EndVoteAfterDelay());
     }
 
-    private IEnumerator EndVoteAfterDelay(float seconds)
+    private IEnumerator EndVoteAfterDelay()
     {
-        yield return new WaitForSeconds(seconds);
+        while (TimeLeftInVoting > 0)
+        {
+            yield return new WaitForSeconds(1f);
+            TimeLeftInVoting--;
+        }
         votingInProgress = false;
         VotingComplete();
     }
@@ -230,52 +238,67 @@ public class GameController : NetworkBehaviour
 
     private void VotingComplete()
     {
-        if (voteCounts.Count == 0)
+        votingInProgress = false;
+
+        if (playerVotes.Count == 0)
         {
-            Debug.Log("No votes cast.");
+            Debug.Log("No votes were cast.");
             return;
         }
 
-        // Get highest vote count(s)
-        int maxVotes = voteCounts.Values.Max();
-        var topVoted = voteCounts.Where(kv => kv.Value == maxVotes).Select(kv => kv.Key).ToList();
+        var groupedVotes = playerVotes
+            .GroupBy(kv => kv.Value) // group by colorIndex
+            .Select(g => new { Color = g.Key, Count = g.Count() })
+            .OrderByDescending(g => g.Count)
+            .ToList();
 
-        if (topVoted.Count > 1)
+        int highestCount = groupedVotes.First().Count;
+        var topColors = groupedVotes.Where(g => g.Count == highestCount).ToList();
+
+        if (topColors.Count > 1)
         {
             Debug.Log("Vote tied. No one is eliminated.");
             return;
         }
 
-        int targetColor = topVoted[0];
-        Debug.Log($"Color {targetColor} has the most votes. Eliminating...");
+        int winningColor = topColors.First().Color;
+        Debug.Log($"Color {winningColor} wins the vote!");
 
         // Eliminate the player with that color
         foreach (var kvp in Players)
         {
             var pc = kvp.Value.GetComponent<PlayerController>();
-            usedColors.Remove(targetColor);
-            if (pc.ColorID.Value == targetColor)
+            usedColors.Remove(winningColor);
+            if (pc.ColorID.Value == winningColor)
             {
-                pc.isDead = true;
+                pc.KillClientRpc();
                 break;
             }
         }
         playerObj.GetComponent<PlayerController>().EndVote();
-
+        secondsRemainingUntilVote = Mathf.CeilToInt(voteStartDelay);
+        StartVoteInitTimerClientRpc();
     }
 
 
 
 
-    public void ReceiveVote(int colorIndex)
+    public void ReceiveVote(ulong clientId, int colorIndex)
     {
+        if (!votingInProgress) return;
 
-        if (!voteCounts.ContainsKey(colorIndex))
-            voteCounts[colorIndex] = 0;
-
-        voteCounts[colorIndex]++;
-        Debug.Log($"[Server] Vote received for color {colorIndex}. Total: {voteCounts[colorIndex]}");
+        if (playerVotes.ContainsKey(clientId))
+        {
+            Debug.Log($"[Server] Player {clientId} changed vote to color {colorIndex}");
+            playerVotes[clientId] = colorIndex;
+        }
+        else
+        {
+            Debug.Log($"[Server] Player {clientId} voted for color {colorIndex}");
+            playerVotes.Add(clientId, colorIndex);
+        }
     }
+
 
 
 

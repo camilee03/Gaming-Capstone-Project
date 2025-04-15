@@ -231,21 +231,23 @@ public void ForceSetColorServerRpc(int colorIndex)
     public void EndVote()
     {
 
-        VotingScreen.DOFade(1, 3);
+        VotingScreen.DOFade(0, 3);
         VotingScreen.GetComponent<VoteManager>().ClearButtons();
 
         VotingScreen.gameObject.SetActive(false);
         Cursor.lockState = CursorLockMode.Locked;
 
+
+
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void CastVoteServerRpc(int colorIndex)
+    public void CastVoteServerRpc(int colorIndex, ServerRpcParams rpcParams = default)
     {
-        Debug.Log($"[ServerRpc] Received vote for color {colorIndex}");
-
-        GameController.Instance.ReceiveVote(colorIndex);
+        Debug.Log($"[ServerRpc] Received vote for color {colorIndex} from {OwnerClientId}");
+        GameController.Instance.ReceiveVote(OwnerClientId, colorIndex);
     }
+
     private void Update()
     {
         // Network checks (ignore if you're testing offline)
@@ -459,7 +461,7 @@ public void ForceSetColorServerRpc(int colorIndex)
     // show the death screen, etc.
     // ------------------------------------------------
     [ClientRpc]
-    private void KillClientRpc()
+    public void KillClientRpc()
     {
         isDead = true;
         Debug.Log($"[ClientRpc] KillClientRpc => Player {OwnerClientId} is now dead.");

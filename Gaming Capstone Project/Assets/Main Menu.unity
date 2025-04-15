@@ -267,8 +267,13 @@ MonoBehaviour:
   numPlayers: 1
   LobbySpawnPoint: {fileID: 0}
   GameSpawnPoint: {fileID: 0}
+  TimeLeftInVoting: 0
+  votingTime: 60
   Spawnpoints: []
   LobbyCanvas: {fileID: 0}
+  secondsRemainingUntilVote: 0
+  VotingCanvas: {fileID: 0}
+  playerObj: {fileID: 0}
 --- !u!4 &220249976
 Transform:
   m_ObjectHideFlags: 0
