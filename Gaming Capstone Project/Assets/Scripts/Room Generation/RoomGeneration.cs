@@ -8,7 +8,6 @@ using UnityEngine.Networking;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
-using UnityEngine.SocialPlatforms.GameCenter;
 
 public class RoomGeneration : NetworkBehaviour
 {
@@ -56,8 +55,7 @@ public class RoomGeneration : NetworkBehaviour
     public void StartGeneration(int numPlayers)
     {
         numRooms = numPlayers * 2;
-        if (debug) { Random.InitState(DebugGen.Instance.seed); }
-        else { if (seed != -1) { Random.InitState(seed); } }
+        if (seed != -1) { Random.InitState(seed); }
 
         GenerateMultipleRooms();
         RoomManager.Instance.InitializeSpawnPoints();
@@ -278,7 +276,7 @@ public class RoomGeneration : NetworkBehaviour
         List<Vector3> hallwayPath = GeneralFunctions.FindShortestAvoidingTiles(tile1, tile2, scale);
 
         if (hallwayPath != null) { hallwayPath.Insert(0, tile1); hallwayPath.Insert(hallwayPath.Count - 1, tile2); }
-        else { Debug.Log("A* couldn't find a path"); if (debug) { DebugGen.Instance.seed++; SceneManager.LoadScene(0); return null; } }
+        else { Debug.Log("A* couldn't find a path"); }
 
         // Spawn hallway
         GameObject hallwayParent = SpawnNetworkedObject(null, roomParentObject, Vector3.zero, Quaternion.identity);
@@ -289,7 +287,7 @@ public class RoomGeneration : NetworkBehaviour
         {
             SpawnNetworkedObject(hallwayParent.transform, tiles, hallwayPath[i], Quaternion.identity);
             List<Vector3> wallPositions = RoomFunctions.GetAllWallPositions();
-            DrawWallsAroundDoors(prevPos, hallwayPath[i], hallwayPath[i + 1], hallwayParent, wallPositions);
+            //DrawWallsAroundDoors(prevPos, hallwayPath[i], hallwayPath[i + 1], hallwayParent, wallPositions);
             prevPos = hallwayPath[i];
         }
 
