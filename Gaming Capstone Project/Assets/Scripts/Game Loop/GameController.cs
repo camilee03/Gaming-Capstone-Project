@@ -1,7 +1,10 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
 using Unity.Netcode.Components;
+using Unity.VisualScripting;
+using UnityEditor.PackageManager;
 using UnityEngine;
 
 public class GameController : NetworkBehaviour
@@ -14,13 +17,24 @@ public class GameController : NetworkBehaviour
     [Header("Spawn Points")]
     public Transform LobbySpawnPoint;
     public Transform GameSpawnPoint;
-    private HashSet<int> usedColors = new HashSet<int>();
+    public NetworkList<int> usedColors = new NetworkList<int>();
+    public NetworkList<int> votesCasted = new NetworkList<int>();
 
 
     public List<Transform> Spawnpoints = new List<Transform>();
     // Number of Doppleganger players to assign
     private int numberOfDopples = 1;
     public GameObject LobbyCanvas;
+    [Header("Voting")]
+    private float voteStartDelay = 25f; // Total time until voting starts
+    public int secondsRemainingUntilVote;      // Countdown shown publicly
+    public Canvas VotingCanvas;
+    public GameObject playerObj;
+
+
+    private Dictionary<int, int> voteCounts = new Dictionary<int, int>(); // colorIndex -> voteCount
+    private bool votingInProgress = false;
+
     // -------------------------------------------------------
     // Initialization / Singleton
     // -------------------------------------------------------
@@ -44,17 +58,34 @@ public class GameController : NetworkBehaviour
             NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
             NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
         }
+        if (IsClient)
+        {
+            usedColors.OnListChanged += OnUsedColorsChanged;
+        }
+        playerObj = NetworkManager.Singleton.LocalClient.PlayerObject.gameObject;
+
     }
 
     public override void OnNetworkDespawn()
     {
+        usedColors.OnListChanged -= OnUsedColorsChanged;
+
         if (IsServer)
         {
             NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
             NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
         }
+
     }
     #endregion
+
+    private void OnUsedColorsChanged(NetworkListEvent<int> change)
+    {
+        // Refresh UI if needed
+        var uiManager = FindFirstObjectByType<ColorSelectionUIManager>();
+        if (uiManager != null)
+            uiManager.RefreshAll();
+    }
 
     // -------------------------------------------------------
     // Client (Player) Connect / Disconnect
@@ -64,10 +95,10 @@ public class GameController : NetworkBehaviour
         if (!IsServer) return;
 
         // Grab the spawned PlayerObject (the default from Netcode)
-        GameObject playerObj = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.gameObject;
-        Players[clientId] = playerObj;
+        GameObject newplayerObj = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.gameObject;
+        Players[clientId] = newplayerObj;
 
-        Debug.Log($"[Server] Player connected => ClientId {clientId}, {playerObj.name}");
+        Debug.Log($"[Server] Player connected => ClientId {clientId}, {newplayerObj.name}");
     }
 
     private void OnClientDisconnected(ulong clientId)
@@ -132,6 +163,9 @@ public class GameController : NetworkBehaviour
     }
 
 
+
+
+
     // -------------------------------------------------------
     // Start of Game
     // -------------------------------------------------------
@@ -142,20 +176,124 @@ public class GameController : NetworkBehaviour
 
         Debug.Log("[Server] HostSelectsStart() => AssignTeams()");
         SpawnPlayersAtRandomPoints();
+        AssignRandomColorsToUnpickedPlayers();
         AssignTeams();
         DisableLobbyCanvasClientRpc();
+        StartVoteInitTimerClientRpc();
+    }
+    [ClientRpc]
+    private void StartVoteInitTimerClientRpc()
+    {
+        votesCasted.Clear();
+        secondsRemainingUntilVote = Mathf.CeilToInt(voteStartDelay);
+        StartCoroutine(StartVoteCountdown());
+    }
+
+    private IEnumerator StartVoteCountdown()
+    {
+        while (secondsRemainingUntilVote > 0)
+        {
+            yield return new WaitForSeconds(1f);
+            secondsRemainingUntilVote--;
+        }
+        StartVote();
+        StartVoteClientRpc();
+    }
+    [ClientRpc]
+    private void StartVoteClientRpc()
+    {
+        Debug.Log("[ClientRpc] Vote started!");
+
+        var localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerController>();
+        localPlayer.StartVote();
+
+    }
+    public void StartVote()
+    {
+        voteCounts.Clear();
+        votingInProgress = true;
+
+        StartVoteClientRpc();
+
+        // End vote in 10 seconds
+        StartCoroutine(EndVoteAfterDelay(30f));
+    }
+
+    private IEnumerator EndVoteAfterDelay(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        votingInProgress = false;
+        VotingComplete();
+    }
+
+
+
+    private void VotingComplete()
+    {
+        if (voteCounts.Count == 0)
+        {
+            Debug.Log("No votes cast.");
+            return;
+        }
+
+        // Get highest vote count(s)
+        int maxVotes = voteCounts.Values.Max();
+        var topVoted = voteCounts.Where(kv => kv.Value == maxVotes).Select(kv => kv.Key).ToList();
+
+        if (topVoted.Count > 1)
+        {
+            Debug.Log("Vote tied. No one is eliminated.");
+            return;
+        }
+
+        int targetColor = topVoted[0];
+        Debug.Log($"Color {targetColor} has the most votes. Eliminating...");
+
+        // Eliminate the player with that color
+        foreach (var kvp in Players)
+        {
+            var pc = kvp.Value.GetComponent<PlayerController>();
+            usedColors.Remove(targetColor);
+            if (pc.ColorID.Value == targetColor)
+            {
+                pc.isDead = true;
+                break;
+            }
+        }
+        playerObj.GetComponent<PlayerController>().EndVote();
 
     }
 
+
+
+
+    public void ReceiveVote(int colorIndex)
+    {
+
+        if (!voteCounts.ContainsKey(colorIndex))
+            voteCounts[colorIndex] = 0;
+
+        voteCounts[colorIndex]++;
+        Debug.Log($"[Server] Vote received for color {colorIndex}. Total: {voteCounts[colorIndex]}");
+    }
+
+
+
     public bool IsColorAvailable(int colorIndex)
     {
+        Debug.Log($"Checking color availability for {colorIndex}");
+
         return !usedColors.Contains(colorIndex);
     }
 
     public void LockColor(int colorIndex)
     {
-        usedColors.Add(colorIndex);
+        if (!usedColors.Contains(colorIndex))
+        {
+            usedColors.Add(colorIndex);
+        }
     }
+
 
     public void UnlockColor(int colorIndex)
     {
@@ -204,6 +342,29 @@ public class GameController : NetworkBehaviour
 
     }
 
+    private void AssignRandomColorsToUnpickedPlayers()
+    {
+        List<int> availableColors = Enumerable.Range(1, 12)
+            .Where(c => IsColorAvailable(c))
+            .ToList();
+
+        foreach (var kvp in Players)
+        {
+            var player = kvp.Value.GetComponent<PlayerController>();
+            if (player.ColorID.Value < 1)
+            {
+                if (availableColors.Count == 0)
+                {
+                    Debug.LogWarning("No colors left to assign!");
+                    return;
+                }
+
+                int chosen = availableColors[Random.Range(0, availableColors.Count)];
+                player.ForceSetColorServerRpc(chosen); // <--- Let the RPC handle LockColor()
+                availableColors.Remove(chosen);
+            }
+        }
+    }
 
     public void RegisterSpawnPoint(Transform t)
     {
@@ -229,4 +390,37 @@ public class GameController : NetworkBehaviour
     }
     #endregion
 
+    public void Start()
+    {
+        initColors();
+    }
+
+    #region ColorVariables
+    Dictionary<int, Color> ColorLibrary = new Dictionary<int, Color>();
+    private void initColors()
+    {
+        ColorLibrary.Add(1, Color.HSVToRGB(0 / 360f, 1, 1)); //red
+        ColorLibrary.Add(2, Color.HSVToRGB(25 / 360f, 1, 1));//orange
+        ColorLibrary.Add(3, Color.HSVToRGB(50 / 360f, 1, 1));//yellow
+        ColorLibrary.Add(4, Color.HSVToRGB(110 / 360f, 1, 1));//green
+        ColorLibrary.Add(5, Color.HSVToRGB(180 / 360f, 1, 1));//teal
+        ColorLibrary.Add(6, Color.HSVToRGB(210 / 360f, 1, 1));//blue
+        ColorLibrary.Add(7, Color.HSVToRGB(280 / 360f, 1, 1));//purple
+        ColorLibrary.Add(8, Color.HSVToRGB(310 / 360f, 1, 1));//pink
+        ColorLibrary.Add(9, Color.HSVToRGB(0, 0, 1));//white
+        ColorLibrary.Add(10, Color.HSVToRGB(0, 0, 0.5f));//gray
+        ColorLibrary.Add(11, Color.HSVToRGB(0, 0, 0.1f));//black
+        ColorLibrary.Add(12, Color.HSVToRGB(30 / 360f, 0.9f, 4f));//brown
+    }
+
+    /// <summary>
+    /// ColorIndex ranges from 1 - 12;
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns></returns>
+    public Color getColorByIndex(int index)
+    {
+        return ColorLibrary[index];
+    }
+    #endregion
 }

@@ -24,6 +24,8 @@ public class DOSInteraction : MonoBehaviour
 
     private DOSCommandController DOSController;
 
+    private DOSManager DOSManager;
+
     void Start()
     {
 
@@ -44,6 +46,10 @@ public class DOSInteraction : MonoBehaviour
 
     private void Update()
     {
+        if(DOSManager == null)
+        {
+            DOSManager = DOSManager.Instance;
+        }
         if (InInteraction)
         {
             if (Input.GetKeyDown(KeyCode.Return))
