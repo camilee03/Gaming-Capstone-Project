@@ -94,11 +94,8 @@ public class Room : NetworkBehaviour
             {
                 if (objectLocations[x, y] == 'f') // spawn floor
                 {
-                    GameObject newObject = SpawnNetworkedObject(tileParent.transform, tile, Vector3.zero, Quaternion.identity);
+                    GameObject newObject = SpawnNetworkedObject(tileParent.transform, tile, new Vector3(x * scale, 2.5f, y * scale), Quaternion.identity);
                     newObject.name = "Tile" + x + "" + y;
-
-                    Vector3 position = new Vector3(x * scale, 2.5f, y * scale);
-                    newObject.transform.position = position;
                     spawnedTiles.Add(newObject);
                 }
                 else if (objectLocations[x, y] == 'w') // spawn wall

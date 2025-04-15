@@ -407,7 +407,7 @@ public class GameController : NetworkBehaviour
 
     public void RegisterSpawnPoint(Transform t)
     {
-        t.position = new Vector3(t.position.x, 8 ,t.position.z);
+        t.position = new Vector3(t.position.x, 15 ,t.position.z);
         if (!Spawnpoints.Contains(t))
             Spawnpoints.Add(t);
     }
