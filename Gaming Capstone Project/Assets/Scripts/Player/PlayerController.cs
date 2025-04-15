@@ -67,6 +67,7 @@ public class PlayerController : NetworkBehaviour
     public NetworkVariable<Vector3> LastAssignedSpawnPos = new NetworkVariable<Vector3>();
     public NetworkVariable<int> ColorID = new NetworkVariable<int>(-1);
 
+    public CanvasGroup VotingScreen;
     public override void OnNetworkSpawn()
     {
         playerInput = GetComponent<PlayerInput>();
@@ -137,10 +138,41 @@ public class PlayerController : NetworkBehaviour
             colormanage.ChangeSuitColor(colorIndex);
         }
     }
+
+
     private void OnColorChanged(int previous, int current)
     {
         ApplyColor(current);
+
+        if (IsOwner)
+        {
+            ColorSelectionUIManager uiManager = FindFirstObjectByType<ColorSelectionUIManager>() ;
+            if (uiManager != null)
+            {
+                uiManager.RefreshAll();
+            }
+        }
     }
+
+
+    [ServerRpc(RequireOwnership = false)]
+public void ForceSetColorServerRpc(int colorIndex)
+{
+    if (!GameController.Instance.usedColors.Contains(colorIndex))
+    {
+        GameController.Instance.LockColor(colorIndex);
+    }
+
+    if (ColorID.Value > 0)
+    {
+        GameController.Instance.UnlockColor(ColorID.Value);
+    }
+
+    ColorID.Value = colorIndex;
+}
+
+
+
     public void RequestColorSelection(int colorIndex)
     {
         if (IsOwner)
@@ -183,6 +215,36 @@ public class PlayerController : NetworkBehaviour
     }
 
 
+    public void StartVote()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        VotingScreen.gameObject.SetActive(true);
+        VotingScreen.DOFade(1, 3);
+        VotingScreen.GetComponent<VoteManager>().CreateColorButtons();
+        //make color buttons.
+        
+        //start voting timer
+    }
+
+    public void EndVote()
+    {
+
+        VotingScreen.DOFade(0, 3);
+        VotingScreen.GetComponent<VoteManager>().ClearButtons();
+
+        VotingScreen.gameObject.SetActive(false);
+        Cursor.lockState = CursorLockMode.Locked;
+
+
+
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void CastVoteServerRpc(int colorIndex, ServerRpcParams rpcParams = default)
+    {
+        Debug.Log($"[ServerRpc] Received vote for color {colorIndex} from {OwnerClientId}");
+        GameController.Instance.ReceiveVote(OwnerClientId, colorIndex);
+    }
 
     private void Update()
     {
@@ -397,7 +459,7 @@ public class PlayerController : NetworkBehaviour
     // show the death screen, etc.
     // ------------------------------------------------
     [ClientRpc]
-    private void KillClientRpc()
+    public void KillClientRpc()
     {
         isDead = true;
         Debug.Log($"[ClientRpc] KillClientRpc => Player {OwnerClientId} is now dead.");
