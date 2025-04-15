@@ -5,17 +5,16 @@ using UnityEngine.InputSystem;
 public class FlashLight : NetworkBehaviour
 {
     bool flashlightEnabled = false;
-    [SerializeField] Light flashlight;
-
+    [SerializeField] GameObject flashlight;
     public void FlashLightToggle(InputAction.CallbackContext context)
     {
         if (context.performed && IsLocalPlayer)
         {
-            //Toggle(); // always toggles locally
+            Toggle(); // always toggles locally
 
             if (IsOwner)
             {
-                if (IsServer) { FlashlightClientRpc(); }
+                if (IsServer) { FlashlightServerRpc(); }
                 else { FlashlightServerRpc(); }
             }
         }
@@ -26,21 +25,21 @@ public class FlashLight : NetworkBehaviour
     private void FlashlightClientRpc()
     {
         Toggle();
+        //FlashlightServerRpc();
         Debug.Log("Client");
     }
 
     [ServerRpc]
     private void FlashlightServerRpc()
     {
-        FlashlightClientRpc();
+        Toggle();
         Debug.Log("Server");
     }
 
     private void Toggle()
     {
-        Debug.Log("Toggling FlashLight");
         flashlightEnabled = !flashlightEnabled;
-        flashlight.enabled = flashlightEnabled;
+        flashlight.SetActive(flashlightEnabled);
     }
 
 }

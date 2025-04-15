@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Drawing;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -49,7 +48,7 @@ public class GeneralFunctions : ScriptableObject
         (Vector3 pos, List<Vector3> path, int cost) node;
 
         //While fringe set is not empty
-        while (!fringe.IsEmpty)
+        while (fringe.count > 0)
         {
             node = fringe.Pop();
             currentState = node.pos;
@@ -105,7 +104,7 @@ public class GeneralFunctions : ScriptableObject
         (Vector3 pos, List<Vector3> path, int cost) node;
 
         //While fringe set is not empty
-        while (!fringe.IsEmpty && currentCost < 100)
+        while (fringe.count > 0 && currentCost < 100)
         {
             // pursue a new path
             node = fringe.Pop();
@@ -141,78 +140,57 @@ public class GeneralFunctions : ScriptableObject
 
     public static List<Vector3> FindShortestAvoidingTiles(Vector3 pos1, Vector3 pos2, float tileScale)
     {
-        //Debug.Log($"Position 1: {pos1} Position 2: {pos2} Tile scale: {tileScale}");
-
-        DataStructures.PriorityQueue<(Vector3, int)> fringe = new();
-        Dictionary<Vector3, Vector3> parentMap = new();
-        GameObject[] listOfTiles = GameObject.FindGameObjectsWithTag("Tile");
+        DataStructures.PriorityQueue<(Vector3, List<Vector3>, int)> fringe = new();
 
         Vector3 currentState = pos1; // start from pos1
-        List<Vector3> successors = GetSuccessorsAvoidingTiles(currentState, tileScale, listOfTiles);
-
-        if (successors.Count == 0) { Debug.Log("Path Blocked"); return null; }
 
         // Create first list of paths that can be taken
-        foreach (Vector3 successor in successors)
+        foreach (Vector3 successor in GetSuccessorsAvoidingTiles(currentState, tileScale))
         {
-            parentMap[successor] = currentState; 
-            float dx = Mathf.Abs(successor.x - pos2.x);
-            float dz = Mathf.Abs(successor.z - pos2.z); // Assuming y-axis is elevation
-            int heuristic = (int)(dx + dz);
-
-            fringe.Push((successor, 1), heuristic + 1);
+            List<Vector3> path = new();
+            path.Add(successor);
+            int cost = 1;
+            fringe.Push((successor, path, cost), (int)Vector3.Distance(successor, pos2) + cost);
         }
 
-        HashSet<Vector3> closed = new();
-        closed.Add(RoundVector3(currentState));
-        (Vector3 pos, int cost) node;
+        List<Vector3> closed = new List<Vector3>();
+        closed.Add(currentState);
+        List<Vector3> solution = new List<Vector3>();
+        List<Vector3> currentPath = new List<Vector3>();
+        int currentCost = 1;
+        (Vector3 pos, List<Vector3> path, int cost) node;
 
         //While fringe set is not empty
-        while (!fringe.IsEmpty)
+        while (fringe._list.Count > 0 && currentCost < 50)
         {
             // pursue a new path
             node = fringe.Pop();
             currentState = node.pos;
+            currentPath = node.path;
+            currentCost = node.cost;
 
             // If have arrived at destination, set path and stop
-            float distanceRemaining = (pos2 - currentState).sqrMagnitude;
-            if (distanceRemaining <= (tileScale * tileScale) / 8.0f)
+            if (Vector3.Distance(pos2, currentState) < tileScale / 4)
             {
-                List<Vector3> path = new();
-                Vector3 goal = currentState;
-                while ((goal - pos1).sqrMagnitude > Mathf.Epsilon)
-                {
-                    path.Add(goal);
-                    goal = parentMap[goal];
-                }
-                path.Reverse();
-                return path;
+                solution = currentPath;
+                return solution;
             }
-            
-            // If the distance has over shot
-            if (node.cost > 50) { Debug.Log($"Node cost: {node.cost}, Successor: {currentState}, Distance remaining: {distanceRemaining}"); break; }
 
             // Check if state is already expanded
-            if (!closed.Contains(RoundVector3(currentState)))
+            if (!closed.Contains(currentState))
             {
-                closed.Add(RoundVector3(currentState));
-                successors = GetSuccessorsAvoidingTiles(currentState, tileScale, listOfTiles);
+                closed.Add(currentState);
 
-                if (successors.Count == 0) { Debug.Log("Error, no successors found." + closed.Count); }
-
-                foreach (Vector3 successor in successors)
+                foreach (Vector3 successor in GetSuccessorsAvoidingTiles(currentState, tileScale))
                 {
-                    if (!parentMap.ContainsKey(successor)) { parentMap[successor] = currentState; }
-                    float dx = Mathf.Abs(successor.x - pos2.x);
-                    float dz = Mathf.Abs(successor.z - pos2.z); // Assuming y-axis is elevation
-                    int heuristic = (int) (dx + dz);
-                    fringe.Push((successor, node.cost + 1), heuristic + node.cost + 1);
+                    List<Vector3> path = new(currentPath);
+                    path.Add(successor);
+                    fringe.Push((successor, path, currentCost + 1), (int)Vector3.Distance(successor, pos2) + currentCost + 1);
                 }
             }
         }
 
-        Debug.Log($"Expanded nodes: {closed.Count}");
-
+        Debug.Log("No path found. Current cost = " + currentCost + " Current path length = " + currentPath.Count);
         return null;
 
     }
@@ -257,44 +235,42 @@ public class GeneralFunctions : ScriptableObject
         return successors;
     }
 
-    static List<Vector3> GetSuccessorsAvoidingTiles(Vector3 parent, float scale, GameObject[] listOfTiles)
+    static List<Vector3> GetSuccessorsAvoidingTiles(Vector3 parent, float scale)
     {
+        GameObject[] listOfTiles = GameObject.FindGameObjectsWithTag("Tile");
         List<Vector3> successors = new List<Vector3>();
         bool[] hasSuccessor = new bool[4] { true, true, true, true };
-        Vector3[] directions = { new Vector3(scale, 0, 0),
-            new Vector3(-scale, 0, 0),
-            new Vector3(0, 0, scale),
-            new Vector3(0, 0, -scale)
-        };
-
-        // Find list of tiles
-        HashSet<Vector3> tilePositions = new();
-        foreach (GameObject tile in listOfTiles)
-        {
-            tilePositions.Add(RoundVector3(tile.transform.position));
-        }
 
         // check to see if any tiles collide with successors
-        foreach (Vector3 direction in directions)
+        foreach (GameObject tile in listOfTiles) 
         {
-            Vector3 successor = parent + direction;
-            if (!tilePositions.Contains(RoundVector3(successor)))
+            if (Vector3.Distance(tile.transform.position, parent + new Vector3(scale, 0, 0)) < scale / 4)
             {
-                successors.Add(successor);
+                hasSuccessor[0] = false; continue;
+            }
+            if (Vector3.Distance(tile.transform.position, parent + new Vector3(-scale, 0, 0)) < scale / 4)
+            {
+                hasSuccessor[1] = false; continue;
+            }
+            if (Vector3.Distance(tile.transform.position, parent + new Vector3(0, 0, scale)) < scale / 4)
+            {
+                hasSuccessor[2] = false; continue;
+            }
+            if (Vector3.Distance(tile.transform.position, parent + new Vector3(0, 0, -scale)) < scale / 4)
+            {
+                hasSuccessor[3] = false; continue;
             }
         }
 
-        return successors;
-    }
+        //Debug.Log("Checking " + parent);
 
-    static Vector3 RoundVector3(Vector3 v)
-    {
-        int precision = 2;
-        float factor = Mathf.Pow(10, precision);
-        return new Vector3(
-            Mathf.Round(v.x * factor) / factor,
-            Mathf.Round(v.y * factor) / factor,
-            Mathf.Round(v.z * factor) / factor
-        );
+        if (hasSuccessor[0]) { successors.Add(parent + new Vector3(scale, 0, 0)); }
+        if (hasSuccessor[1]) { successors.Add(parent + new Vector3(-scale, 0, 0)); }
+        if (hasSuccessor[2]) { successors.Add(parent + new Vector3(0, 0, scale)); }
+        if (hasSuccessor[3]) { successors.Add(parent + new Vector3(0, 0, -scale)); }
+
+        Debug.Log("Num successors: " +  successors.Count);
+
+        return successors;
     }
 }

@@ -78,13 +78,10 @@ public class RoomFunctions : ScriptableObject
                         parent = parent.transform.parent.gameObject;
                     }
 
-                    if (parent != room)
+                    if (parent != room && Vector3.Distance(coll.transform.position, tiles.GetChild(i).position) <= 3 * scale)
                     {
-                        float distanceSquared = Mathf.Sqrt((coll.transform.position - tiles.GetChild(i).position).sqrMagnitude);
-                        if (distanceSquared <= (2 * scale))
-                        {
-                            return true;
-                        }
+                        //Debug.Log(coll.name + " collided with " + tiles.GetChild(i).name);
+                        return true;
                     }
                 }
             }

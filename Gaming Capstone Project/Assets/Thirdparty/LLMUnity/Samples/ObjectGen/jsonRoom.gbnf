@@ -1,0 +1,14 @@
+root ::= Room
+RoomName ::= "\"Command Center\"" | "\"Communication Room\"" | "\"Operations Room\"" | "\"Briefing Room\"" | "\"War Room\"" | "\"Control Room\"" | "\"Surveillance Room\"" | "\"Intelligence Room\"" | "\"Strategy Room\"" | "\"Map Room\"" | "\"Situation Room\"" | "\"Planning Room\"" | "\"Conference Room\"" | "\"Security Room\"" | "\"Armory\"" | "\"Weapons\"" | "\"Storage\"" | "\"Ammunition\"" | "\"Depot\"" | "\"Equipment Room\"" | "\"Supply Room\"" | "\"Medical Bay\"" | "\"Infirmary\"" | "\"Quarantine Room\"" | "\"Laboratory\"" | "\"Research Room\"" | "\"Engineering Room\"" | "\"Maintenance Room\"" | "\"Workshop\"" | "\"Power Room\"" | "\"Generator Room\"" | "\"Fuel Storage\"" | "\"Water Treatment Room\"" | "\"Food Storage\"" | "\"Kitchen\"" | "\"Dining Hall\"" | "\"Living Quarters\"" | "\"Sleeping Quarters\"" | "\"Officer's Quarters\"" | "\"Barracks\"" | "\"Recreation Room\"" | "\"Gym\"" | "\"Training Room\"" | "\"Library\"" | "\"Archive Room\"" | "\"Storage Room\"" | "\"Laundry Room\"" | "\"Shower Room\"" | "\"Restroom\"" | "\"Escape Tunnel\"" | "\"Air Filtration Room\"" | "\"Decontamination Room\""
+Properties ::= "'Scarce'" | "'Plentiful'" | "'Essential'" | "'None'"
+ObjectName ::= "'BulletinBoard'" | "'Button'" | "'Box'" | "\"Cabinet\"" | "\"Chair\"" | "\"Clothes\"" | "\"Coal\"" | "\"Fan\"" | "\"Food\"" | "\"Furnace\"" | "\"EnergyCore\"" | "\"Lever\"" | "\"Light\"" | "\"Table\"" | "\"Trash\"" | "\"Terminal\"" | "\"Radio\""
+Object ::= "{"   ws   "\"objectName\":"   ws   ObjectName   ","   ws   "\"properties\":"   ws   Propertieslist   "}"
+Objectlist ::= "[]" | "["   ws   Object   (","   ws   Object)*   "]"
+Room ::= "{"   ws   "\"roomName\":"   ws   RoomName   ","   ws   "\"objects\":"   ws   Objectlist   "}"
+Roomlist ::= "[]" | "["   ws   Room   (","   ws   Room)*   "]"
+string ::= "\""   ([^"]*)   "\""
+boolean ::= "true" | "false"
+ws ::= [ \t\n]*
+number ::= [0-9]+   "."?   [0-9]*
+stringlist ::= "["   ws   "]" | "["   ws   string   (","   ws   string)*   ws   "]"
+numberlist ::= "["   ws   "]" | "["   ws   string   (","   ws   number)*   ws   "]"

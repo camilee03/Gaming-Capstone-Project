@@ -1,0 +1,58 @@
+// Not for use in real thing
+{
+  "name": "Command Center",
+  "object": [
+    {
+      "name": "Light",
+      "properties": [ "plentiful", "essential" ]
+    },
+    {
+      "name": "Light",
+      "properties": [ "plentiful", "essential" ]
+    },
+    {
+      "name": "BulletinBoard",
+      "properties": [ "essential", "scarce" ]
+    },
+    {
+      "name": "Trash",
+      "properties": [ "plentiful" ]
+    },
+    {
+      "name": "Trash",
+      "properties": [ "plentiful" ]
+    },
+    {
+      "name": "Fan",
+      "properties": [ "essential" ]
+    },
+    {
+      "name": "Terminal",
+      "properties": [ "essential", "scarce" ]
+    },
+    "object",
+    :,
+    {
+      "name": "Radio",
+      "properties": [ "none" ]
+    },
+    "object",
+    :,
+    {
+      "name": "Chair",
+      "properties": [ "paired[Table]" ]
+    },
+    "object",
+    :,
+    {
+      "name": "Chair",
+      "properties": [ "paired[Table]" ]
+    },
+    "object",
+    :
+    {
+      "name": "Table",
+      "properties": [ "scarce", "paired[Chair]" ]
+    }
+  ]
+}
