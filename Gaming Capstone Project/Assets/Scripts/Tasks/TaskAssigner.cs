@@ -21,6 +21,7 @@ public class TaskAssigner : MonoBehaviour
     // Task display
     [SerializeField] TMP_Text tasksCompleted;
     [SerializeField] GameObject notebook;
+    [SerializeField] GameObject taskLayoutGroup;
     [SerializeField] Interact interactManager;
     PlayerController playerController;
     TaskManager taskManager;
@@ -35,6 +36,7 @@ public class TaskAssigner : MonoBehaviour
     [SerializeField] GameObject defaultToggle;
     ToggleGroup toggleGroup;
     List<Toggle> toggles = new List<Toggle>();
+    public Animator anim;
 
     const string STRIKE_START = "<s>";
     const string STRIKE_END = "</s>";
@@ -227,8 +229,8 @@ public class TaskAssigner : MonoBehaviour
 
     public void OpenTaskMenu(InputAction.CallbackContext context)
     {
-        this.transform.GetChild(0).gameObject.SetActive(!notebook.activeSelf);
         notebook.SetActive(!notebook.activeSelf);
+        anim.SetLayerWeight(3, 1 - anim.GetLayerWeight(3));
 
         if (notebook.activeSelf) { Cursor.lockState = CursorLockMode.None; }
         else { Cursor.lockState = CursorLockMode.Locked; }
@@ -259,9 +261,13 @@ public class TaskAssigner : MonoBehaviour
         // Instantiate toggle
         GameObject newToggleObject = GameObject.Instantiate(defaultToggle);
         newToggleObject.name = number.ToString();
-        newToggleObject.transform.SetParent(this.transform.GetChild(0)); // gets canvas
-        newToggleObject.transform.localPosition = position;
-        newToggleObject.transform.localScale = new Vector3(6, 2, 2);
+        newToggleObject.transform.SetParent(taskLayoutGroup.transform); // gets canvas
+
+        RectTransform toggleTransform = newToggleObject.GetComponent<RectTransform>();
+        toggleTransform.localRotation = Quaternion.identity;
+        toggleTransform.localPosition = Vector3.zero;
+
+        toggleTransform.localScale = new Vector3(6, 2, 2);
 
         // Get & set components
         Toggle newToggle = newToggleObject.GetComponent<Toggle>();

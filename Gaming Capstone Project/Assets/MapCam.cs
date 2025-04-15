@@ -15,7 +15,7 @@ public class MapCam : MonoBehaviour
         for(int i = 0; i < rm.spawnPoints.Count; i++)
         {
             Vector3 pt = rm.spawnPoints[i].transform.position;
-            GameObject newObject = GameObject.Instantiate(textPrefab, new Vector3(pt.x, 10, pt.z), Quaternion.Euler(new Vector3(Mathf.Deg2Rad * 90, 0, 0)));
+            GameObject newObject = GameObject.Instantiate(textPrefab, new Vector3(pt.x, 10, pt.z), Quaternion.EulerAngles(new Vector3(Mathf.Deg2Rad * 90, 0, 0)));
             newObject.name = "RoomText" + i;
             newObject.GetComponent<TextMesh>().text = rm.rooms[i].roomName;
         }

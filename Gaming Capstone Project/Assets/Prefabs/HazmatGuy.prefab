@@ -2030,7 +2030,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tasksCompleted: {fileID: 484559439684501427}
   notebook: {fileID: 7923325739284133495}
-  TaskCanvas: {fileID: 7906991300087213569}
+  taskLayoutGroup: {fileID: 7906991300087213569}
   interactManager: {fileID: 6056992011005364390}
   start: 0
   taskPointer: {fileID: 4687314843321430345}
