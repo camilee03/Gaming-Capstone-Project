@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 using static TaskManager;
 
@@ -25,6 +26,23 @@ public class TaskManager : MonoBehaviour
     GameObject[] buttons;
     GameObject[] terminals;
     GameObject[] useables;
+
+    public int completedTasks = 0;
+    GameObject canvas;
+    int numPlayersWithTasks;
+
+    private void Start()
+    {
+        canvas = GameObject.Find("WinCanvas");
+        numPlayersWithTasks = NetworkManager.Singleton.ConnectedClients.Count - GameController.Instance.GetNumberOfDopples();
+    }
+
+    public void UpdateTasks()
+    {
+        completedTasks++;
+        if (completedTasks == numPlayersWithTasks) { canvas.SetActive(true); }
+        else { canvas.SetActive(false); }
+    }
 
     public void CreateTasks()
     {
@@ -174,7 +192,8 @@ public class TaskManager : MonoBehaviour
             for (int i = 0; i < gameObject1.Length - 1; i++)
             {
                 objectData1[i] = gameObject1[i].GetComponent<ObjectData>();
-                rooms1.Add(gameObject1[i].transform.parent.parent.GetComponent<Room>());
+                Room room = RoomFunctions.FindRoomOfObject(gameObject1[i]);
+                rooms1.Add(room);
             }
         }
 
@@ -187,7 +206,8 @@ public class TaskManager : MonoBehaviour
             for (int i=0; i<gameObject2.Length-1; i++)
             {
                 objectData2[i] = gameObject2[i].GetComponent<ObjectData>();
-                rooms2.Add(gameObject2[i].transform.parent.parent.GetComponent<Room>());
+                Room room = RoomFunctions.FindRoomOfObject(gameObject2[i]);
+                rooms2.Add(room);
             }
         }
 

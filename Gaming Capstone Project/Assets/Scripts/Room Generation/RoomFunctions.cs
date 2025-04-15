@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -119,5 +120,37 @@ public class RoomFunctions : ScriptableObject
         }
 
         return (minX, minZ, maxX, maxZ);
+    }
+
+    public static Room FindRoomOfObject(GameObject obj)
+    {
+        GameObject roomObject = obj.transform.parent.parent.gameObject;
+
+        foreach (Room room in RoomManager.Instance.rooms)
+        {
+            if (roomObject == room.parent) { return room; }
+        }
+
+        return null;
+    }
+
+    public static List<Vector3> GetAllWallPositions()
+    {
+        List<Vector3> positions = new();
+        
+        foreach (Room room in RoomManager.Instance.rooms)
+        {
+            for (int i=0; i<room.wallParent.transform.childCount; i++)
+            {
+                positions.Add(RoundVector3(room.wallParent.transform.GetChild(i).position));
+            }
+        }
+
+        return positions;
+    }
+
+    public static Vector3 RoundVector3(Vector3 vector)
+    {
+        return new Vector3((int)Mathf.Round(vector.x), (int)Mathf.Round(vector.y), (int)Mathf.Round(vector.z));
     }
 }

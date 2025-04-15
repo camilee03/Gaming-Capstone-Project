@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class SpawnPoint : NetworkBehaviour
 {
-    public override void OnNetworkSpawn()
+    public void Start()
     {
         if (IsServer)
         {

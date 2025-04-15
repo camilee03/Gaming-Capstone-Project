@@ -19,6 +19,7 @@ public class ObjectGeneration : NetworkBehaviour
     [Header("Domains")]
     List<Vector3> tilePositions = new();
     List<Vector3> wallPositions = new();
+    List<Vector3> doorPositions = new();
     Dictionary<Vector3, Quaternion> wallRotations = new();
 
     [Header("Existing Room")]
@@ -35,7 +36,8 @@ public class ObjectGeneration : NetworkBehaviour
     [Header("Spawning")]
     List<GameObject> spawnedObjects = new List<GameObject>();
     GameObject roomObject;
-    GameObject roomParentObject;
+    GameObject roomParentObject; 
+    List<Object> bestSolution = new List<Object>();
 
     enum Constraints { None, Orientation, Wall, Ceiling, }
     enum Properties { None, Paired }
@@ -76,7 +78,7 @@ public class ObjectGeneration : NetworkBehaviour
                 wallPositions.Add(newWall.position);
                 wallRotations[newWall.position] = newWall.rotation;
             }
-            else { Debug.Log("DOOR"); }
+            else { doorPositions.Add(newWall.position); }
         }
         tilePositions = new();
         for (int i = 0; i < room.tileParent.transform.childCount - 1; ++i)
@@ -134,7 +136,10 @@ public class ObjectGeneration : NetworkBehaviour
 
         foreach (Object newObject in assignedObjects)
         {
-            PlaceObjects2(newObject.identifier, newObject.domains[0], scale, objectParent);
+            if (!doorPositions.Contains(newObject.domains[0]))
+            {
+                PlaceObjects2(newObject.identifier, newObject.domains[0], scale, objectParent);
+            }
         }
 
         return objectParent;
@@ -142,43 +147,57 @@ public class ObjectGeneration : NetworkBehaviour
 
     private List<Object> RecursiveBacktracking(List<Object> assigned, List<Object> unassigned, int numObjects)
     {
+        // Update best solution
+        if (assigned.Count > bestSolution.Count)
+        {
+            bestSolution = new List<Object>(assigned);
+        }
+
         // no more objects to assign
-        if (assigned.Count == numObjects) { return assigned; } 
+        if (assigned.Count == numObjects) { return assigned; }
+        if (unassigned.Count == 0) { return bestSolution; }
 
         // find new unassigned object
         Object newObject = unassigned[0];
         List<Vector3> domains = newObject.domains;
 
         // Find a place for unassigned object
-        bool constaintsSatisfied = false;
-        while (!constaintsSatisfied) {
+        while (domains.Count > 0) {
 
             // Find new possible position
-            if (domains.Count == 0) { Debug.LogError("Ran out of possible positions"); }
             int randomDomain = Random.Range(0, domains.Count-1);
             Vector3 domain = domains[randomDomain];
             domains.Remove(domain);
 
-            if (CheckConstraints(assigned, domain, newObject)) // if constraints hold up
+            // Check if can add the value
+            if (CheckConstraints(assigned, domain, newObject))
             {
                 newObject.domains = new List<Vector3>() { domain };
                 assigned.Add(newObject);
                 unassigned.RemoveAt(0);
 
-                List<Object> result = RecursiveBacktracking(assigned, unassigned, numObjects);
+                // Apply arc consistency to prune domains.
+                if (ArcConsistency(unassigned))
+                {
+                    List<Object> result = RecursiveBacktracking(assigned, unassigned, numObjects);
+                    if (result != null && result.Count == numObjects)
+                        return result;
+                }
 
-                if (result.Count == numObjects) { return result; }
-                else { assigned.Remove(newObject); unassigned.Insert(0, newObject); }
+                // Backtrack if no solution was found.
+                assigned.Remove(newObject);
+                unassigned.Insert(0, newObject);
             }
+
         }
 
-        return null; // failed
+        return bestSolution; // failed
     }
 
     private bool CheckConstraints(List<Object> assigned, Vector3 domain, Object unassigned)
     {
-        if (assigned.Count == 0) { return true; }
-        if (unassigned.constraint == Constraints.Ceiling) { return true; }
+        if (assigned.Count == 0) { return true; } // nothing to check against
+        if (unassigned.constraint == Constraints.Ceiling) { return true; } // only lights
 
         bool hasPairing = unassigned.properties.Contains(Properties.Paired);
         bool constraintsHold = !hasPairing;
@@ -193,7 +212,7 @@ public class ObjectGeneration : NetworkBehaviour
             // Check pairing
             if (hasPairing && obj.identifier.Equals(unassigned.pairedIdentifier))
             {
-                if (Vector3.Distance(domain, obj.domains[0]) <= 30)
+                if (Vector3.Distance(domain, obj.domains[0]) <= 50)
                 {
                     constraintsHold = true;
                 }
@@ -203,26 +222,104 @@ public class ObjectGeneration : NetworkBehaviour
         return constraintsHold;
     }
 
-    private void ArcConsistency(List<Object> objects)
+    // Assumes your custom object class has at least:
+    //   List<Vector3> domains;
+    //   a constraint field of type Constraints (e.g., Constraints.Ceiling)
+    //   an identifier field (e.g., a string or number)
+    //   a pairedIdentifier field (to match a pair)
+    //   a properties collection (which may contain Properties.Paired)
+    private bool ArcConsistency(List<Object> objects)
     {
-        foreach(Object obj in objects)
+        // Build a queue of all arcs (ordered pairs) between distinct objects.
+        Queue<(Object, Object)> arcs = new Queue<(Object, Object)>();
+        for (int i = 0; i < objects.Count; i++)
         {
-            foreach(Vector3 domain in obj.domains)
+            for (int j = 0; j < objects.Count; j++)
             {
-                // if two objects have the same constraints, check that there is one position that doesn't equal this position for each object
-
-
-
-                // check other constraints here
-
-
-
-                // remove if constraints are not met
+                if (i != j)
+                    arcs.Enqueue((objects[i], objects[j]));
             }
-
-            // if domain == null, arc consistency failed
         }
+
+        // Process the arcs
+        while (arcs.Count > 0)
+        {
+            var (xi, xj) = arcs.Dequeue();
+            if (Revise(xi, xj)) // If any domain value was removed
+            {
+                if (xi.domains.Count == 0)
+                {
+                    Debug.Log("Arc consistency failed: object " + xi.identifier + " has no valid positions left.");
+                    return false;
+                }
+                // Add all arcs (xk, xi) where xk is any neighbor (other object) other than xj.
+                foreach (var xk in objects)
+                {
+                    if (xk != xi && xk != xj)
+                        arcs.Enqueue((xk, xi));
+                }
+            }
+        }
+        return true;
     }
+
+    private bool Revise(Object xi, Object xj)
+    {
+        bool revised = false;
+        // Collect values to remove so we can iterate safely over xi.domains.
+        List<Vector3> removalList = new List<Vector3>();
+
+        foreach (Vector3 vi in xi.domains)
+        {
+            bool hasSupport = false;
+            // Look for at least one value vj in xj's domain that is consistent with vi.
+            foreach (Vector3 vj in xj.domains)
+            {
+                if (CheckBinaryConstraints(xi, vi, xj, vj))
+                {
+                    hasSupport = true;
+                    break;
+                }
+            }
+            // If no valid support exists, mark vi for removal.
+            if (!hasSupport)
+                removalList.Add(vi);
+        }
+        // Remove all unsupported values.
+        foreach (var val in removalList)
+        {
+            xi.domains.Remove(val);
+            revised = true;
+        }
+        return revised;
+    }
+
+    private bool CheckBinaryConstraints(Object obj1, Vector3 value1, Object obj2, Vector3 value2)
+    {
+        // If either object is of type Ceiling (for lights, for example), we assume constraints do not apply.
+        if (obj1.constraint == Constraints.Ceiling || obj2.constraint == Constraints.Ceiling)
+            return true;
+
+        // Standard constraint: two objects (non-ceiling) should not occupy the same position.
+        if (value1.Equals(value2))
+            return false;
+
+        // Check the pairing constraint if applicable.
+        // For instance, if obj1 is paired, then when comparing with its paired object, the positions must be within 50 units.
+        if (obj1.properties.Contains(Properties.Paired) && obj2.identifier.Equals(obj1.pairedIdentifier))
+        {
+            return Vector3.Distance(value1, value2) <= 50;
+        }
+        // Also check the symmetric case.
+        if (obj2.properties.Contains(Properties.Paired) && obj1.identifier.Equals(obj2.pairedIdentifier))
+        {
+            return Vector3.Distance(value1, value2) <= 50;
+        }
+
+        // Otherwise, there’s no additional binary constraint.
+        return true;
+    }
+
 
 
     // -- Object Creation -- //
@@ -244,10 +341,10 @@ public class ObjectGeneration : NetworkBehaviour
                 newObject = SpawnNetworkedObject(parent.transform, objects["button"], tilePos + disp, wallRotations[tilePos]);
                 break;
             case 'b': // box
-                newObject = SpawnNetworkedObject(parent.transform, objects["box"], tilePos + Vector3.up * 5, Quaternion.identity);
+                newObject = SpawnNetworkedObject(parent.transform, objects["box"], tilePos, Quaternion.Euler(-90, 0, randomRotationsY[i]));
                 break;
             case 'C': // Chair
-                newObject = SpawnNetworkedObject(parent.transform, objects["chair"], tilePos, Quaternion.Euler(-90, randomRotationsY[i], 0));
+                newObject = SpawnNetworkedObject(parent.transform, objects["chair"], tilePos, Quaternion.Euler(-90, 0, randomRotationsY[i]));
                 break;
             case 'c': // Coal
                 int chooseRandomObject = Random.Range(0, 3);
@@ -257,7 +354,7 @@ public class ObjectGeneration : NetworkBehaviour
                 newObject = SpawnNetworkedObject(parent.transform, objects["energy core"], tilePos, Quaternion.identity);
                 break;
             case 'F': // Furnace
-                newObject = SpawnNetworkedObject(parent.transform, objects["furnace"], tilePos, Quaternion.Euler(-90, randomRotationsY[i], 0));
+                newObject = SpawnNetworkedObject(parent.transform, objects["furnace"], tilePos, Quaternion.Euler(-90, 0, randomRotationsY[i]));
                 break;
             case 'f': // fan
                 newObject = SpawnNetworkedObject(parent.transform, objects["fan"], tilePos + Vector3.up * 10, Quaternion.Euler(0, randomRotationsY[i], 0));
@@ -459,7 +556,7 @@ public class ObjectGeneration : NetworkBehaviour
 
             // Default for objects without these properties
             default:
-                return Mathf.Min(Random.Range(1, 1 + wiggleRoom), 5);
+                return Mathf.Min(Random.Range(1, 1 + wiggleRoom), 4);
         }
 
     }
@@ -476,7 +573,7 @@ public class ObjectGeneration : NetworkBehaviour
 
     // Some global constraints: objects must be inside room / on wall, objects cannot be assigned to same place as another
 
-    struct Object
+    class Object
     {
         public char identifier;
         public List<Vector3> domains; // all the locations this object can be

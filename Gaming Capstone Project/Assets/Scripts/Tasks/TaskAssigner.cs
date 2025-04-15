@@ -22,6 +22,7 @@ public class TaskAssigner : MonoBehaviour
     [SerializeField] TMP_Text tasksCompleted;
     [SerializeField] GameObject notebook;
     [SerializeField] Interact interactManager;
+    PlayerController playerController;
     TaskManager taskManager;
 
     public bool start = false; // toggle through another function
@@ -38,13 +39,22 @@ public class TaskAssigner : MonoBehaviour
     const string STRIKE_START = "<s>";
     const string STRIKE_END = "</s>";
 
+    private void Start()
+    {
+        playerController = GetComponent<PlayerController>();
+    }
+
     private void Update()
     {
         if (start)
         {
-            AssignTasks();
-            start = false;
-            donow = true;
+            if (playerController.isDopple) { tasksCompleted.text = "You have no tasks, you are a dopple."; }
+            else
+            {
+                AssignTasks();
+                start = false;
+                donow = true;
+            }
         }
         else if (donow)
         {
@@ -76,6 +86,8 @@ public class TaskAssigner : MonoBehaviour
         }
 
         tasksCompleted.text = numTasksFinished + "/" + numTasks;
+
+        if (numTasksFinished == numTasks) { taskManager.UpdateTasks(); numTasks = -1; }
     }
 
     void AssignTasks()
@@ -86,6 +98,8 @@ public class TaskAssigner : MonoBehaviour
 
         for (int i = 0; i < numTasks; i++)
         {
+            if (taskList.Count == 0) { break; }
+
             // Add random tasks from total tasks in task manager
             int newTask = Random.Range(0, taskList.Count - 1);
 
@@ -215,6 +229,9 @@ public class TaskAssigner : MonoBehaviour
     {
         this.transform.GetChild(0).gameObject.SetActive(!notebook.activeSelf);
         notebook.SetActive(!notebook.activeSelf);
+
+        if (notebook.activeSelf) { Cursor.lockState = CursorLockMode.None; }
+        else { Cursor.lockState = CursorLockMode.Locked; }
     }
 
     void ShowCurrentTask()

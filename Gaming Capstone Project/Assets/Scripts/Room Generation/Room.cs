@@ -115,14 +115,14 @@ public class Room : NetworkBehaviour
     /// <summary> Creates new bounds for a room </summary>
     void GenerateNewRoom()
     {
-        size = Random.Range(10, 20);
+        size = Random.Range(11, 20);
         objectLocations = new char[size, size]; // set random room size
 
         int numSquares = Random.Range(1, 5); // determine how many squares will be generated
 
         for (int i = 0; i < numSquares; i++) // for each square, place randomly in the grid
         {
-            int x0 = Random.Range(3, size - 6); // leave gap on edges
+            int x0 = Random.Range(4, size - 6); // leave gap on edges
             int y0 = Random.Range(3, size - 6);
             int width = Random.Range(3, size - (x0 + 3)); // at least 3 w&h to prevent small rooms
             int height = Random.Range(3, size - (y0 + 3));

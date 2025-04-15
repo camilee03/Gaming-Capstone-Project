@@ -173,7 +173,7 @@ public class RoomGeneration : NetworkBehaviour
                         (wallForward == Vector3.right) ? 2 : 3;
 
         // replace wall with door
-        Destroy(wallParent.transform.GetChild(index).gameObject);
+        wallParent.transform.GetChild(index).GetComponent<NetworkObject>().Despawn(true);
         GameObject newDoor = SpawnNetworkedObject(wallParent.transform, doors, wallPosition, wallRotation);
         newDoor.name = "Door" + direction;
 
@@ -272,7 +272,7 @@ public class RoomGeneration : NetworkBehaviour
         tile1 = ComputeDoorTile(dar1.door);
         tile2 = ComputeDoorTile(dar2.door);
 
-        Debug.Log($"Tile1 {tile1} Tile2 {tile2}");
+        //Debug.Log($"Tile1 {tile1} Tile2 {tile2}");
 
         // Create a path in between doors
         List<Vector3> hallwayPath = GeneralFunctions.FindShortestAvoidingTiles(tile1, tile2, scale);
@@ -288,7 +288,8 @@ public class RoomGeneration : NetworkBehaviour
         for (int i = 0; i < hallwayPath.Count - 1; i++)
         {
             SpawnNetworkedObject(hallwayParent.transform, tiles, hallwayPath[i], Quaternion.identity);
-            DrawWallsAroundDoors(prevPos, hallwayPath[i], hallwayPath[i + 1], hallwayParent, new Vector3[] { dar1.door.transform.position, dar2.door.transform.position});
+            List<Vector3> wallPositions = RoomFunctions.GetAllWallPositions();
+            DrawWallsAroundDoors(prevPos, hallwayPath[i], hallwayPath[i + 1], hallwayParent, wallPositions);
             prevPos = hallwayPath[i];
         }
 
@@ -305,24 +306,32 @@ public class RoomGeneration : NetworkBehaviour
     }
 
     /// <summary> Outlines a hallway with walls </summary>
-    void DrawWallsAroundDoors(Vector3 prevPos, Vector3 pos, Vector3 nextPos, GameObject parent, Vector3[] doors)
+    void DrawWallsAroundDoors(Vector3 prevPos, Vector3 pos, Vector3 nextPos, GameObject parent, List<Vector3> wallPos)
     {
-        List<Vector3> positions = new List<Vector3>{pos+Vector3.right*scale, pos+Vector3.forward*scale, 
-            pos+Vector3.left*scale,  pos+Vector3.back*scale};
+        List<Vector3> positions = new List<Vector3>{pos+Vector3.left*scale, pos+Vector3.back*scale, 
+            pos+Vector3.right*scale,  pos+Vector3.forward*scale};
+
+        // Define outward directions for walls
+        Vector3[] outwardDirections = new Vector3[4] {
+        Vector3.left,    // Pointing West
+        Vector3.back,    // Pointing North
+        Vector3.right,   // Pointing East
+        Vector3.forward  // Pointing South
+        };
 
         Vector3 spawnLeft = new Vector3(pos.x + scale / 2, 2.5f, pos.z);
+        Vector3 spawnBelow = new Vector3(pos.x, 2.5f, pos.z - scale / 2);
         Vector3 spawnRight = new Vector3(pos.x - scale / 2, 2.5f, pos.z);
         Vector3 spawnAbove = new Vector3(pos.x, 2.5f, pos.z + scale / 2);
-        Vector3 spawnBelow = new Vector3(pos.x, 2.5f, pos.z - scale / 2);
-        Vector3[] spawnPos = new Vector3[4] { spawnLeft, spawnAbove, spawnRight, spawnBelow };
+        Vector3[] spawnPos = new Vector3[4] { spawnLeft, spawnBelow, spawnRight, spawnAbove };
 
         for (int i=0; i<positions.Count; i++)
         {
-            if (!doors.Contains(spawnPos[i]) && positions[i] != prevPos && positions[i] != nextPos)
+            if (!wallPos.Contains(RoomFunctions.RoundVector3(spawnPos[i])) && positions[i] != prevPos && positions[i] != nextPos)
             {
                 GameObject newObject = SpawnNetworkedObject(parent.transform, walls, Vector3.zero, Quaternion.identity);
                 newObject.transform.position = spawnPos[i];
-                newObject.transform.localRotation = Quaternion.Euler(-90, ((i + 1) % 2) * 90, 0);
+                newObject.transform.rotation = Quaternion.LookRotation(outwardDirections[i], Vector3.up) * Quaternion.Euler(-90, 0, 0);
             }
         }
     }

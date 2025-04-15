@@ -143,7 +143,6 @@ public class GameController : NetworkBehaviour
 
     private void StartRoomGeneration()
     {
-        Debug.Log("SPAWNING");
         GameObject.Find("RoomGenerationManager").GetComponent<RoomGeneration>().StartGeneration(numPlayers);
     }
 

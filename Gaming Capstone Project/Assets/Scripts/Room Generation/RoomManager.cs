@@ -15,7 +15,7 @@ public class RoomManager : MonoBehaviour
     }
 
     public List<Room> rooms;
-    public List<Vector3> spawnPoints;
+    public List<GameObject> spawnPoints;
 
     public void InitializeSpawnPoints()
     {
@@ -28,7 +28,11 @@ public class RoomManager : MonoBehaviour
                 sumVector += child.position;
             }
             Vector3 centerVector = sumVector / t.GetChild(0).childCount;
-            spawnPoints.Add(centerVector);
+            centerVector.y = 5;
+            GameObject spawnPoint = new GameObject("SpawnPoint");
+            spawnPoint.transform.position = centerVector;
+            GameController.Instance.RegisterSpawnPoint(spawnPoint.transform);
+            spawnPoints.Add(spawnPoint);
         }
     }
 }
