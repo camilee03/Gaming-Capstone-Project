@@ -19,18 +19,20 @@ public class MapCam : MonoBehaviour
         midPoint = midPoint / rm.spawnPoints.Count;
         float maxDistance = 0;
         Vector3 maxDistanceVector;
+        float maxDistanceSize = 0;
         for (int i = 0; i < rm.spawnPoints.Count; i++)
         {
             Vector3 pt = rm.spawnPoints[i].transform.position;
             if (Vector3.Distance(pt, midPoint) > maxDistance)
             {
                 maxDistance = Vector3.Distance(pt, midPoint);
+                maxDistanceSize = rm.rooms[i].size * rm.rooms[i].scale;
                 maxDistanceVector = pt;
             }
         }
         foreach (Camera cam in cams)
         {
-            cam.orthographicSize = maxDistance * 1.1f;
+            cam.orthographicSize = maxDistance + maxDistanceSize / 4;
         }
         transform.position = new Vector3(midPoint.x, 30, midPoint.z);
         Debug.Log("Mid Position: " + transform.position);

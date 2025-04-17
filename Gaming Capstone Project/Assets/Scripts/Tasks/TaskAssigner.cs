@@ -231,8 +231,8 @@ public class TaskAssigner : MonoBehaviour
     {
         anim.SetLayerWeight(3, 1 - anim.GetLayerWeight(3));
 
-        if (notebook.activeSelf) { Cursor.lockState = CursorLockMode.None; }
-        else { Cursor.lockState = CursorLockMode.Locked; }
+        if (notebook.activeSelf) { Cursor.lockState = CursorLockMode.Locked; }
+        else { Cursor.lockState = CursorLockMode.None; }
     }
 
     void ShowCurrentTask()

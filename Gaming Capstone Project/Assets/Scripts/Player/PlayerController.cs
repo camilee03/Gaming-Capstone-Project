@@ -405,16 +405,19 @@ public void ForceSetColorServerRpc(int colorIndex)
     }
     public void Morph(InputAction.CallbackContext context)
     {
-        if (context.performed && IsOwner)
+        if (canMove)
         {
-            if (isDopple && !isTransformed)
+            if (context.performed && IsOwner)
             {
-                isTransformed = true;
-                StartCoroutine(Morph());
+                if (isDopple && !isTransformed)
+                {
+                    isTransformed = true;
+                    StartCoroutine(Morph());
+                }
+                else isTransformed = false;
+                if (useAnimator)
+                    animator.SetBool("Transformed", isTransformed);
             }
-            else isTransformed = false;
-            if (useAnimator)
-                animator.SetBool("Transformed", isTransformed);
         }
     }
 
