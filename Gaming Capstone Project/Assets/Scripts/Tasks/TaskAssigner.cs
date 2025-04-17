@@ -110,7 +110,7 @@ public class TaskAssigner : MonoBehaviour
 
             // Add new task checkbox
             goalTextResult = "Task " + i + ": " + DisplayText(taskList[newTask]) + "\n";
-            CreateCheckboxes(new Vector3(-200, 400 - i * 100, 0), i, goalTextResult);
+            CreateCheckboxes(new Vector3(200 + (i * 100), -200, 0), i, goalTextResult);
         }
 
         finishedTasks = new Dictionary<RoomTask, bool>();
@@ -229,11 +229,10 @@ public class TaskAssigner : MonoBehaviour
 
     public void OpenTaskMenu(InputAction.CallbackContext context)
     {
-        notebook.SetActive(!notebook.activeSelf);
         anim.SetLayerWeight(3, 1 - anim.GetLayerWeight(3));
 
-        if (notebook.activeSelf) { Cursor.lockState = CursorLockMode.None; }
-        else { Cursor.lockState = CursorLockMode.Locked; }
+        if (notebook.activeSelf) { Cursor.lockState = CursorLockMode.Locked; }
+        else { Cursor.lockState = CursorLockMode.None; }
     }
 
     void ShowCurrentTask()

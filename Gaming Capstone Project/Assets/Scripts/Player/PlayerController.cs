@@ -72,6 +72,8 @@ public class PlayerController : NetworkBehaviour
 
 
     public CanvasGroup VotingScreen;
+    bool point, wave;
+
     public override void OnNetworkSpawn()
     {
         playerInput = GetComponent<PlayerInput>();
@@ -263,6 +265,21 @@ public void ForceSetColorServerRpc(int colorIndex)
             animator.SetBool("Grounded", isGrounded);
             animator.SetBool("Transformed", isTransformed);
             animator.SetFloat("YVelocity", rgd.linearVelocity.y);
+
+            if (wave)
+            {
+                animator.SetLayerWeight(4, 1);//set emote layer weight to 1
+                animator.SetFloat("currentEmote", 0);
+            }
+            else if (point)
+            {
+                animator.SetLayerWeight(4, 1);//set emote layer weight to 1
+                animator.SetFloat("currentEmote", 1);
+            }
+            else
+            {
+                animator.SetLayerWeight(4, 0);
+            }
         }
 
         // Handle movement (if allowed)
@@ -388,16 +405,19 @@ public void ForceSetColorServerRpc(int colorIndex)
     }
     public void Morph(InputAction.CallbackContext context)
     {
-        if (context.performed && IsOwner)
+        if (canMove)
         {
-            if (isDopple && !isTransformed)
+            if (context.performed && IsOwner)
             {
-                isTransformed = true;
-                StartCoroutine(Morph());
+                if (isDopple && !isTransformed)
+                {
+                    isTransformed = true;
+                    StartCoroutine(Morph());
+                }
+                else isTransformed = false;
+                if (useAnimator)
+                    animator.SetBool("Transformed", isTransformed);
             }
-            else isTransformed = false;
-            if (useAnimator)
-                animator.SetBool("Transformed", isTransformed);
         }
     }
 
@@ -408,6 +428,16 @@ public void ForceSetColorServerRpc(int colorIndex)
         yield return new WaitForSeconds(1.1f);
         canMove = true;
         canAttack = true;
+    }
+
+
+    public void Point(InputAction.CallbackContext context)
+    {
+        point = context.ReadValueAsButton();
+    }
+    public void Wave(InputAction.CallbackContext context)
+    {
+        wave = context.ReadValueAsButton();
     }
 
     public void Attack(InputAction.CallbackContext context)

@@ -23,8 +23,8 @@ public class Room : NetworkBehaviour
 
     List<GameObject> spawnedTiles = new();
 
-    int size;
-    float scale;
+    [HideInInspector] public int size;
+    [HideInInspector] public float scale;
 
     [Header("Spawn Type")]
     GameObject tile;

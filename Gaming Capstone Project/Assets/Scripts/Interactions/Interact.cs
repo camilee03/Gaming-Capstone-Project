@@ -36,29 +36,33 @@ public class Interact : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        HitScan();
+        if (!anim.GetBool("Transformed"))
+            HitScan();
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E)) { OnClick(); }
 
-        // Shows the pickedup object in hand
-        if (!canPickup && pickedupObject != null)
-        {
-            pickedupObject.transform.position = rightHand.position + (rightHand.forward * offset.x) + (rightHand.up * offset.y) + (rightHand.right * offset.z);
-            pickedupObject.transform.rotation = rightHand.rotation;
-        }
-        
         //Check for Doppel Transform, must drop if transformed.
         if (anim.GetBool("Transformed"))
         {
             Place();
             canPickup = false;
         }
-        else if (pickedupObject == null) //reenable picking up if untransformed.
+        else
         {
-            canPickup = true;
+            if (pickedupObject == null) //reenable picking up if untransformed.
+            {
+                canPickup = true;
+            }
+            if (Input.GetKeyDown(KeyCode.E)) { OnClick(); }
+
+            // Shows the pickedup object in hand
+            if (!canPickup && pickedupObject != null)
+            {
+                pickedupObject.transform.position = rightHand.position + (rightHand.forward * offset.x) + (rightHand.up * offset.y) + (rightHand.right * offset.z);
+                pickedupObject.transform.rotation = rightHand.rotation;
+            }
         }
 
     }
@@ -101,11 +105,13 @@ public class Interact : NetworkBehaviour
                     break;
                 case "Chair":
                     chairSittingIn = highlightedObject;
-                    chairSittingIn.GetComponent<Collider>().enabled = false;
+                    foreach (Collider col in chairSittingIn.GetComponents<Collider>())
+                        col.enabled = false;
                     player.canMove = false;
                     sitting = true;
-                    player.transform.position = new Vector3(chairSittingIn.transform.position.x, player.transform.position.y,chairSittingIn.transform.position.z) + chairSittingIn.transform.forward * 0.36f;
-                    player.transform.rotation = Quaternion.EulerAngles(new Vector3(0, chairSittingIn.transform.localRotation.eulerAngles.z, 0));
+                    anim.SetBool("Sitting", true);
+                    player.transform.position = new Vector3(chairSittingIn.transform.position.x, player.transform.position.y,chairSittingIn.transform.position.z) + chairSittingIn.transform.up * 0.36f;
+                    player.transform.rotation = Quaternion.Euler(new Vector3(0, chairSittingIn.transform.rotation.eulerAngles.y, 0));
                     break;
             }
         }
@@ -114,15 +120,14 @@ public class Interact : NetworkBehaviour
                 Place();
             else if (sitting)
             {
-                if (sitting)
-                {
-                    sitting = false;
-                    chairSittingIn.GetComponent<Collider>().enabled = true;
-                    player.canMove = true;
-                    sitting = false;
-                    player.transform.position = new Vector3(chairSittingIn.transform.position.x, player.transform.position.y, chairSittingIn.transform.position.z) + chairSittingIn.transform.forward * 1f;
-                    chairSittingIn = null;
-                }
+                sitting = false;
+                foreach (Collider col in chairSittingIn.GetComponents<Collider>())
+                    col.enabled = true;
+                player.canMove = true;
+                sitting = false;
+                anim.SetBool("Sitting", false);
+                player.transform.position = new Vector3(chairSittingIn.transform.position.x, player.transform.position.y, chairSittingIn.transform.position.z) + chairSittingIn.transform.up * 1f;
+                chairSittingIn = null;
             }
         }
     }
