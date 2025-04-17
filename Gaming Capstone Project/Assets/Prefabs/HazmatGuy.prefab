@@ -670,7 +670,7 @@ Transform:
   m_GameObject: {fileID: 1027052324192167614}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.02498, z: 0.005}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1453,6 +1453,9 @@ GameObject:
   - component: {fileID: 4257613629345953098}
   - component: {fileID: 917763358606224804}
   - component: {fileID: 730179910265013865}
+  - component: {fileID: 4280053529718459018}
+  - component: {fileID: 33642597598672953}
+  - component: {fileID: 3111002669551901148}
   - component: {fileID: 8940150618810314082}
   - component: {fileID: 3410276990868744084}
   - component: {fileID: 4034896462899514786}
@@ -1724,7 +1727,7 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 2
+        m_CallState: 1
     m_ActionId: 6c2ab1b8-8984-453a-af3d-a3c78ae1679a
     m_ActionName: 'Player/Attack[/Mouse/leftButton,/Keyboard/enter]'
   - m_PersistentCalls:
@@ -1968,6 +1971,47 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   Speed: 5
+--- !u!114 &4280053529718459018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1640891303535538884}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fe30a646720a4d48b3d494eb871eb69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  localPlayerHead: {fileID: 772185668066212194}
+  newVolumeMinusPlus50: 0
+--- !u!114 &33642597598672953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1640891303535538884}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c463018fda20d04481533a2de008160, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  proximityChat: {fileID: 3111002669551901148}
+--- !u!114 &3111002669551901148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1640891303535538884}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6f21259f7d556840910120c7e0bfc39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 1640891303535538884}
 --- !u!114 &8940150618810314082
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4438,7 +4482,7 @@ Transform:
   m_GameObject: {fileID: 6976586360405549163}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 0.007, z: 0.0005}
+  m_LocalPosition: {x: -0, y: 0.0058, z: 0.0005}
   m_LocalScale: {x: 0.5, y: 0.50000024, z: 0.49999997}
   m_ConstrainProportionsScale: 0
   m_Children:

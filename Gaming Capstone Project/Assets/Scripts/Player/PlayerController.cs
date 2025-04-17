@@ -67,6 +67,10 @@ public class PlayerController : NetworkBehaviour
     public NetworkVariable<Vector3> LastAssignedSpawnPos = new NetworkVariable<Vector3>();
     public NetworkVariable<int> ColorID = new NetworkVariable<int>(-1);
 
+    [Header("Death Visuals")]
+    public GameObject playerModel; // Assign in Inspector: this should be the mesh or object representing the visible character
+
+
     public CanvasGroup VotingScreen;
     public override void OnNetworkSpawn()
     {
@@ -83,8 +87,6 @@ public class PlayerController : NetworkBehaviour
             playerInput.enabled = true;
             cam.gameObject.SetActive(true);
             camMovement.enabled = true;
-            al.enabled = true;
-            PlayerDisplay.SetActive(true);
         }
         else
         {
@@ -254,18 +256,6 @@ public void ForceSetColorServerRpc(int colorIndex)
             if (!IsOwner || !IsSpawned) return;
         }
 
-        // If we're dead, show death screen, disable movement, then exit
-        if (isDead)
-        {
-            canMove = false;
-            if (DeathScreen.alpha == 0)
-            {
-                Debug.Log("dead as hell");
-                DeathScreen.DOFade(1, 3);
-            }
-            return;
-        }
-
         // Check if on the ground
         isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayer);
         if (useAnimator)
@@ -354,11 +344,17 @@ public void ForceSetColorServerRpc(int colorIndex)
 
     private void FixedUpdate()
     {
-        // If not grounded and character is moving downward, apply extra downward force
-        if (!isGrounded && rgd.linearVelocity.y < 0)
+        if(isDead)
         {
-            // Multiply the default gravity effect to make the character fall faster
-            rgd.linearVelocity += Vector3.up * (Physics.gravity.y * (fallMultiplier - 1) * Time.fixedDeltaTime);
+            return;
+        }
+        else {
+            // If not grounded and character is moving downward, apply extra downward force
+            if (!isGrounded && rgd.linearVelocity.y < 0)
+            {
+                // Multiply the default gravity effect to make the character fall faster
+                rgd.linearVelocity += Vector3.up * (Physics.gravity.y * (fallMultiplier - 1) * Time.fixedDeltaTime);
+            }
         }
     }
 
@@ -392,7 +388,7 @@ public void ForceSetColorServerRpc(int colorIndex)
     }
     public void Morph(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.performed && IsOwner)
         {
             if (isDopple && !isTransformed)
             {
@@ -420,7 +416,7 @@ public void ForceSetColorServerRpc(int colorIndex)
         // If you want only Dopples to do this, check isDopple here:
         // if (!isDopple) return;
 
-        if (context.performed && canAttack)
+        if (context.performed && canAttack && IsOwner)
         {
             // Start the cooldown
             canAttack = false;
@@ -463,8 +459,46 @@ public void ForceSetColorServerRpc(int colorIndex)
     {
         isDead = true;
         Debug.Log($"[ClientRpc] KillClientRpc => Player {OwnerClientId} is now dead.");
+        StartCoroutine(EnterGhostMode());
         // The next Update() will show the death screen and disable movement.
     }
+
+private IEnumerator EnterGhostMode()
+{
+    isDead = true;
+    canMove = false;
+
+    Debug.Log($"[Client] Entering ghost mode for Player {OwnerClientId}");
+
+    // Fade in the death screen
+    if (DeathScreen != null && IsOwner)
+        DeathScreen.DOFade(1, 2f);
+
+    yield return new WaitForSeconds(3f); // time to show death screen
+
+    // Fade out the death screen
+    if (DeathScreen != null && IsOwner)
+        DeathScreen.DOFade(0, 2f);
+
+    // Make the player invisible
+    if (playerModel != null)
+        playerModel.SetActive(false);
+
+    // Disable the collider so they can walk through stuff
+    Collider col = GetComponent<Collider>();
+    if (col != null)
+        col.enabled = false;
+
+    // Disable attacking if you want
+    canAttack = false;
+
+    // Now allow movement again (ghost mode)
+    canMove = true;
+
+    Debug.Log($"[Client] Player {OwnerClientId} is now a ghost.");
+}
+
+
 
     // Helper method to cleanly stop sprinting logic
     private void StopSprinting()
