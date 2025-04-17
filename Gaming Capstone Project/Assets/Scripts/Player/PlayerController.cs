@@ -120,18 +120,6 @@ public class PlayerController : NetworkBehaviour
             if (!IsOwner || !IsSpawned) return;
         }
 
-        // If we're dead, show death screen, disable movement, then exit
-        if (isDead && IsOwner)
-        {
-            canMove = false;
-            if (DeathScreen.alpha == 0)
-            {
-                Debug.Log("dead as hell");
-                DeathScreen.DOFade(1, 3);
-            }
-            return;
-        }
-
         // Check if on the ground
         isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayer);
         animator.SetBool("Grounded", isGrounded);
@@ -216,11 +204,17 @@ public class PlayerController : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        // If not grounded and character is moving downward, apply extra downward force
-        if (!isGrounded && rgd.linearVelocity.y < 0)
+        if(isDead)
         {
-            // Multiply the default gravity effect to make the character fall faster
-            rgd.linearVelocity += Vector3.up * (Physics.gravity.y * (fallMultiplier - 1) * Time.fixedDeltaTime);
+            return;
+        }
+        else {
+            // If not grounded and character is moving downward, apply extra downward force
+            if (!isGrounded && rgd.linearVelocity.y < 0)
+            {
+                // Multiply the default gravity effect to make the character fall faster
+                rgd.linearVelocity += Vector3.up * (Physics.gravity.y * (fallMultiplier - 1) * Time.fixedDeltaTime);
+            }
         }
     }
 
@@ -319,20 +313,46 @@ public class PlayerController : NetworkBehaviour
     // Called on the victim to set isDead = true,
     // show the death screen, etc.
     // ------------------------------------------------
-    [ClientRpc]
-    private void KillClientRpc()
-    {
-        isDead = true;
-        Debug.Log($"[ClientRpc] KillClientRpc => Player {OwnerClientId} is now dead.");
-        // The next Update() will show the death screen and disable movement.
-        if (playerModel != null)
-            playerModel.SetActive(false);
+[ClientRpc]
+private void KillClientRpc()
+{
+    StartCoroutine(EnterGhostMode());
+}
 
-        // Optional: disable collider if needed
-        Collider col = GetComponent<Collider>();
-        if (col != null)
-            col.enabled = false;
-    }
+private IEnumerator EnterGhostMode()
+{
+    isDead = true;
+    canMove = false;
+
+    Debug.Log($"[Client] Entering ghost mode for Player {OwnerClientId}");
+
+    // Fade in the death screen
+    if (DeathScreen != null && IsOwner)
+        DeathScreen.DOFade(1, 2f);
+
+    yield return new WaitForSeconds(3f); // time to show death screen
+
+    // Fade out the death screen
+    if (DeathScreen != null && IsOwner)
+        DeathScreen.DOFade(0, 2f);
+
+    // Make the player invisible
+    if (playerModel != null)
+        playerModel.SetActive(false);
+
+    // Disable the collider so they can walk through stuff
+    Collider col = GetComponent<Collider>();
+    if (col != null)
+        col.enabled = false;
+
+    // Disable attacking if you want
+    canAttack = false;
+
+    // Now allow movement again (ghost mode)
+    canMove = true;
+
+    Debug.Log($"[Client] Player {OwnerClientId} is now a ghost.");
+}
 
 
 
