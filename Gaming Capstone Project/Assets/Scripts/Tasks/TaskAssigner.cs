@@ -21,7 +21,11 @@ public class TaskAssigner : MonoBehaviour
     // Task display
     [SerializeField] TMP_Text tasksCompleted;
     [SerializeField] GameObject notebook;
+<<<<<<< Updated upstream
     [SerializeField] GameObject taskLayoutGroup;
+=======
+    [SerializeField] GameObject TaskCanvas;
+>>>>>>> Stashed changes
     [SerializeField] Interact interactManager;
     PlayerController playerController;
     TaskManager taskManager;
@@ -36,6 +40,8 @@ public class TaskAssigner : MonoBehaviour
     [SerializeField] GameObject defaultToggle;
     ToggleGroup toggleGroup;
     List<Toggle> toggles = new List<Toggle>();
+    public Animator anim;
+
     public Animator anim;
 
     const string STRIKE_START = "<s>";
@@ -110,7 +116,7 @@ public class TaskAssigner : MonoBehaviour
 
             // Add new task checkbox
             goalTextResult = "Task " + i + ": " + DisplayText(taskList[newTask]) + "\n";
-            CreateCheckboxes(new Vector3(-200, 400 - i * 100, 0), i, goalTextResult);
+            CreateCheckboxes(new Vector3(200 + (i * 100), -200, 0), i, goalTextResult);
         }
 
         finishedTasks = new Dictionary<RoomTask, bool>();
@@ -229,11 +235,17 @@ public class TaskAssigner : MonoBehaviour
 
     public void OpenTaskMenu(InputAction.CallbackContext context)
     {
+<<<<<<< Updated upstream
         notebook.SetActive(!notebook.activeSelf);
         anim.SetLayerWeight(3, 1 - anim.GetLayerWeight(3));
 
         if (notebook.activeSelf) { Cursor.lockState = CursorLockMode.None; }
         else { Cursor.lockState = CursorLockMode.Locked; }
+=======
+        anim.SetLayerWeight(3, 1 - anim.GetLayerWeight(3));
+        //this.transform.GetChild(0).gameObject.SetActive(!notebook.activeSelf);
+        //notebook.SetActive(!notebook.activeSelf);
+>>>>>>> Stashed changes
     }
 
     void ShowCurrentTask()
@@ -261,6 +273,7 @@ public class TaskAssigner : MonoBehaviour
         // Instantiate toggle
         GameObject newToggleObject = GameObject.Instantiate(defaultToggle);
         newToggleObject.name = number.ToString();
+<<<<<<< Updated upstream
         newToggleObject.transform.SetParent(taskLayoutGroup.transform); // gets canvas
 
         RectTransform toggleTransform = newToggleObject.GetComponent<RectTransform>();
@@ -268,6 +281,12 @@ public class TaskAssigner : MonoBehaviour
         toggleTransform.localPosition = Vector3.zero;
 
         toggleTransform.localScale = new Vector3(6, 2, 2);
+=======
+        newToggleObject.transform.parent = TaskCanvas.transform; // gets canvas
+        newToggleObject.GetComponent<RectTransform>().localRotation = Quaternion.identity;
+        newToggleObject.GetComponent<RectTransform>().localPosition = Vector3.zero;
+        newToggleObject.GetComponent<RectTransform>().localScale = new Vector3(6, 2, 2);
+>>>>>>> Stashed changes
 
         // Get & set components
         Toggle newToggle = newToggleObject.GetComponent<Toggle>();

@@ -134,6 +134,24 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Point"",
+                    ""type"": ""Button"",
+                    ""id"": ""f97b677d-df06-4be3-995b-859ee8455f41"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Wave"",
+                    ""type"": ""Button"",
+                    ""id"": ""7a023581-13bf-4fa2-89cb-dd9d2a211d57"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -508,6 +526,28 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""Notebook"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2129acde-6c16-422b-a685-220dfe2cd8bc"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Wave"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6a922eb6-f565-40e4-a4f2-4cd82e63e529"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Point"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1107,6 +1147,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_FlashLightToggle = m_Player.FindAction("FlashLightToggle", throwIfNotFound: true);
         m_Player_Morph = m_Player.FindAction("Morph", throwIfNotFound: true);
         m_Player_Notebook = m_Player.FindAction("Notebook", throwIfNotFound: true);
+        m_Player_Point = m_Player.FindAction("Point", throwIfNotFound: true);
+        m_Player_Wave = m_Player.FindAction("Wave", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1198,6 +1240,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_FlashLightToggle;
     private readonly InputAction m_Player_Morph;
     private readonly InputAction m_Player_Notebook;
+    private readonly InputAction m_Player_Point;
+    private readonly InputAction m_Player_Wave;
     public struct PlayerActions
     {
         private @InputSystem_Actions m_Wrapper;
@@ -1214,6 +1258,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         public InputAction @FlashLightToggle => m_Wrapper.m_Player_FlashLightToggle;
         public InputAction @Morph => m_Wrapper.m_Player_Morph;
         public InputAction @Notebook => m_Wrapper.m_Player_Notebook;
+        public InputAction @Point => m_Wrapper.m_Player_Point;
+        public InputAction @Wave => m_Wrapper.m_Player_Wave;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1259,6 +1305,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Notebook.started += instance.OnNotebook;
             @Notebook.performed += instance.OnNotebook;
             @Notebook.canceled += instance.OnNotebook;
+            @Point.started += instance.OnPoint;
+            @Point.performed += instance.OnPoint;
+            @Point.canceled += instance.OnPoint;
+            @Wave.started += instance.OnWave;
+            @Wave.performed += instance.OnWave;
+            @Wave.canceled += instance.OnWave;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -1299,6 +1351,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Notebook.started -= instance.OnNotebook;
             @Notebook.performed -= instance.OnNotebook;
             @Notebook.canceled -= instance.OnNotebook;
+            @Point.started -= instance.OnPoint;
+            @Point.performed -= instance.OnPoint;
+            @Point.canceled -= instance.OnPoint;
+            @Wave.started -= instance.OnWave;
+            @Wave.performed -= instance.OnWave;
+            @Wave.canceled -= instance.OnWave;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -1493,6 +1551,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         void OnFlashLightToggle(InputAction.CallbackContext context);
         void OnMorph(InputAction.CallbackContext context);
         void OnNotebook(InputAction.CallbackContext context);
+        void OnPoint(InputAction.CallbackContext context);
+        void OnWave(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {
