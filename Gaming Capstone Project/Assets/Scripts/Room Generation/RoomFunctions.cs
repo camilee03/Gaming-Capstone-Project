@@ -151,6 +151,6 @@ public class RoomFunctions : ScriptableObject
 
     public static Vector3 RoundVector3(Vector3 vector)
     {
-        return new Vector3((int)Mathf.Round(vector.x), (int)Mathf.Round(vector.y), (int)Mathf.Round(vector.z));
+        return new Vector3((int)Mathf.Round(vector.x), 2.5f, (int)Mathf.Round(vector.z));
     }
 }
