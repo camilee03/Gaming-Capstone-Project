@@ -156,15 +156,13 @@ public class Room : NetworkBehaviour
         {
             if (locations[i]) // if can spawn
             {
-                newObject = SpawnNetworkedObject(parent, child, Vector3.zero, Quaternion.identity);
-                newObject.transform.position = RoomFunctions.ConvertTileToPos(x, y, i, true, scale);
-
                 // Calculate the outward direction
                 Vector3 outwardDir = outwardDirections[i];
 
                 // Combine -90 degrees on x-axis with outward direction rotation
                 Quaternion wallRotation = Quaternion.LookRotation(outwardDir, Vector3.up) * Quaternion.Euler(-90, 0, 0);
-                newObject.transform.rotation = wallRotation;
+                newObject = SpawnNetworkedObject(parent, child, RoomFunctions.ConvertTileToPos(x, y, i, true, scale), wallRotation);
+
 
                 newObject.name = "Wall" + i;
 
