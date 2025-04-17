@@ -67,16 +67,13 @@ public class PlayerController : NetworkBehaviour
     public NetworkVariable<Vector3> LastAssignedSpawnPos = new NetworkVariable<Vector3>();
     public NetworkVariable<int> ColorID = new NetworkVariable<int>(-1);
 
-<<<<<<< Updated upstream
     [Header("Death Visuals")]
     public GameObject playerModel; // Assign in Inspector: this should be the mesh or object representing the visible character
 
 
     public CanvasGroup VotingScreen;
-=======
     bool point, wave;
 
->>>>>>> Stashed changes
     public override void OnNetworkSpawn()
     {
         playerInput = GetComponent<PlayerInput>();
