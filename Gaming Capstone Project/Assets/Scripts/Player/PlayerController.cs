@@ -67,11 +67,16 @@ public class PlayerController : NetworkBehaviour
     public NetworkVariable<Vector3> LastAssignedSpawnPos = new NetworkVariable<Vector3>();
     public NetworkVariable<int> ColorID = new NetworkVariable<int>(-1);
 
+<<<<<<< Updated upstream
     [Header("Death Visuals")]
     public GameObject playerModel; // Assign in Inspector: this should be the mesh or object representing the visible character
 
 
     public CanvasGroup VotingScreen;
+=======
+    bool point, wave;
+
+>>>>>>> Stashed changes
     public override void OnNetworkSpawn()
     {
         playerInput = GetComponent<PlayerInput>();
@@ -263,6 +268,21 @@ public void ForceSetColorServerRpc(int colorIndex)
             animator.SetBool("Grounded", isGrounded);
             animator.SetBool("Transformed", isTransformed);
             animator.SetFloat("YVelocity", rgd.linearVelocity.y);
+
+            if (wave)
+            {
+                animator.SetLayerWeight(4, 1);//set emote layer weight to 1
+                animator.SetFloat("currentEmote", 0);
+            }
+            else if (point)
+            {
+                animator.SetLayerWeight(4, 1);//set emote layer weight to 1
+                animator.SetFloat("currentEmote", 1);
+            }
+            else
+            {
+                animator.SetLayerWeight(4, 0);
+            }
         }
 
         // Handle movement (if allowed)
@@ -408,6 +428,16 @@ public void ForceSetColorServerRpc(int colorIndex)
         yield return new WaitForSeconds(1.1f);
         canMove = true;
         canAttack = true;
+    }
+
+
+    public void Point(InputAction.CallbackContext context)
+    {
+        point = context.ReadValueAsButton();
+    }
+    public void Wave(InputAction.CallbackContext context)
+    {
+        wave = context.ReadValueAsButton();
     }
 
     public void Attack(InputAction.CallbackContext context)

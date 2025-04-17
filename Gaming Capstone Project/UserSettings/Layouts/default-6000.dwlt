@@ -1169,7 +1169,11 @@ MonoBehaviour:
   m_AudioPlay: 0
   m_DebugDrawModesUseInteractiveLightBakingData: 0
   m_Position:
+<<<<<<< Updated upstream
     m_Target: {x: 0, y: 0, z: 0}
+=======
+    m_Target: {x: -30.931335, y: 116.65643, z: -35.446648}
+>>>>>>> Stashed changes
     speed: 2
     m_Value: {x: 158.84616, y: 10, z: 219.23077}
   m_RenderMode: 0
@@ -1217,11 +1221,19 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
+<<<<<<< Updated upstream
     m_Target: {x: -0.08717229, y: 0.89959055, z: -0.21045254, w: -0.3726226}
+=======
+    m_Target: {x: 0.65740854, y: -0.017175386, z: 0.014991877, w: 0.7531905}
+>>>>>>> Stashed changes
     speed: 2
     m_Value: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
   m_Size:
+<<<<<<< Updated upstream
     m_Target: 10
+=======
+    m_Target: 286.29056
+>>>>>>> Stashed changes
     speed: 2
     m_Value: 28.693844
   m_Ortho:

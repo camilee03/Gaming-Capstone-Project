@@ -102,20 +102,16 @@ public class RoomFunctions : ScriptableObject
         float maxZ = -1000000;
 
         float deviation = 100;
-
         foreach (Room room in RoomManager.Instance.rooms)
         {
-            if (room.parent.transform.position.x - deviation < minX || room.parent.transform.position.z - deviation < minZ ||
-                room.parent.transform.position.x + deviation > maxX || room.parent.transform.position.z + deviation > maxZ)
+            Transform t = room.parent.transform;
+            foreach (Transform child in t.GetChild(0)) //sum the walls
             {
-                for (int i = 0; i < room.tileParent.transform.childCount; i++)
-                {
-                    Vector3 tilePos = room.tileParent.transform.GetChild(i).position;
-                    if (tilePos.x < minX) { minX = tilePos.x; }
-                    if (tilePos.z < minZ) { minZ = tilePos.z; }
-                    if (tilePos.x > maxX) { maxX = tilePos.z; }
-                    if (tilePos.z > maxZ) { maxZ = tilePos.z; }
-                }
+                Vector3 pos = child.position;
+                if (pos.x < minX) minX = pos.x;
+                if (pos.z < minZ) minZ = pos.z;
+                if (pos.x > maxX) maxX = pos.x;
+                if (pos.x > maxZ) maxZ = pos.z;
             }
         }
 
