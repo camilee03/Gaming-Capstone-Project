@@ -10,12 +10,8 @@ public class MapCam : MonoBehaviour
         Vector3 midPoint = Vector3.zero;
         for(int i = 0; i < rm.spawnPoints.Count; i++)
         {
-<<<<<<< Updated upstream
             Vector3 pt = rm.spawnPoints[i].transform.position;
-=======
-            Vector3 pt = rm.spawnPoints[i];
             midPoint += pt;
->>>>>>> Stashed changes
             GameObject newObject = GameObject.Instantiate(textPrefab, new Vector3(pt.x, 10, pt.z), Quaternion.EulerAngles(new Vector3(Mathf.Deg2Rad * 90, 0, 0)));
             newObject.name = "RoomText" + i;
             newObject.GetComponent<TextMesh>().text = rm.rooms[i].roomName;
@@ -25,7 +21,7 @@ public class MapCam : MonoBehaviour
         Vector3 maxDistanceVector;
         for (int i = 0; i < rm.spawnPoints.Count; i++)
         {
-            Vector3 pt = rm.spawnPoints[i];
+            Vector3 pt = rm.spawnPoints[i].transform.position;
             if (Vector3.Distance(pt, midPoint) > maxDistance)
             {
                 maxDistance = Vector3.Distance(pt, midPoint);
