@@ -60,8 +60,18 @@ public class Interact : NetworkBehaviour
             // Shows the pickedup object in hand
             if (!canPickup && pickedupObject != null)
             {
-                pickedupObject.transform.position = rightHand.position + (rightHand.forward * offset.x) + (rightHand.up * offset.y) + (rightHand.right * offset.z);
-                pickedupObject.transform.rotation = rightHand.rotation;
+
+                InteractibleObject IO = pickedupObject.GetComponent<InteractibleObject>();
+                if (IO.customOffset)
+                {
+                    pickedupObject.transform.position = rightHand.position + (rightHand.forward * IO.positionOffset.x) + (rightHand.up * IO.positionOffset.y) + (rightHand.right * IO.positionOffset.z);
+                    pickedupObject.transform.rotation = Quaternion.Euler(new Vector3(rightHand.rotation.eulerAngles.x + IO.rotationOffset.x, rightHand.rotation.eulerAngles.y + IO.rotationOffset.y, rightHand.rotation.eulerAngles.z + IO.rotationOffset.z));
+                }
+                else
+                {
+                    pickedupObject.transform.position = rightHand.position + (rightHand.forward * offset.x) + (rightHand.up * offset.y) + (rightHand.right * offset.z);
+                    pickedupObject.transform.rotation = rightHand.rotation;
+                }
             }
         }
 
@@ -78,18 +88,7 @@ public class Interact : NetworkBehaviour
                     {
                         canPickup = false;
                         pickedupObject = highlightedObject;
-                        if (pickedupObject.GetComponent<Rigidbody>())
-                        {
-                            pickedupRigidBody = pickedupObject.GetComponent<Rigidbody>();
-                            pickedupRigidBody.useGravity = false;
-                        }
-                        Collider[] colliders = pickedupObject.GetComponents<Collider>();
-                        foreach (Collider collider in colliders)
-                        {
-                            collider.enabled = false;
-                        }
-                        anim.SetLayerWeight(1, 1);
-                        highlightedObject = null;
+                        PickUp();
                     }
                     break;
                 case "Button": // Press button / lever
@@ -132,10 +131,37 @@ public class Interact : NetworkBehaviour
         }
     }
 
+    private void PickUp()
+    {
+        if (pickedupObject.GetComponent<Rigidbody>())
+        {
+            pickedupRigidBody = pickedupObject.GetComponent<Rigidbody>();
+            pickedupRigidBody.useGravity = false;
+        }
+        Collider[] colliders = pickedupObject.GetComponents<Collider>();
+        foreach (Collider collider in colliders)
+        {
+            collider.enabled = false;
+        }
+
+        InteractibleObject IO = pickedupObject.GetComponent<InteractibleObject>();
+
+        anim.SetLayerWeight(IO.amountOfHandsNeeded, 1);
+        anim.SetFloat("ItemThickness",IO.itemThickness);
+
+        highlightedObject = null;
+    }
+
     private void Place()
     {
         if (pickedupObject != null)
         {
+
+            InteractibleObject IO = pickedupObject.GetComponent<InteractibleObject>();
+
+            anim.SetLayerWeight(IO.amountOfHandsNeeded, 0);
+            anim.SetFloat("ItemThickness", IO.itemThickness);
+
             pickedupObject.transform.position = rightHand.position + rightHand.forward * offset.x + rightHand.up * offset.y + rightHand.right * offset.z;
 
             Collider[] colliders = pickedupObject.GetComponents<Collider>();
@@ -143,7 +169,6 @@ public class Interact : NetworkBehaviour
             {
                 collider.enabled = true;
             }
-            anim.SetLayerWeight(1, 0);
             if (pickedupRigidBody != null)
             {
                 pickedupRigidBody.useGravity = true;

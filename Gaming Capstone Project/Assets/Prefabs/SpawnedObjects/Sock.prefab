@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1648707409762468445}
   - component: {fileID: 2757620440082690417}
   - component: {fileID: 3420484931634662298}
+  - component: {fileID: 1673616850835997761}
   m_Layer: 0
   m_Name: Sock
   m_TagString: Selectable
@@ -134,3 +135,21 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.012499999, y: 0.009999998, z: 0.00049999985}
   m_Center: {x: 0.0040431023, y: -0.0027930946, z: -1.4551913e-11}
+--- !u!114 &1673616850835997761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2593458629373130127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0c24905a8a80fd45b42bbda064c2e49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PickUpable: 1
+  amountOfHandsNeeded: 1
+  itemThickness: 0
+  customOffset: 0
+  rotationOffset: {x: 0, y: 0, z: 0}
+  positionOffset: {x: 0, y: 0, z: 0}

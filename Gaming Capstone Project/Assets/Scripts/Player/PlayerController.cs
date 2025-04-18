@@ -72,7 +72,7 @@ public class PlayerController : NetworkBehaviour
 
 
     public CanvasGroup VotingScreen;
-    bool point, wave;
+    bool point, wave, thumbsUp, peaceSign;
 
     public override void OnNetworkSpawn()
     {
@@ -265,16 +265,26 @@ public void ForceSetColorServerRpc(int colorIndex)
             animator.SetBool("Grounded", isGrounded);
             animator.SetBool("Transformed", isTransformed);
             animator.SetFloat("YVelocity", rgd.linearVelocity.y);
-
+            
             if (wave)
             {
                 animator.SetLayerWeight(4, 1);//set emote layer weight to 1
-                animator.SetFloat("currentEmote", 0);
+                animator.SetFloat("currentEmote", 3);
+            }
+            else if (peaceSign)
+            {
+                animator.SetLayerWeight(4, 1);//set emote layer weight to 1
+                animator.SetFloat("currentEmote", 2);
+            }
+            else if (thumbsUp)
+            {
+                animator.SetLayerWeight(4, 1);//set emote layer weight to 1
+                animator.SetFloat("currentEmote", 1);
             }
             else if (point)
             {
                 animator.SetLayerWeight(4, 1);//set emote layer weight to 1
-                animator.SetFloat("currentEmote", 1);
+                animator.SetFloat("currentEmote", 0);
             }
             else
             {
@@ -438,6 +448,14 @@ public void ForceSetColorServerRpc(int colorIndex)
     public void Wave(InputAction.CallbackContext context)
     {
         wave = context.ReadValueAsButton();
+    }
+    public void ThumbsUp(InputAction.CallbackContext context)
+    {
+        thumbsUp = context.ReadValueAsButton();
+    }
+    public void PeaceSign(InputAction.CallbackContext context)
+    {
+        peaceSign = context.ReadValueAsButton();
     }
 
     public void Attack(InputAction.CallbackContext context)

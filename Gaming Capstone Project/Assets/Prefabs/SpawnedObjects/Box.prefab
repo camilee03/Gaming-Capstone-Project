@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: -7907770767831749222}
   - component: {fileID: 8688456817352374907}
   - component: {fileID: 3711238228679316189}
+  - component: {fileID: 8991671196139954572}
   m_Layer: 0
   m_Name: Box
   m_TagString: Selectable
@@ -162,3 +163,21 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.02, y: 0.027999993, z: 0.013999997}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &8991671196139954572
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 975355757099521476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0c24905a8a80fd45b42bbda064c2e49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PickUpable: 1
+  amountOfHandsNeeded: 2
+  itemThickness: 0.9
+  customOffset: 1
+  rotationOffset: {x: -175, y: 14, z: 0}
+  positionOffset: {x: 0.1, y: 0.5, z: -1}
