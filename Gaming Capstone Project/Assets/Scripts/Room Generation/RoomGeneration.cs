@@ -58,6 +58,7 @@ public class RoomGeneration : NetworkBehaviour
         RoomManager.Instance.InitializeSpawnPoints();
         taskManager.CreateTasks();
         mcam.Setup();
+        RoomManager.Instance.ChangeWalls();
     }
 
     /// <summary> Use the room procedure to create multiple rooms </summary>

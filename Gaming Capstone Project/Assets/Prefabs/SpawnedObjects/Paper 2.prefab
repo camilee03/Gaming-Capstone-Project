@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: -1808658116018228132}
   - component: {fileID: 6064373305439788982}
   - component: {fileID: 1505533928741152183}
+  - component: {fileID: 7387302970873144037}
   m_Layer: 0
   m_Name: Paper 2
   m_TagString: Selectable
@@ -162,3 +163,21 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &7387302970873144037
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2340950732892518580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0c24905a8a80fd45b42bbda064c2e49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PickUpable: 1
+  amountOfHandsNeeded: 1
+  itemThickness: 1
+  customOffset: 0
+  rotationOffset: {x: 0, y: 0, z: 0}
+  positionOffset: {x: 0, y: 0, z: 0}

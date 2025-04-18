@@ -145,9 +145,27 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Wave"",
+                    ""name"": ""ThumbsUp"",
+                    ""type"": ""Button"",
+                    ""id"": ""233eb911-e8ca-4c86-82b2-141b8a067f95"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Peace"",
                     ""type"": ""Button"",
                     ""id"": ""7a023581-13bf-4fa2-89cb-dd9d2a211d57"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Wave"",
+                    ""type"": ""Button"",
+                    ""id"": ""6b4b2656-ac9b-4df7-9699-f03bc9f3fb2c"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -532,10 +550,21 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""2129acde-6c16-422b-a685-220dfe2cd8bc"",
-                    ""path"": ""<Keyboard>/2"",
+                    ""path"": ""<Keyboard>/3"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""Peace"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6b3e40a7-ffab-49d8-a661-34c59ef0ab11"",
+                    ""path"": ""<Keyboard>/4"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""Wave"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -546,8 +575,19 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/1"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""Point"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9f5364f5-fa18-476c-b641-bb1c4574e47c"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""ThumbsUp"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1148,6 +1188,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_Morph = m_Player.FindAction("Morph", throwIfNotFound: true);
         m_Player_Notebook = m_Player.FindAction("Notebook", throwIfNotFound: true);
         m_Player_Point = m_Player.FindAction("Point", throwIfNotFound: true);
+        m_Player_ThumbsUp = m_Player.FindAction("ThumbsUp", throwIfNotFound: true);
+        m_Player_Peace = m_Player.FindAction("Peace", throwIfNotFound: true);
         m_Player_Wave = m_Player.FindAction("Wave", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
@@ -1241,6 +1283,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Morph;
     private readonly InputAction m_Player_Notebook;
     private readonly InputAction m_Player_Point;
+    private readonly InputAction m_Player_ThumbsUp;
+    private readonly InputAction m_Player_Peace;
     private readonly InputAction m_Player_Wave;
     public struct PlayerActions
     {
@@ -1259,6 +1303,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         public InputAction @Morph => m_Wrapper.m_Player_Morph;
         public InputAction @Notebook => m_Wrapper.m_Player_Notebook;
         public InputAction @Point => m_Wrapper.m_Player_Point;
+        public InputAction @ThumbsUp => m_Wrapper.m_Player_ThumbsUp;
+        public InputAction @Peace => m_Wrapper.m_Player_Peace;
         public InputAction @Wave => m_Wrapper.m_Player_Wave;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
@@ -1308,6 +1354,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Point.started += instance.OnPoint;
             @Point.performed += instance.OnPoint;
             @Point.canceled += instance.OnPoint;
+            @ThumbsUp.started += instance.OnThumbsUp;
+            @ThumbsUp.performed += instance.OnThumbsUp;
+            @ThumbsUp.canceled += instance.OnThumbsUp;
+            @Peace.started += instance.OnPeace;
+            @Peace.performed += instance.OnPeace;
+            @Peace.canceled += instance.OnPeace;
             @Wave.started += instance.OnWave;
             @Wave.performed += instance.OnWave;
             @Wave.canceled += instance.OnWave;
@@ -1354,6 +1406,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Point.started -= instance.OnPoint;
             @Point.performed -= instance.OnPoint;
             @Point.canceled -= instance.OnPoint;
+            @ThumbsUp.started -= instance.OnThumbsUp;
+            @ThumbsUp.performed -= instance.OnThumbsUp;
+            @ThumbsUp.canceled -= instance.OnThumbsUp;
+            @Peace.started -= instance.OnPeace;
+            @Peace.performed -= instance.OnPeace;
+            @Peace.canceled -= instance.OnPeace;
             @Wave.started -= instance.OnWave;
             @Wave.performed -= instance.OnWave;
             @Wave.canceled -= instance.OnWave;
@@ -1552,6 +1610,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         void OnMorph(InputAction.CallbackContext context);
         void OnNotebook(InputAction.CallbackContext context);
         void OnPoint(InputAction.CallbackContext context);
+        void OnThumbsUp(InputAction.CallbackContext context);
+        void OnPeace(InputAction.CallbackContext context);
         void OnWave(InputAction.CallbackContext context);
     }
     public interface IUIActions

@@ -172,6 +172,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 246d78e01a78cec4297578ceea95c79f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  wallpaperTextures:
+  - {fileID: 2800000, guid: ae9243082136c5442a22cdea5fbb8402, type: 3}
+  - {fileID: 2800000, guid: 98622122a5c91de46bdff5a2a8cbd892, type: 3}
+  - {fileID: 2800000, guid: 92ee3c924045d87439df704339a4fd6c, type: 3}
+  wallDamageTextures:
+  - {fileID: 2800000, guid: 92ee3c924045d87439df704339a4fd6c, type: 3}
+  - {fileID: 2800000, guid: 92ee3c924045d87439df704339a4fd6c, type: 3}
+  - {fileID: 2800000, guid: 92ee3c924045d87439df704339a4fd6c, type: 3}
+  - {fileID: 2800000, guid: 230ef15618535f346abf35eab3e8b98e, type: 3}
+  - {fileID: 2800000, guid: c29cd08f5e0b1834889f829217683236, type: 3}
+  baseWallMat: {fileID: 2100000, guid: f65fbc4cb9a96904da5b2285217b1e17, type: 2}
   rooms: []
   spawnPoints: []
 --- !u!114 &6757427336724844059
