@@ -380,7 +380,7 @@ public class ObjectGeneration : NetworkBehaviour
                 newObject = SpawnNetworkedObject(parent.transform, objects["lever"], tilePos + disp + Vector3.up * 3, wallDict[tilePos].transform.rotation);
                 break;
             case 'P': // Poster
-                newObject = SpawnNetworkedObject(parent.transform, objects["poster"], tilePos + disp * 0.5f + Vector3.up * 4, Quaternion.LookRotation(wallDict[tilePos].transform.right) * Quaternion.Euler(-90, 0, 90));
+                newObject = SpawnNetworkedObject(parent.transform, objects["poster"], tilePos + disp * 0.5f + Vector3.up * 5, Quaternion.LookRotation(wallDict[tilePos].transform.right) * Quaternion.Euler(-90, 0, 90));
                 break;
             case 'p': // paper
                 newObject = SpawnNetworkedObject(parent.transform, objects["paper"], tilePos, Quaternion.identity);
