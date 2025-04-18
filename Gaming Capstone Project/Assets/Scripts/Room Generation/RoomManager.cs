@@ -6,6 +6,8 @@ using UnityEngine;
 public class RoomManager : MonoBehaviour
 {
     public static RoomManager Instance { get; private set; }
+    public Texture2D [] wallpaperTextures;
+    public Texture2D [] wallDamageTextures;
 
     private void Awake()
     {
@@ -32,6 +34,23 @@ public class RoomManager : MonoBehaviour
             spawnPoint.transform.position = centerVector;
             GameController.Instance.RegisterSpawnPoint(spawnPoint.transform);
             spawnPoints.Add(spawnPoint);
+        }
+    }
+
+    public void ChangeWalls()
+    {
+        foreach(Room room in rooms)
+        {
+            Color color = new Color(Random.Range(0.5f, 1), Random.Range(0.5f, 1), Random.Range(0.5f, 1));
+            Texture2D wallPaper = wallpaperTextures[Mathf.RoundToInt(Random.Range(0, wallpaperTextures.Length))];
+            Transform t = room.parent.transform;
+            foreach(Renderer r in t.GetChild(0).GetComponentsInChildren<Renderer>())
+            {
+                int i = Mathf.RoundToInt(Random.Range(0, wallDamageTextures.Length));
+                r.material.SetColor("_Color", color);
+                r.material.SetTexture("_Wallpaper", wallPaper);
+                r.material.SetTexture("_Damage", wallDamageTextures[i]);
+            }
         }
     }
 }

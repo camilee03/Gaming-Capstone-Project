@@ -105,9 +105,12 @@ public class NetMic2 : NetworkBehaviour
 
     void PlayReceivedAudio(float[] floats)
     {
-        AudioClip clip = AudioClip.Create("Received", floats.Length, 1, sampleRate, false);
-        clip.SetData(floats, 0);
-        source.clip = clip;
-        source.Play();        
+        if (playable)
+        {
+            AudioClip clip = AudioClip.Create("Received", floats.Length, 1, sampleRate, false);
+            clip.SetData(floats, 0);
+            source.clip = clip;
+            source.Play();
+        }
     }
 }
