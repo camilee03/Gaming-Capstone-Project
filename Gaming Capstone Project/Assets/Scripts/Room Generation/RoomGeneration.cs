@@ -60,6 +60,7 @@ public class RoomGeneration : NetworkBehaviour
         GenerateMultipleRooms();
         RoomManager.Instance.InitializeSpawnPoints();
         taskManager.CreateTasks();
+        taskManager.CreateTasksClientRpc();
         mcam.Setup();
     }
 
@@ -244,7 +245,7 @@ public class RoomGeneration : NetworkBehaviour
 
         dar2.room.transform.Translate(displacement);
 
-        // Determine each door’s direction
+        // Determine each doorï¿½s direction
         Vector3 meetingDir1 = -dar1.door.transform.up.normalized;
         Vector3 meetingDir2 = -dar2.door.transform.up.normalized;
 
