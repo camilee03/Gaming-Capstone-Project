@@ -87,6 +87,7 @@ public class PlayerController : NetworkBehaviour
             playerInput.enabled = true;
             cam.gameObject.SetActive(true);
             camMovement.enabled = true;
+            PlayerDisplay.SetActive(true);
         }
         else
         {
@@ -98,6 +99,7 @@ public class PlayerController : NetworkBehaviour
             cam.enabled = false;
             camMovement.enabled = false;
             al.enabled = false;
+            PlayerDisplay.SetActive(false);
         }
     }
 
@@ -216,26 +218,31 @@ public void ForceSetColorServerRpc(int colorIndex)
             TeamDeclaration.text = "You are a : Scientist";
     }
 
-
-    public void StartVote()
+    [ClientRpc]
+    public void StartVoteClientRpc()
     {
-        Cursor.lockState = CursorLockMode.None;
-        VotingScreen.gameObject.SetActive(true);
-        VotingScreen.DOFade(1, 3);
-        VotingScreen.GetComponent<VoteManager>().CreateColorButtons();
-        //make color buttons.
-        
-        //start voting timer
+        if (!isDead)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            VotingScreen.gameObject.SetActive(true);
+            VotingScreen.DOFade(1, 3);
+            VotingScreen.GetComponent<VoteManager>().CreateColorButtons();
+            VotingScreen.GetComponent<VoteManager>().SetProximityChatAmount(0);
+        }
+
     }
-
-    public void EndVote()
+    [ClientRpc]
+    public void EndVoteClientRpc()
     {
+        Debug.Log("Voting on client");
+        VotingScreen.GetComponent<VoteManager>().SetProximityChatAmount(1);
 
         VotingScreen.DOFade(0, 3);
         VotingScreen.GetComponent<VoteManager>().ClearButtons();
 
         VotingScreen.gameObject.SetActive(false);
         Cursor.lockState = CursorLockMode.Locked;
+
 
 
 

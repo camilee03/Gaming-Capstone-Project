@@ -19,9 +19,8 @@ public class GameController : NetworkBehaviour
     public NetworkList<int> usedColors = new NetworkList<int>();
     public NetworkList<int> votesCasted = new NetworkList<int>();
 
-
-    public int TimeLeftInVoting = 0;
-    public float votingTime = 60f;
+    public NetworkVariable<int> TimeLeftInVoting = new NetworkVariable<int>();
+    public float votingTime = 30f;
 
     public List<Transform> Spawnpoints = new List<Transform>();
     // Number of Doppleganger players to assign
@@ -29,10 +28,10 @@ public class GameController : NetworkBehaviour
     public GameObject LobbyCanvas;
     [Header("Voting")]
     private float voteStartDelay = 120f; // Total time until voting starts
-    public int secondsRemainingUntilVote;      // Countdown shown publicly
+    public NetworkVariable<int> secondsRemainingUntilVote;      // Countdown shown publicly
     public Canvas VotingCanvas;
     public GameObject playerObj;
-
+    public bool hostSelectedStart =false;
 
     private Dictionary<ulong, int> playerVotes = new Dictionary<ulong, int>(); // clientId -> colorIndex
     private bool votingInProgress = false;
@@ -198,33 +197,33 @@ public class GameController : NetworkBehaviour
         AssignTeams();
         AssignTasks();
         DisableLobbyCanvasClientRpc();
-        StartVoteInitTimerClientRpc();
+        StartVoteInitTimerServerRpc();
     }
-    [ClientRpc]
-    private void StartVoteInitTimerClientRpc()
+    [ServerRpc]
+    private void StartVoteInitTimerServerRpc()
     {
         votesCasted.Clear();
-        secondsRemainingUntilVote = Mathf.CeilToInt(voteStartDelay);
+        secondsRemainingUntilVote.Value = Mathf.CeilToInt(voteStartDelay);
         StartCoroutine(StartVoteCountdown());
     }
 
     private IEnumerator StartVoteCountdown()
     {
-        while (secondsRemainingUntilVote > 0)
+        while (secondsRemainingUntilVote.Value > 0)
         {
             yield return new WaitForSeconds(1f);
-            secondsRemainingUntilVote--;
+            secondsRemainingUntilVote.Value--;
         }
         StartVote();
-        StartVoteClientRpc();
+        StartVoteServerRpc();
     }
-    [ClientRpc]
-    private void StartVoteClientRpc()
+    [ServerRpc]
+    private void StartVoteServerRpc()
     {
         Debug.Log("[ClientRpc] Vote started!");
 
         var localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerController>();
-        localPlayer.StartVote();
+        localPlayer.StartVoteClientRpc();
 
     }
     public void StartVote()
@@ -232,68 +231,84 @@ public class GameController : NetworkBehaviour
         playerVotes.Clear();
         votingInProgress = true;
 
-        StartVoteClientRpc();
-        TimeLeftInVoting = Mathf.CeilToInt(votingTime);
+        StartVoteServerRpc();
+        TimeLeftInVoting.Value = Mathf.CeilToInt(votingTime);
 
         // End vote in 10 seconds
-        StartCoroutine(EndVoteAfterDelay());
+        if(IsServer) StartCoroutine(EndVoteAfterDelay());
     }
 
     private IEnumerator EndVoteAfterDelay()
     {
-        while (TimeLeftInVoting > 0)
+        while (TimeLeftInVoting.Value > 0)
         {
             yield return new WaitForSeconds(1f);
-            TimeLeftInVoting--;
+            TimeLeftInVoting.Value--;
         }
         votingInProgress = false;
         VotingComplete();
     }
 
 
-
+    
     private void VotingComplete()
     {
+        Debug.Log("Voting competed");
         votingInProgress = false;
 
-        if (playerVotes.Count == 0)
-        {
-            Debug.Log("No votes were cast.");
+            if (playerVotes.Count == 0)
+            {
+                Debug.Log("No votes were cast.");
+            secondsRemainingUntilVote.Value = Mathf.CeilToInt(voteStartDelay);
+            StartVoteInitTimerServerRpc();
+
+            Debug.Log("Voting competed3");
+
+            playerObj.GetComponent<PlayerController>().EndVoteClientRpc();
             return;
-        }
+            }
+        Debug.Log("Voting competed LIST");
 
         var groupedVotes = playerVotes
-            .GroupBy(kv => kv.Value) // group by colorIndex
-            .Select(g => new { Color = g.Key, Count = g.Count() })
-            .OrderByDescending(g => g.Count)
-            .ToList();
+                .GroupBy(kv => kv.Value) // group by colorIndex
+                .Select(g => new { Color = g.Key, Count = g.Count() })
+                .OrderByDescending(g => g.Count)
+                .ToList();
+        Debug.Log("Voting competed LIST");
 
         int highestCount = groupedVotes.First().Count;
-        var topColors = groupedVotes.Where(g => g.Count == highestCount).ToList();
+            var topColors = groupedVotes.Where(g => g.Count == highestCount).ToList();
 
-        if (topColors.Count > 1)
-        {
-            Debug.Log("Vote tied. No one is eliminated.");
-            return;
-        }
-
-        int winningColor = topColors.First().Color;
-        Debug.Log($"Color {winningColor} wins the vote!");
-
-        // Eliminate the player with that color
-        foreach (var kvp in Players)
-        {
-            var pc = kvp.Value.GetComponent<PlayerController>();
-            usedColors.Remove(winningColor);
-            if (pc.ColorID.Value == winningColor)
+            if (topColors.Count > 1)
             {
-                pc.KillClientRpc();
-                break;
+                Debug.Log("Vote tied. No one is eliminated.");
+                return;
             }
-        }
-        playerObj.GetComponent<PlayerController>().EndVote();
-        secondsRemainingUntilVote = Mathf.CeilToInt(voteStartDelay);
-        StartVoteInitTimerClientRpc();
+
+            int winningColor = topColors.First().Color;
+            Debug.Log($"Color {winningColor} wins the vote!");
+            Debug.Log("Voting competed 1");
+
+            // Eliminate the player with that color
+            foreach (var kvp in Players)
+            {
+                var pc = kvp.Value.GetComponent<PlayerController>();
+                usedColors.Remove(winningColor);
+                if (pc.ColorID.Value == winningColor)
+                {
+                    pc.KillClientRpc();
+                    break;
+                }
+            }
+            Debug.Log("Voting competed2");
+
+            secondsRemainingUntilVote.Value = Mathf.CeilToInt(voteStartDelay);
+            StartVoteInitTimerServerRpc();
+        
+        Debug.Log("Voting competed3");
+
+        playerObj.GetComponent<PlayerController>().EndVoteClientRpc();
+
     }
 
 
@@ -423,8 +438,9 @@ public class GameController : NetworkBehaviour
     public void DisableLobbyCanvasClientRpc()
     {
             LobbyCanvas.SetActive(false);
-        
-        
+        hostSelectedStart = true;
+
+
         Debug.Log($"[ClientRpc] Player {OwnerClientId} => Successfully deleted canvas");
 
     }
