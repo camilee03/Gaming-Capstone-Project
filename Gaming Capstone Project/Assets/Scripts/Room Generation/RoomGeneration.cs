@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -275,14 +276,14 @@ public class RoomGeneration : NetworkBehaviour
     /// <summary> Compute the tile outside the given door </summary>
     Vector3 ComputeDoorTile(GameObject door)
     {
-        // Assume the door's forward should point away from where the floor tile should be placed.
-        Vector3 doorDir = -door.transform.forward.normalized;
+        // Assume the door's up should point away from where the floor tile should be placed.
+        Vector3 doorDir = -door.transform.up.normalized;
         Vector3 tilePos = door.transform.position + doorDir * scale/2;
         return tilePos; 
     }
 
     /// <summary> Outlines a hallway with walls </summary>
-    void DrawWallsAroundDoors(Vector3 prevPos, Vector3 pos, Vector3 nextPos, GameObject parent, List<Vector3> wallPos)
+    void DrawWallsAroundDoors(Vector3 prevPos, Vector3 pos, Vector3 nextPos, GameObject parent, List<Vector3> wallPositions)
     {
         List<Vector3> positions = new List<Vector3>{pos+Vector3.left*scale, pos+Vector3.back*scale, 
             pos+Vector3.right*scale,  pos+Vector3.forward*scale};
@@ -304,7 +305,14 @@ public class RoomGeneration : NetworkBehaviour
 
         for (int i=0; i<positions.Count; i++)
         {
-            if (!wallPos.Contains(RoomFunctions.RoundVector3(spawnPos[i])) && positions[i] != prevPos && positions[i] != nextPos)
+            bool collided = false;
+            foreach (Vector3 wallPos in wallPositions)
+            {
+                if (Vector3.Distance(wallPos, spawnPos[i]) < 1) { collided = true; continue; }
+            }
+            if (collided) { continue; }
+
+            if (positions[i] != prevPos && positions[i] != nextPos)
             {
                 Quaternion rotation = Quaternion.LookRotation(outwardDirections[i], Vector3.up) * Quaternion.Euler(-90, 0, 0);
                 GameObject newObject = SpawnNetworkedObject(parent.transform, walls, spawnPos[i], rotation);

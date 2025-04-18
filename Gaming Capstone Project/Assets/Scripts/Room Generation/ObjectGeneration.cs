@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.ConstrainedExecution;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Xml.Serialization;
 using Unity.Netcode;
 using Unity.VisualScripting;
@@ -20,7 +21,7 @@ public class ObjectGeneration : NetworkBehaviour
     List<Vector3> tilePositions = new();
     List<Vector3> wallPositions = new();
     List<Vector3> doorPositions = new();
-    Dictionary<Vector3, Quaternion> wallRotations = new();
+    Dictionary<Vector3, GameObject> wallDict = new();
 
     [Header("Existing Room")]
     char[,] descripterTiles; // what each tile has on it
@@ -69,14 +70,15 @@ public class ObjectGeneration : NetworkBehaviour
 
         // Create viable locations lists
         wallPositions = new();
-        wallRotations = new();
+        wallDict = new();
         for (int i = 0; i < room.wallParent.transform.childCount - 1; i++)
         {
             Transform newWall = room.wallParent.transform.GetChild(i);
             if (newWall.gameObject.name.StartsWith('W'))
             {
                 wallPositions.Add(newWall.position);
-                wallRotations[newWall.position] = newWall.rotation;
+                Debug.Log(newWall.position);
+                wallDict[RoomFunctions.RoundVector3(newWall.position)] = newWall.gameObject;
             }
             else { doorPositions.Add(newWall.position); }
         }
@@ -140,10 +142,15 @@ public class ObjectGeneration : NetworkBehaviour
 
         foreach (Object newObject in assignedObjects)
         {
-            if (!doorPositions.Contains(RoomFunctions.RoundVector3(newObject.domains[0])))
+            if (newObject.domains.Count == 0) { continue; }
+            bool collided = false;
+            foreach (Vector3 doorPos in doorPositions)
             {
-                PlaceObjects(newObject.identifier, newObject.domains[0], scale, objectParent);
+                if (Vector3.Distance(doorPos, newObject.domains[0]) < 1) { collided = true; continue; }
             }
+            if (collided) { continue; }
+
+            PlaceObjects(newObject.identifier, newObject.domains[0], scale, objectParent);
         }
 
         return objectParent;
@@ -329,12 +336,15 @@ public class ObjectGeneration : NetworkBehaviour
     // -- Object Creation -- //
     private void PlaceObjects(char type, Vector3 tilePos, int scale, GameObject parent)
     {
+        tilePos = RoomFunctions.RoundVector3(tilePos);
+
         GameObject newObject = null;
         Vector3 ceilingHeight = Vector3.up * 12;
 
         Vector3[] displacementVector = new Vector3[4] {Vector3.left, Vector3.down, Vector3.right, Vector3.up };
         Vector3 disp = Vector3.zero;
-        if (wallRotations.Keys.Contains(tilePos)) { disp = displacementVector[FindWallDirection(wallRotations[tilePos], tilePos, roomParent)]; }
+
+        if (wallDict.Keys.Contains(tilePos)) { disp = displacementVector[FindWallDirection(tilePos)]; }
 
         float[] randomRotationsY = new float[4] { 90, 0, 180, -90 };
         int i = Random.Range(0, 4);
@@ -342,7 +352,7 @@ public class ObjectGeneration : NetworkBehaviour
         switch (type)
         {
             case 'B': // button
-                newObject = SpawnNetworkedObject(parent.transform, objects["button"], tilePos + disp, wallRotations[tilePos]);
+                newObject = SpawnNetworkedObject(parent.transform, objects["button"], tilePos + disp, wallDict[tilePos].transform.rotation);
                 break;
             case 'b': // box
                 newObject = SpawnNetworkedObject(parent.transform, objects["box"], tilePos, Quaternion.Euler(-90, 0, randomRotationsY[i]));
@@ -367,7 +377,10 @@ public class ObjectGeneration : NetworkBehaviour
                 newObject = SpawnNetworkedObject(parent.transform, objects["light"], tilePos + ceilingHeight, Quaternion.Euler(-90, 0, 0));
                 break;
             case 'l': // lever
-                newObject = SpawnNetworkedObject(parent.transform, objects["lever"], tilePos + disp + Vector3.up * 3, wallRotations[tilePos]);
+                newObject = SpawnNetworkedObject(parent.transform, objects["lever"], tilePos + disp + Vector3.up * 3, wallDict[tilePos].transform.rotation);
+                break;
+            case 'P': // Poster
+                newObject = SpawnNetworkedObject(parent.transform, objects["poster"], tilePos + disp * 0.5f + Vector3.up * 4, Quaternion.LookRotation(wallDict[tilePos].transform.right) * Quaternion.Euler(-90, 0, 90));
                 break;
             case 'p': // paper
                 newObject = SpawnNetworkedObject(parent.transform, objects["paper"], tilePos, Quaternion.identity);
@@ -376,7 +389,7 @@ public class ObjectGeneration : NetworkBehaviour
                 newObject = SpawnNetworkedObject(parent.transform, objects["radio"], tilePos, Quaternion.Euler(0, randomRotationsY[i], 0));
                 break;
             case 's': // speaker
-                newObject = SpawnNetworkedObject(parent.transform, objects["speaker"], tilePos + disp + Vector3.up * 3, wallRotations[tilePos]);
+                newObject = SpawnNetworkedObject(parent.transform, objects["speaker"], tilePos + disp + Vector3.up * 3, Quaternion.LookRotation(wallDict[tilePos].transform.forward) * Quaternion.Euler(0, 90, 0));
                 break;
             case 'T': // Table
                 newObject = SpawnNetworkedObject(parent.transform, objects["table"], tilePos, Quaternion.Euler(-90, randomRotationsY[i], 0));
@@ -387,13 +400,13 @@ public class ObjectGeneration : NetworkBehaviour
                 newObject.transform.localScale /= 1.1f;
                 break;
             case 'v': // vent
-                newObject = SpawnNetworkedObject(parent.transform, objects["vent"], tilePos + disp * 0.5f + Vector3.up, wallRotations[tilePos]);
+                newObject = SpawnNetworkedObject(parent.transform, objects["vent"], tilePos + disp * 0.5f + Vector3.up, Quaternion.LookRotation(wallDict[tilePos].transform.right) * Quaternion.Euler(-90, 0, 90));
                 break;
             case 'W': // Chute
-                newObject = SpawnNetworkedObject(parent.transform, objects["chute"], tilePos + disp, wallRotations[tilePos]);
+                newObject = SpawnNetworkedObject(parent.transform, objects["chute"], tilePos + disp, wallDict[tilePos].transform.rotation);
                 break;
             case 'w': // Wires
-                newObject = SpawnNetworkedObject(parent.transform, objects["wires"], tilePos + disp, wallRotations[tilePos]);
+                newObject = SpawnNetworkedObject(parent.transform, objects["wires"], tilePos + disp, wallDict[tilePos].transform.rotation);
                 break;
             case 'X': // food
                 newObject = SpawnNetworkedObject(parent.transform, objects["food"], tilePos, Quaternion.Euler(0, randomRotationsY[i], 0));
@@ -414,24 +427,15 @@ public class ObjectGeneration : NetworkBehaviour
         spawnedObjects.Add(newObject);
     }
 
-    int FindWallDirection(Quaternion rotation, Vector3 position, GameObject room)
+    int FindWallDirection(Vector3 position)
     {
-        if (rotation.eulerAngles.y % 180 == 90)
-        {
-            // Direction 0 (left)
-            if (position.x < room.transform.position.x) { return 0; }
+        Vector3 doorDir = -wallDict[position].transform.up;
 
-            // Direction 2 (right)
-            return 2;
-        }
-        else
-        {
-            // Direction 1 (below)
-            if (position.z < room.transform.position.z) { return 1; }
+        int result = doorDir == Vector3.right ? 0 : 
+            doorDir == Vector3.forward ? 1 :
+            doorDir == Vector3.left ? 2 : 3;
 
-            // Direction 3 (above)
-            return 3;
-        }
+        return result;
     }
 
     private Object CreateObject(char identifier)
@@ -461,6 +465,7 @@ public class ObjectGeneration : NetworkBehaviour
             // -- Wall Constraints -- //
             case 'W': // Chute
             case 'l': // Lever
+            case 'P': // Poster
             case 's': // Speaker
             case 'v': // Vent
             case 'w': // Wires
