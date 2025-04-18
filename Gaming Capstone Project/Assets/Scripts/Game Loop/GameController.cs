@@ -5,10 +5,12 @@ using Unity.Netcode;
 using Unity.Netcode.Components;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class GameController : NetworkBehaviour
 {
     public static GameController Instance { get; private set; }
+    Dictionary<int, Color> ColorLibrary = new Dictionary<int, Color>();
 
     public Dictionary<ulong, GameObject> Players = new Dictionary<ulong, GameObject>();
     public int numPlayers = 1;
@@ -63,7 +65,18 @@ public class GameController : NetworkBehaviour
         {
             usedColors.OnListChanged += OnUsedColorsChanged;
         }
+
+    }
+    private System.Collections.IEnumerator WaitForLocalPlayer()
+    {
+        while (NetworkManager.Singleton.LocalClient == null ||
+               NetworkManager.Singleton.LocalClient.PlayerObject == null)
+        {
+            yield return null;
+        }
+
         playerObj = NetworkManager.Singleton.LocalClient.PlayerObject.gameObject;
+        initColors();
 
     }
 
@@ -83,7 +96,7 @@ public class GameController : NetworkBehaviour
     private void OnUsedColorsChanged(NetworkListEvent<int> change)
     {
         // Refresh UI if needed
-        var uiManager = FindFirstObjectByType<ColorSelectionUIManager>();
+        var uiManager = FindFirstObjectByType<SelectColorButton>();
         if (uiManager != null)
             uiManager.RefreshAll();
     }
@@ -339,7 +352,23 @@ public class GameController : NetworkBehaviour
 
         return !usedColors.Contains(colorIndex);
     }
+    public bool IsColorAvailableByColor(Color color)
+    {
 
+        return !usedColors.Contains(GetKeyByValue(ColorLibrary, color));
+    }
+
+    public TKey GetKeyByValue<TKey, TValue>(Dictionary<TKey, TValue> dict, TValue value)
+    {
+        foreach (var pair in dict)
+        {
+            if (EqualityComparer<TValue>.Default.Equals(pair.Value, value))
+            {
+                return pair.Key;
+            }
+        }
+        return default; // or throw exception if not found
+    }
     public void LockColor(int colorIndex)
     {
         if (!usedColors.Contains(colorIndex))
@@ -448,25 +477,25 @@ public class GameController : NetworkBehaviour
 
     public void Start()
     {
-        initColors();
+        StartCoroutine(WaitForLocalPlayer());
+
     }
 
     #region ColorVariables
-    Dictionary<int, Color> ColorLibrary = new Dictionary<int, Color>();
     private void initColors()
     {
-        ColorLibrary.Add(1, Color.HSVToRGB(0 / 360f, 1, 1)); //red
-        ColorLibrary.Add(2, Color.HSVToRGB(25 / 360f, 1, 1));//orange
-        ColorLibrary.Add(3, Color.HSVToRGB(50 / 360f, 1, 1));//yellow
-        ColorLibrary.Add(4, Color.HSVToRGB(110 / 360f, 1, 1));//green
-        ColorLibrary.Add(5, Color.HSVToRGB(180 / 360f, 1, 1));//teal
-        ColorLibrary.Add(6, Color.HSVToRGB(210 / 360f, 1, 1));//blue
-        ColorLibrary.Add(7, Color.HSVToRGB(280 / 360f, 1, 1));//purple
-        ColorLibrary.Add(8, Color.HSVToRGB(310 / 360f, 1, 1));//pink
-        ColorLibrary.Add(9, Color.HSVToRGB(0, 0, 1));//white
-        ColorLibrary.Add(10, Color.HSVToRGB(0, 0, 0.5f));//gray
-        ColorLibrary.Add(11, Color.HSVToRGB(0, 0, 0.1f));//black
-        ColorLibrary.Add(12, Color.HSVToRGB(30 / 360f, 0.9f, 4f));//brown
+        ColorLibrary.Add(0, Color.HSVToRGB(0 / 360f, 1, 1)); //red
+        ColorLibrary.Add(1, Color.HSVToRGB(25 / 360f, 1, 1));//orange
+        ColorLibrary.Add(2, Color.HSVToRGB(50 / 360f, 1, 1));//yellow
+        ColorLibrary.Add(3, Color.HSVToRGB(110 / 360f, 1, 1));//green
+        ColorLibrary.Add(4, Color.HSVToRGB(180 / 360f, 1, 1));//teal
+        ColorLibrary.Add(5, Color.HSVToRGB(210 / 360f, 1, 1));//blue
+        ColorLibrary.Add(6, Color.HSVToRGB(280 / 360f, 1, 1));//purple
+        ColorLibrary.Add(7, Color.HSVToRGB(310 / 360f, 1, 1));//pink
+        ColorLibrary.Add(8, Color.HSVToRGB(0, 0, 1));//white
+        ColorLibrary.Add(9, Color.HSVToRGB(0, 0, 0.5f));//gray
+        ColorLibrary.Add(10, Color.HSVToRGB(0, 0, 0.1f));//black
+        ColorLibrary.Add(11, Color.HSVToRGB(30 / 360f, 0.9f, 4f));//brown
     }
 
     /// <summary>

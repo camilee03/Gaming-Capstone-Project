@@ -136,21 +136,30 @@ public class PlayerController : NetworkBehaviour
     private void ApplyColor(int colorIndex)
     {
 
-        if (gameObject.GetComponent<ColorManager>() != null && colorIndex >= 1 && colorIndex < 13)
+        if (gameObject.GetComponent<ColorManager>() != null)
         {
             ColorManager colormanage = gameObject.GetComponent<ColorManager>();
             colormanage.ChangeSuitColor(colorIndex);
         }
     }
+    private System.Collections.IEnumerator WaitForLocalPlayer()
+    {
+        while (NetworkManager.Singleton.LocalClient == null ||
+               NetworkManager.Singleton.LocalClient.PlayerObject == null)
+        {
+            yield return null;
+        }
+
+    }
 
 
     private void OnColorChanged(int previous, int current)
     {
-        ApplyColor(current);
+        //ApplyColor(current);
 
         if (IsOwner)
         {
-            ColorSelectionUIManager uiManager = FindFirstObjectByType<ColorSelectionUIManager>() ;
+            SelectColorButton uiManager = FindFirstObjectByType<SelectColorButton>() ;
             if (uiManager != null)
             {
                 uiManager.RefreshAll();
@@ -193,7 +202,7 @@ public void ForceSetColorServerRpc(int colorIndex)
         GameController.Instance.LockColor(colorIndex);
 
         // Release previous color (if changing)
-        if (ColorID.Value > 0)
+        if (ColorID.Value >= 0)
         {
             GameController.Instance.UnlockColor(ColorID.Value);
         }
@@ -254,6 +263,8 @@ public void ForceSetColorServerRpc(int colorIndex)
         Debug.Log($"[ServerRpc] Received vote for color {colorIndex} from {OwnerClientId}");
         GameController.Instance.ReceiveVote(OwnerClientId, colorIndex);
     }
+
+
 
     private void Update()
     {
