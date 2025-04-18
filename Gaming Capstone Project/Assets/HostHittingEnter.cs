@@ -12,7 +12,8 @@ public class HostHittingEnter : NetworkBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     GameController controller;
     public Button StartButton;
-    public Canvas LobbyMenu;
+    public GameObject LobbyMenu;
+    public LobbyFadeScript LobbyFadeScript;
 
     public LobbyTextAnimation text;
 
@@ -29,7 +30,7 @@ public class HostHittingEnter : NetworkBehaviour
 
         controller = GameController.Instance;
 
-        controller.setLobby(LobbyMenu.gameObject);
+        controller.setLobby(LobbyMenu);
     }
     private void LateUpdate()
     {
@@ -64,6 +65,8 @@ public class HostHittingEnter : NetworkBehaviour
                 text.ShowError(1);
                 yield break;
             }
+            LobbyFadeScript.LevelFade();
+
             StartButton.interactable = false;
             StartButton.GetComponentInChildren<TMP_Text>().text = "Loading...";
             timer += Time.deltaTime;
