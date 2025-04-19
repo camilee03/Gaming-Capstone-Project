@@ -56,7 +56,7 @@ public class PlayerController : NetworkBehaviour
     private CameraMovement camMovement;
 
     private bool isTransformed = false;
-    private bool canAttack = true;
+    private bool canAttack = false;
     private float staminaRegenTimer;
     private float attackTimer;                  // Tracks time left before we can attack again
     public bool isGrounded;
@@ -412,7 +412,7 @@ public void ForceSetColorServerRpc(int colorIndex)
 
     public void Jump(InputAction.CallbackContext context)
     {
-        if (context.performed && isGrounded)
+        if (context.performed && isGrounded && !isDead)
         {
             // Launch the character upward
             rgd.linearVelocity = new Vector3(rgd.linearVelocity.x, jumpForce, rgd.linearVelocity.z);
@@ -482,7 +482,7 @@ public void ForceSetColorServerRpc(int colorIndex)
         // If you want only Dopples to do this, check isDopple here:
         // if (!isDopple) return;
 
-        if (context.performed && canAttack && IsOwner)
+        if (context.performed && canAttack && IsOwner && isDopple)
         {
             // Start the cooldown
             canAttack = false;
@@ -554,6 +554,10 @@ private IEnumerator EnterGhostMode()
     Collider col = GetComponent<Collider>();
     if (col != null)
         col.enabled = false;
+
+    // Disable gravity
+    Rigidbody rigidbody = GetComponent<Rigidbody>();
+    rigidbody.useGravity = false;
 
     // Disable attacking if you want
     canAttack = false;

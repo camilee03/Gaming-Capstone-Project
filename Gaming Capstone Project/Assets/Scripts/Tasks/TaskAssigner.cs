@@ -4,13 +4,14 @@ using TMPro;
 using System.Linq;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using Unity.Netcode;
 using UnityEngine.EventSystems;
 
 
 
 // MENTAL NOTE: MAKE SURE TASK POSITION SPAWNS > 50 AWAY FROM THE CURRENT OBJECT
 
-public class TaskAssigner : MonoBehaviour
+public class TaskAssigner : NetworkBehaviour
 {
     // Task containers
     List<RoomTask> taskList;
@@ -48,21 +49,21 @@ public class TaskAssigner : MonoBehaviour
 
     private void Update()
     {
-        if (start)
-        {
-            if (playerController.isDopple) { tasksCompleted.text = "You have no tasks, you are a dopple."; }
-            else
+            if (start)
             {
-                AssignTasks();
-                start = false;
-                donow = true;
+                if (playerController.isDopple) { tasksCompleted.text = "You have no tasks, you are a dopple."; }
+                else
+                {
+                    AssignTasksClientRpc();
+                    start = false;
+                    donow = true;
+                }
             }
-        }
-        else if (donow)
-        {
-            UpdateTasks();
-            CheckCheckboxes();
-        }
+            else if (donow)
+            {
+                UpdateTasks();
+                CheckCheckboxes();
+            }
     }
 
     void UpdateTasks()
@@ -92,31 +93,83 @@ public class TaskAssigner : MonoBehaviour
         if (numTasksFinished == numTasks) { taskManager.UpdateTasks(); numTasks = -1; }
     }
 
-    void AssignTasks()
+    [ServerRpc]
+    void AssignTasksServerRpc(ServerRpcParams rpcParams = default)
     {
         taskManager = GameObject.Find("RoomGenerationManager").GetComponent<TaskManager>();
         taskList = taskManager.taskList;
-        string goalTextResult = "";
+
+        List<RoomTask> playerTasks = new List<RoomTask>();
 
         for (int i = 0; i < numTasks; i++)
         {
-            if (taskList.Count == 0) { break; }
+            if (taskList.Count == 0) break;
 
-            // Add random tasks from total tasks in task manager
-            int newTask = Random.Range(0, taskList.Count - 1);
+            int newTask = Random.Range(0, taskList.Count);
 
-            assignedTasks.Add(taskList[newTask]);
-            taskList.Remove(taskList[newTask]); // make sure other players can't get this task
+            RoomTask task = taskList[newTask];
 
-            // Add new task checkbox
-            goalTextResult = "Task " + i + ": " + DisplayText(taskList[newTask]) + "\n";
-            CreateCheckboxes(new Vector3(200 + (i * 100), -200, 0), i, goalTextResult);
+            playerTasks.Add(task);
+            taskList.RemoveAt(newTask);
         }
 
+        // Send to this client
+        AssignTasksClientRpc(playerTasks.Select(t => taskManager.taskList.IndexOf(t)).ToArray(), rpcParams.Receive.SenderClientId);
+    }
+
+    [ClientRpc]
+    void AssignTasksClientRpc(int[] taskIndices, ulong clientId)
+    {
+        if (!IsOwner) return;
+
+        taskManager = GameObject.Find("RoomGenerationManager").GetComponent<TaskManager>();
+        assignedTasks = taskIndices.Select(index => taskManager.taskList[index]).ToList();
         finishedTasks = new Dictionary<RoomTask, bool>();
 
-        // set initial UI
+        string goalTextResult;
+
+        for (int i = 0; i < assignedTasks.Count; i++)
+        {
+            goalTextResult = "Task " + i + ": " + DisplayText(assignedTasks[i]) + "\n";
+            CreateCheckboxes(new Vector3(-200, 400 - i * 100, 0), i, goalTextResult);
+        }
+
         tasksCompleted.text = "0/" + numTasks;
+    }
+
+
+    [ClientRpc]
+    void AssignTasksClientRpc()
+    {
+        if (IsOwner)
+        {
+            taskManager = GameObject.Find("RoomGenerationManager").GetComponent<TaskManager>();
+            taskList = taskManager.taskList;
+            string goalTextResult = "";
+            if(taskList == null)
+            {
+                Debug.Log("task list null");
+            }
+            for (int i = 0; i < numTasks; i++)
+            {
+                if (taskList.Count == 0) { break; }
+
+                // Add random tasks from total tasks in task manager
+                int newTask = Random.Range(0, taskList.Count - 1);
+
+                assignedTasks.Add(taskList[newTask]);
+                taskList.Remove(taskList[newTask]); // make sure other players can't get this task
+                Debug.Log("task added" + taskList[newTask].type + "\n");
+                // Add new task checkbox
+                goalTextResult = "Task " + i + ": " + DisplayText(taskList[newTask]) + "\n";
+                CreateCheckboxes(new Vector3(-200, 400 - i * 100, 0), i, goalTextResult);
+            }
+
+            finishedTasks = new Dictionary<RoomTask, bool>();
+
+            // set initial UI
+            tasksCompleted.text = "0/" + numTasks;
+        }
     }
 
 

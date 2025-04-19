@@ -5,7 +5,7 @@ using Unity.Netcode;
 using UnityEngine;
 using static TaskManager;
 
-public class TaskManager : MonoBehaviour
+public class TaskManager : NetworkBehaviour
 {
     [Header("UI")]
     TMP_Text taskCommand;
@@ -62,6 +62,12 @@ public class TaskManager : MonoBehaviour
         
         //Debug.Log("NUM TASKS: " + taskList.Count);
     }
+    [ClientRpc]
+    public void CreateTasksClientRpc()
+    {
+        CreateTasks();  // Populate taskList on clients
+    }
+
 
     void CreateInteractTasks(GameObject[] useables, GameObject[] buttons)
     {
