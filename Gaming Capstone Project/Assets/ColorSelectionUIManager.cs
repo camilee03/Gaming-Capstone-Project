@@ -18,7 +18,7 @@ public class ColorSelectionUIManager : MonoBehaviour
     {
         foreach (var button in colorButtons)
         {
-            button.RefreshState();
+            button.RefreshAll();
         }
     }
 }

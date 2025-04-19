@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
@@ -12,7 +13,7 @@ public class VoteManager : NetworkBehaviour
     public HorizontalLayoutGroup HorizontalLayoutGroup;
     private List<GameObject> buttons;
     private Dictionary<GameObject, int> buttonToColor = new Dictionary<GameObject, int>();
-
+    public AudioSource PlayerAudioSource;
 
     private void OnEnable()
     {
@@ -47,6 +48,18 @@ public class VoteManager : NetworkBehaviour
             buttons.Add(button);
             buttonToColor[button] = capturedColor;
         }
+        
+    }
+
+
+    public void SetProximityChatAmount(float amount)
+    {
+        DOTween.To(
+            () => PlayerAudioSource.spatialBlend,
+            x => PlayerAudioSource.spatialBlend = x,
+            amount,
+            3f
+        ).SetEase(Ease.InOutSine);
     }
 
 

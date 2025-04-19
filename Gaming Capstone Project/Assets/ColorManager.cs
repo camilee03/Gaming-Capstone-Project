@@ -4,7 +4,7 @@ using UnityEngine;
 public class ColorManager : MonoBehaviour
 {
 
-    Color[] colors = {
+    public Color[] colors = {
         Color.HSVToRGB(0/360f,1,1), //Red
         Color.HSVToRGB(25/360f,1,1), //Orange
         Color.HSVToRGB(50/360f,1,1), //Yellow
@@ -22,12 +22,16 @@ public class ColorManager : MonoBehaviour
 
     public void ChangeSuitColor(int index)
     {
-        hazmatSuit1.material.SetColor("_Color", colors[index]);
-        hazmatSuit2.material.SetColor("_Color", colors[index]);
-        if (indicator != null)
+        if (index < colors.Length && index > -1)
         {
-            Debug.Log("Changing Color of Indicator");
-            indicator.material.SetColor("_BaseColor", colors[index]);
+            Debug.Log("WTF " + index);
+            hazmatSuit1.material.SetColor("_Color", colors[index]);
+            hazmatSuit2.material.SetColor("_Color", colors[index]);
+            if (indicator != null)
+            {
+                Debug.Log("Changing Color of Indicator");
+                indicator.material.SetColor("_BaseColor", colors[index]);
+            }
         }
     }
 }

@@ -4,26 +4,28 @@ using UnityEngine.UI;
 
 public class SelectColorButton : MonoBehaviour
 {
-    [Tooltip("Color index from 1 to 12")]
-    public int colorIndex;
+    [Tooltip("Color index from 0 to 11")]
 
     private Button buttonComponent;
     private Image buttonImage;
     private Color color;
+    public LobbyColorGuy lobbyColorGuy;
+
+    public LobbyColorButton[] colorButtons;
+
     private void Awake()
     {
         buttonComponent = GetComponent<Button>();
         buttonImage = GetComponent<Image>();
-        color = buttonImage.color;
 
     }
 
     private void Start()
     {
-        RefreshState();
+        RefreshAll();
     }
 
-    public void OnClick_SelectColor()
+    public void OnClick_SelectColor(int colorIndex)
     {
         if (!NetworkManager.Singleton.IsConnectedClient) return;
 
@@ -37,19 +39,13 @@ public class SelectColorButton : MonoBehaviour
 
     }
 
-    public void RefreshState()
+    public void RefreshAll()
     {
-        if (GameController.Instance == null || buttonComponent == null) return;
-
-        bool available = GameController.Instance.IsColorAvailable(colorIndex);
-        buttonComponent.interactable = available;
-
-        // Gray out the color if taken
-        if (buttonImage != null)
+        foreach (var button in colorButtons)
         {
-            if(available) buttonImage.color = color;
-            else buttonImage.color = Color.gray;
-            Debug.Log("RefreshedColor");
+            button.RefreshState();
         }
+    
+    lobbyColorGuy.UpdateColor();
     }
 }

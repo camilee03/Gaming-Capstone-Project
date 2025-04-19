@@ -1160,7 +1160,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1772910116491687248
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5842,6 +5842,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2382224101158354578}
     m_Modifications:
+    - target: {fileID: 1238525325206112707, guid: 9e99d18d864676a46b448f32ce00aab2, type: 3}
+      propertyPath: PlayerAudioSource
+      value: 
+      objectReference: {fileID: 8741315578205649328}
     - target: {fileID: 1639263181387124365, guid: 9e99d18d864676a46b448f32ce00aab2, type: 3}
       propertyPath: m_Name
       value: Voting Screen

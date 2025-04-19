@@ -9,7 +9,7 @@ public class TimeUntilVote : MonoBehaviour
     {
         if (GameController.Instance != null)
         {
-            int totalSeconds = GameController.Instance.secondsRemainingUntilVote;
+            int totalSeconds = GameController.Instance.secondsRemainingUntilVote.Value;
             int minutes = totalSeconds / 60;
             int seconds = totalSeconds % 60;
 
