@@ -77,7 +77,6 @@ public class ObjectGeneration : NetworkBehaviour
             if (newWall.gameObject.name.StartsWith('W'))
             {
                 wallPositions.Add(newWall.position);
-                Debug.Log(newWall.position);
                 wallDict[RoomFunctions.RoundVector3(newWall.position)] = newWall.gameObject;
             }
             else { doorPositions.Add(newWall.position); }
@@ -116,8 +115,6 @@ public class ObjectGeneration : NetworkBehaviour
 
             Object newObject = CreateObject(identifier);
             if (newObject == null) { continue; }
-            if (newObject.domains == wallPositions) { Debug.Log("HEREWALL"); }
-            if (newObject.domains == tilePositions) { Debug.Log("HERETILE"); }
 
             else if (newObject.constraint == Constraints.None && numTilePositions > 0) // check that can still place on tiles
             {
@@ -146,11 +143,13 @@ public class ObjectGeneration : NetworkBehaviour
             bool collided = false;
             foreach (Vector3 doorPos in doorPositions)
             {
-                if (Vector3.Distance(doorPos, newObject.domains[0]) < 1) { collided = true; continue; }
+                if ((doorPos - newObject.domains[0]).sqrMagnitude < 10) { collided = true; continue; }
             }
-            if (collided) { continue; }
 
-            PlaceObjects(newObject.identifier, newObject.domains[0], scale, objectParent);
+            // Check condition for dictionary
+            if (newObject.constraint == Constraints.Ceiling) { if (!wallDict.Keys.Contains(RoomFunctions.RoundVector3(newObject.domains[0]))) { continue; } }
+
+            if (!collided) { PlaceObjects(newObject.identifier, newObject.domains[0], scale, objectParent); }
         }
 
         return objectParent;
@@ -218,7 +217,12 @@ public class ObjectGeneration : NetworkBehaviour
             if (obj.constraint == Constraints.Ceiling) { continue; }
 
             // Check that no assigned spot has the same pos as current
-            if (obj.domains.Contains(domain)) { return false; }
+            bool collided = false;
+            foreach (Vector3 position in obj.domains)
+            {
+                if ((domain - position).sqrMagnitude < 10) { collided = true; continue; }
+            }
+            if (collided) { return false; }
 
             // Check pairing
             if (hasPairing && obj.identifier.Equals(unassigned.pairedIdentifier))
@@ -312,7 +316,7 @@ public class ObjectGeneration : NetworkBehaviour
             return true;
 
         // Standard constraint: two objects (non-ceiling) should not occupy the same position.
-        if (value1.Equals(value2))
+        if ((value1 -value2).sqrMagnitude < 10)
             return false;
 
         // Check the pairing constraint if applicable.

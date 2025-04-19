@@ -62,27 +62,29 @@ public class RoomFunctions : ScriptableObject
     {
         List<GameObject> colliderList = GameObject.FindGameObjectsWithTag("Tile").ToList(); // list of tiles
         List<GameObject> roomList = GetRootChild(room, "TileParent", 1, false); // list of rooms in room
-        List<GameObject> hallwayList = GetRootChild(room, "Hallway", 2, false); // list of parents of hallways in room
+        //List<GameObject> hallwayList = GetRootChild(room, "Hallway", 2, false); // list of parents of hallways in room
 
         foreach (GameObject root in roomList) // iterates through rooms
         {
             Transform tiles = root.transform.GetChild(1); // gets tileParent
             int childNum = tiles.childCount;
 
-            for (int i = 0; i < childNum; i++) // iterates through room tiles
+            for (int i = 0; i < childNum; i++) // iterates through all room tiles
             {
-                foreach (GameObject coll in colliderList) // iterates through all tiles
+                foreach (GameObject coll in colliderList) // iterates through all global tiles
                 {
+                    // Find the uppermost parent
                     GameObject parent = coll;
                     while(parent.transform.parent != null)
                     {
                         parent = parent.transform.parent.gameObject;
                     }
 
+                    // Figure out if global and room tile collide
                     if (parent != room)
                     {
-                        float distanceSquared = Mathf.Sqrt((coll.transform.position - tiles.GetChild(i).position).sqrMagnitude);
-                        if (distanceSquared <= (2 * scale))
+                        float distanceSquared = (coll.transform.position - tiles.GetChild(i).position).sqrMagnitude;
+                        if (distanceSquared <= Mathf.Pow((2 * scale),2))
                         {
                             return true;
                         }
@@ -147,6 +149,6 @@ public class RoomFunctions : ScriptableObject
 
     public static Vector3 RoundVector3(Vector3 vector)
     {
-        return new Vector3((int)Mathf.Round(vector.x), 2.5f, (int)Mathf.Round(vector.z));
+        return new Vector3((int)Mathf.CeilToInt(vector.x), 2.5f, (int)Mathf.CeilToInt(vector.z));
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using Unity.Netcode;
 using Unity.VisualScripting;
+using UnityEditor.Rendering;
 using UnityEngine;
 
 public class RoomGeneration : NetworkBehaviour
@@ -309,11 +310,10 @@ public class RoomGeneration : NetworkBehaviour
             bool collided = false;
             foreach (Vector3 wallPos in wallPositions)
             {
-                if (Vector3.Distance(wallPos, spawnPos[i]) < 1) { collided = true; continue; }
+                if ((wallPos - spawnPos[i]).sqrMagnitude < 10) { collided = true; continue; }
             }
-            if (collided) { continue; }
 
-            if (positions[i] != prevPos && positions[i] != nextPos)
+            if (!collided && positions[i] != prevPos && positions[i] != nextPos)
             {
                 Quaternion rotation = Quaternion.LookRotation(outwardDirections[i], Vector3.up) * Quaternion.Euler(-90, 0, 0);
                 GameObject newObject = SpawnNetworkedObject(parent.transform, walls, spawnPos[i], rotation);
