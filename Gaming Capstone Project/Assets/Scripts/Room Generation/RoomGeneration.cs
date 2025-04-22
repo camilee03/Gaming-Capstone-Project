@@ -264,12 +264,12 @@ public class RoomGeneration : NetworkBehaviour
         GameObject hallwayParent = SpawnNetworkedObject(null, roomParentObject, Vector3.zero, Quaternion.identity);
         hallwayParent.name = "Hallway";
 
-        Vector3 prevPos = dar1.door.transform.position;
+        Vector3 prevPos = tile1;
         for (int i = 0; i < hallwayPath.Count - 1; i++)
         {
             SpawnNetworkedObject(hallwayParent.transform, tiles, hallwayPath[i], Quaternion.identity);
             List<Vector3> wallPositions = RoomFunctions.GetAllWallPositions();
-            DrawWallsAroundDoors(prevPos, hallwayPath[i], hallwayPath[i + 1], hallwayParent, wallPositions);
+            DrawWallsAroundHallways(prevPos, hallwayPath[i], hallwayPath[i + 1], hallwayParent, wallPositions);
             prevPos = hallwayPath[i];
         }
 
@@ -286,9 +286,10 @@ public class RoomGeneration : NetworkBehaviour
     }
 
     /// <summary> Outlines a hallway with walls </summary>
-    void DrawWallsAroundDoors(Vector3 prevPos, Vector3 pos, Vector3 nextPos, GameObject parent, List<Vector3> wallPositions)
+    void DrawWallsAroundHallways(Vector3 prevPos, Vector3 pos, Vector3 nextPos, GameObject parent, List<Vector3> wallPositions)
     {
-        List<Vector3> positions = new List<Vector3>{pos+Vector3.left*scale, pos+Vector3.back*scale, 
+        List<Vector3> floorPositions = new List<Vector3>{
+            pos+Vector3.left*scale, pos+Vector3.back*scale, 
             pos+Vector3.right*scale,  pos+Vector3.forward*scale};
 
         // Define outward directions for walls
@@ -306,7 +307,7 @@ public class RoomGeneration : NetworkBehaviour
             new(pos.x, 2.5f, pos.z + scale / 2) // floor below (spawn up)
         };
 
-        for (int i=0; i<positions.Count; i++)
+        for (int i=0; i<floorPositions.Count; i++)
         {
             bool collided = false;
             foreach (Vector3 wallPos in wallPositions)
@@ -314,10 +315,11 @@ public class RoomGeneration : NetworkBehaviour
                 if ((wallPos - spawnPos[i]).sqrMagnitude < 10) { collided = true; continue; }
             }
 
-            if (!collided && positions[i] != prevPos && positions[i] != nextPos)
+            if (!collided && floorPositions[i] != prevPos && floorPositions[i] != nextPos)
             {
-                Quaternion rotation = Quaternion.LookRotation(outwardDirections[i], Vector3.up) * Quaternion.Euler(-90, 0, 0);
+                Quaternion rotation = Quaternion.LookRotation(-outwardDirections[i], Vector3.up) * Quaternion.Euler(-90, 0, 0);
                 GameObject newObject = SpawnNetworkedObject(parent.transform, walls, spawnPos[i], rotation);
+                newObject.name = "Wall" + i;
             }
         }
     }
