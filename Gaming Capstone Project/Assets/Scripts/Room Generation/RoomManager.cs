@@ -64,8 +64,8 @@ public class RoomManager : NetworkBehaviour
     }
     void SetWallTextures(Vector3 color, int wallpaperIndex, ulong tID)
     {
-        UnityEngine.Color c = new UnityEngine.Color(color.x, color.y, color.z);
-        Texture2D wallPaper = RoomManager.Instance.wallpaperTextures[wallpaperIndex];
+        Color c = new Color(color.x, color.y, color.z);
+        Texture2D wallPaper = wallpaperTextures[wallpaperIndex];
         NetworkObject netObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[tID];
         Transform t = netObj.transform;
         foreach (Renderer r in t.GetChild(0).GetComponentsInChildren<Renderer>())
@@ -73,7 +73,7 @@ public class RoomManager : NetworkBehaviour
             int i = Mathf.RoundToInt(Random.Range(0, wallDamageTextures.Length));
             r.material.SetColor("_Color", c);
             r.material.SetTexture("_Wallpaper", wallPaper);
-            r.material.SetTexture("_Damage", RoomManager.Instance.wallDamageTextures[i]);
+            r.material.SetTexture("_Damage", wallDamageTextures[i]);
         }
     }
 }

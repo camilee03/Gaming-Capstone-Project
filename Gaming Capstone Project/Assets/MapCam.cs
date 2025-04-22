@@ -1,6 +1,7 @@
 using UnityEngine;
+using Unity.Netcode;
 
-public class MapCam : MonoBehaviour
+public class MapCam : NetworkBehaviour
 {
     public Camera[] cams;
     public GameObject textPrefab;
@@ -12,9 +13,13 @@ public class MapCam : MonoBehaviour
         {
             Vector3 pt = rm.spawnPoints[i].transform.position;
             midPoint += pt;
-            GameObject newObject = GameObject.Instantiate(textPrefab, new Vector3(pt.x, 10, pt.z), Quaternion.EulerAngles(new Vector3(Mathf.Deg2Rad * 90, 0, 0)));
-            newObject.name = "RoomText" + i;
-            newObject.GetComponent<TextMesh>().text = rm.rooms[i].roomName;
+            if (IsOwner)
+            {
+                Debug.Log("Setting up Room Text");
+                if (IsServer) { setUpRoomTextClientRpc(rm.rooms[i].roomName, pt, i); }
+                else { setUpRoomTextServerRpc(rm.rooms[i].roomName, pt, i); }
+            }
+            else Debug.Log("Not Owner.");
         }
         midPoint = midPoint / rm.spawnPoints.Count;
         float maxDistance = 0;
@@ -30,12 +35,48 @@ public class MapCam : MonoBehaviour
                 maxDistanceVector = pt;
             }
         }
+        if (IsOwner)
+        {
+            Debug.Log("Setting Up Cams");
+            if (IsServer) { setUpCamClientRpc(maxDistance, maxDistanceSize, midPoint); }
+            else { setUpCamServerRpc(maxDistance, maxDistanceSize, midPoint); }
+        }
+        else Debug.Log("Not Owner.");
+    }
+    [ClientRpc]
+    public void setUpRoomTextClientRpc(string text, Vector3 point, int index)
+    {
+        setUpRoomText(text, point, index);
+    }
+    [ServerRpc]
+    public void setUpRoomTextServerRpc(string text, Vector3 point, int index)
+    {
+        setUpRoomTextClientRpc(text, point, index);
+    }
+    void setUpRoomText(string text, Vector3 point, int index)
+    {
+        GameObject newObject = GameObject.Instantiate(textPrefab, new Vector3(point.x, 10, point.z), Quaternion.EulerAngles(new Vector3(Mathf.Deg2Rad * 90, 0, 0)));
+        newObject.name = "RoomText" + index;
+        newObject.GetComponent<TextMesh>().text = text;
+    }
+
+    [ClientRpc]
+    public void setUpCamClientRpc(float maxDistance, float maxDistanceSize, Vector3 midPoint)
+    {
+        setUpCam(maxDistance, maxDistanceSize, midPoint);
+    }
+    [ServerRpc]
+    public void setUpCamServerRpc(float maxDistance, float maxDistanceSize, Vector3 midPoint)
+    {
+        setUpCamClientRpc(maxDistance, maxDistanceSize, midPoint);
+    }
+    void setUpCam(float maxDistance, float maxDistanceSize, Vector3 midPoint)
+    {
         foreach (Camera cam in cams)
         {
             cam.orthographicSize = maxDistance + maxDistanceSize / 4;
         }
         transform.position = new Vector3(midPoint.x, 30, midPoint.z);
         Debug.Log("Mid Position: " + transform.position);
-
     }
 }
