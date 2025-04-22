@@ -3,7 +3,7 @@ using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class RoomManager : MonoBehaviour
+public class RoomManager : NetworkBehaviour
 {
     public static RoomManager Instance { get; private set; }
     public Texture2D [] wallpaperTextures;
@@ -41,16 +41,39 @@ public class RoomManager : MonoBehaviour
     {
         foreach(Room room in rooms)
         {
-            Color color = new Color(Random.Range(0.5f, 1), Random.Range(0.5f, 1), Random.Range(0.5f, 1));
-            Texture2D wallPaper = wallpaperTextures[Mathf.RoundToInt(Random.Range(0, wallpaperTextures.Length))];
-            Transform t = room.parent.transform;
-            foreach(Renderer r in t.GetChild(0).GetComponentsInChildren<Renderer>())
+            Vector3 color = new Vector3(Random.Range(0.5f, 1), Random.Range(0.5f, 1), Random.Range(0.5f, 1));
+            int wallPaper = Mathf.RoundToInt(Random.Range(0, wallpaperTextures.Length));
+            ulong tID = room.parent.GetComponent<NetworkObject>().NetworkObjectId;
+            if (IsOwner)
             {
-                int i = Mathf.RoundToInt(Random.Range(0, wallDamageTextures.Length));
-                r.material.SetColor("_Color", color);
-                r.material.SetTexture("_Wallpaper", wallPaper);
-                r.material.SetTexture("_Damage", wallDamageTextures[i]);
+                if (IsServer) { setWallTexturesClientRpc(color, wallPaper, tID); }
+                else { setWallTexturesServerRpc(color, wallPaper, tID); }
             }
+        }
+    }
+
+    [ServerRpc]
+    public void setWallTexturesServerRpc(Vector3 color, int wallpaperIndex, ulong tID)
+    {
+        setWallTexturesClientRpc(color, wallpaperIndex, tID);
+    }
+    [ClientRpc]
+    public void setWallTexturesClientRpc(Vector3 color, int wallpaperIndex, ulong tID)
+    {
+        SetWallTextures(color, wallpaperIndex, tID);
+    }
+    void SetWallTextures(Vector3 color, int wallpaperIndex, ulong tID)
+    {
+        UnityEngine.Color c = new UnityEngine.Color(color.x, color.y, color.z);
+        Texture2D wallPaper = RoomManager.Instance.wallpaperTextures[wallpaperIndex];
+        NetworkObject netObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[tID];
+        Transform t = netObj.transform;
+        foreach (Renderer r in t.GetChild(0).GetComponentsInChildren<Renderer>())
+        {
+            int i = Mathf.RoundToInt(Random.Range(0, wallDamageTextures.Length));
+            r.material.SetColor("_Color", c);
+            r.material.SetTexture("_Wallpaper", wallPaper);
+            r.material.SetTexture("_Damage", RoomManager.Instance.wallDamageTextures[i]);
         }
     }
 }
