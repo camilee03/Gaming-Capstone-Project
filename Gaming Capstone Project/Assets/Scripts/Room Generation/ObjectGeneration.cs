@@ -147,7 +147,7 @@ public class ObjectGeneration : NetworkBehaviour
             }
 
             // Check condition for dictionary
-            if (newObject.constraint == Constraints.Ceiling) { if (!wallDict.Keys.Contains(RoomFunctions.RoundVector3(newObject.domains[0]))) { continue; } }
+            if (newObject.constraint == Constraints.Ceiling) { if (!wallDict.Keys.Contains(newObject.domains[0])) { Debug.Log(newObject.domains[0]); continue; } }
 
             if (!collided) { PlaceObjects(newObject.identifier, newObject.domains[0], scale, objectParent); }
         }
@@ -381,10 +381,16 @@ public class ObjectGeneration : NetworkBehaviour
                 newObject = SpawnNetworkedObject(parent.transform, objects["light"], tilePos + ceilingHeight, Quaternion.Euler(-90, 0, 0));
                 break;
             case 'l': // lever
-                newObject = SpawnNetworkedObject(parent.transform, objects["lever"], tilePos + disp + Vector3.up * 3, wallDict[tilePos].transform.rotation);
+                if (wallDict.Keys.Contains(tilePos))
+                {
+                    newObject = SpawnNetworkedObject(parent.transform, objects["lever"], tilePos + disp + Vector3.up * 3, wallDict[tilePos].transform.rotation);
+                }
                 break;
             case 'P': // Poster
-                newObject = SpawnNetworkedObject(parent.transform, objects["poster"], tilePos + disp * 0.5f + Vector3.up * 5, Quaternion.LookRotation(wallDict[tilePos].transform.right) * Quaternion.Euler(-90, 0, 90));
+                if (wallDict.Keys.Contains(tilePos))
+                {
+                    newObject = SpawnNetworkedObject(parent.transform, objects["poster"], tilePos + disp * 0.5f + Vector3.up * 5, Quaternion.LookRotation(wallDict[tilePos].transform.right) * Quaternion.Euler(-90, 0, 90));
+                }
                 break;
             case 'p': // paper
                 newObject = SpawnNetworkedObject(parent.transform, objects["paper"], tilePos, Quaternion.identity);
@@ -393,7 +399,10 @@ public class ObjectGeneration : NetworkBehaviour
                 newObject = SpawnNetworkedObject(parent.transform, objects["radio"], tilePos, Quaternion.Euler(0, randomRotationsY[i], 0));
                 break;
             case 's': // speaker
-                newObject = SpawnNetworkedObject(parent.transform, objects["speaker"], tilePos + disp + Vector3.up * 3, Quaternion.LookRotation(wallDict[tilePos].transform.forward) * Quaternion.Euler(0, 90, 0));
+                if (wallDict.Keys.Contains(tilePos))
+                {
+                    newObject = SpawnNetworkedObject(parent.transform, objects["speaker"], tilePos + disp + Vector3.up * 3, Quaternion.LookRotation(wallDict[tilePos].transform.forward) * Quaternion.Euler(0, 90, 0));
+                }
                 break;
             case 'T': // Table
                 newObject = SpawnNetworkedObject(parent.transform, objects["table"], tilePos, Quaternion.Euler(-90, randomRotationsY[i], 0));
@@ -404,13 +413,22 @@ public class ObjectGeneration : NetworkBehaviour
                 newObject.transform.localScale /= 1.1f;
                 break;
             case 'v': // vent
-                newObject = SpawnNetworkedObject(parent.transform, objects["vent"], tilePos + disp * 0.5f + Vector3.up, Quaternion.LookRotation(wallDict[tilePos].transform.right) * Quaternion.Euler(-90, 0, 90));
+                if (wallDict.Keys.Contains(tilePos))
+                {
+                    newObject = SpawnNetworkedObject(parent.transform, objects["vent"], tilePos + disp * 0.5f + Vector3.up, Quaternion.LookRotation(wallDict[tilePos].transform.right) * Quaternion.Euler(-90, 0, 90));
+                }
                 break;
             case 'W': // Chute
-                newObject = SpawnNetworkedObject(parent.transform, objects["chute"], tilePos + disp, wallDict[tilePos].transform.rotation);
+                if (wallDict.Keys.Contains(tilePos))
+                {
+                    newObject = SpawnNetworkedObject(parent.transform, objects["chute"], tilePos + disp, wallDict[tilePos].transform.rotation);
+                }
                 break;
             case 'w': // Wires
-                newObject = SpawnNetworkedObject(parent.transform, objects["wires"], tilePos + disp, wallDict[tilePos].transform.rotation);
+                if (wallDict.Keys.Contains(tilePos))
+                {
+                    newObject = SpawnNetworkedObject(parent.transform, objects["wires"], tilePos + disp, wallDict[tilePos].transform.rotation);
+                }
                 break;
             case 'X': // food
                 newObject = SpawnNetworkedObject(parent.transform, objects["food"], tilePos, Quaternion.Euler(0, randomRotationsY[i], 0));
@@ -428,7 +446,7 @@ public class ObjectGeneration : NetworkBehaviour
         }
 
 
-        spawnedObjects.Add(newObject);
+        if (newObject != null) { spawnedObjects.Add(newObject); }
     }
 
     int FindWallDirection(Vector3 position)

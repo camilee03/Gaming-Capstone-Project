@@ -51,7 +51,7 @@ public class TaskAssigner : NetworkBehaviour
     {
             if (start)
             {
-                if (playerController.isDopple) { tasksCompleted.text = "You have no tasks, you are a dopple."; }
+                if (false && playerController.isDopple) { tasksCompleted.text = "You have no tasks, you are a dopple."; }
                 else
                 {
                     AssignTasksClientRpc();
@@ -92,51 +92,6 @@ public class TaskAssigner : NetworkBehaviour
 
         if (numTasksFinished == numTasks) { taskManager.UpdateTasks(); numTasks = -1; }
     }
-
-    [ServerRpc]
-    void AssignTasksServerRpc(ServerRpcParams rpcParams = default)
-    {
-        taskManager = GameObject.Find("RoomGenerationManager").GetComponent<TaskManager>();
-        taskList = taskManager.taskList;
-
-        List<RoomTask> playerTasks = new List<RoomTask>();
-
-        for (int i = 0; i < numTasks; i++)
-        {
-            if (taskList.Count == 0) break;
-
-            int newTask = Random.Range(0, taskList.Count);
-
-            RoomTask task = taskList[newTask];
-
-            playerTasks.Add(task);
-            taskList.RemoveAt(newTask);
-        }
-
-        // Send to this client
-        AssignTasksClientRpc(playerTasks.Select(t => taskManager.taskList.IndexOf(t)).ToArray(), rpcParams.Receive.SenderClientId);
-    }
-
-    [ClientRpc]
-    void AssignTasksClientRpc(int[] taskIndices, ulong clientId)
-    {
-        if (!IsOwner) return;
-
-        taskManager = GameObject.Find("RoomGenerationManager").GetComponent<TaskManager>();
-        assignedTasks = taskIndices.Select(index => taskManager.taskList[index]).ToList();
-        finishedTasks = new Dictionary<RoomTask, bool>();
-
-        string goalTextResult;
-
-        for (int i = 0; i < assignedTasks.Count; i++)
-        {
-            goalTextResult = "Task " + i + ": " + DisplayText(assignedTasks[i]) + "\n";
-            CreateCheckboxes(new Vector3(-200, 400 - i * 100, 0), i, goalTextResult);
-        }
-
-        tasksCompleted.text = "0/" + numTasks;
-    }
-
 
     [ClientRpc]
     void AssignTasksClientRpc()
@@ -272,10 +227,10 @@ public class TaskAssigner : NetworkBehaviour
 
         switch (task.type)
         {
-            case TaskType.Interact: return "Activate " + results;
-            case TaskType.Terminal: return "Use the terminal in " + triggerRooms + " to ____";
-            case TaskType.Pickup: return "Move " + triggers + " in " + triggerRooms + " to " + resultRooms;
-            case TaskType.Paper: return "Piece the papers in " + triggerRooms + "together in " + resultRooms + ".";
+            case TaskType.Interact: return "Activate" + results;
+            case TaskType.Terminal: return "Use the terminal in" + triggerRooms + " to ____";
+            case TaskType.Pickup: return "Move" + triggers + " in" + triggerRooms + " to" + resultRooms;
+            case TaskType.Paper: return "Piece the papers in " + triggerRooms + " together in" + resultRooms + ".";
             default: return "";
         }
     }
