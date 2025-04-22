@@ -191,7 +191,57 @@ public class GameController : NetworkBehaviour
         GameObject.Find("RoomGenerationManager").GetComponent<RoomGeneration>().StartGeneration(numPlayers);
     }
 
+    [ServerRpc]
+    public void CheckForEndOfGameServerRpc()
+    {
+        int deadDopples = 0, deadSci = 0;
+        foreach(var kvp in Players)
+        {
+            if(kvp.Value.GetComponent<PlayerController>().isDead)
+            {
+                if(kvp.Value.GetComponent<PlayerController>().isDopple)
+                {
+                    deadDopples++;
+                    Debug.Log("Plus 1 dead Dopple, now at " + deadDopples);
+                }
+                else
+                {
+                    deadSci++;
+                    Debug.Log("Plus 1 dead scientsit, now at " + deadSci);
 
+                }
+            }
+        }
+
+        if(deadDopples >= numberOfDopples)
+        {
+            Debug.Log("Scientsits Win!");
+            EndGameForScienceWin();
+            return;
+        }
+        if (numberOfDopples-deadDopples >= (Players.Count-numberOfDopples)-deadSci)
+        {
+            Debug.Log("Dopples Win!");
+            EndGameForDoppleWin();
+            return;
+        }
+        Debug.Log("Nobody Won!");
+        //Maybe change Task-based win/loss to into this script? idk
+    }
+
+    private void EndGameForScienceWin()
+    {
+        if(IsServer)
+        playerObj.GetComponentInChildren<PlayerDisplayFade>().ScientistWinClientRpc();
+    }
+
+
+    private void EndGameForDoppleWin()
+    {
+        if(IsServer) 
+        playerObj.GetComponentInChildren<PlayerDisplayFade>().DoppleWinClientRpc();
+
+    }
 
 
 
@@ -319,8 +369,8 @@ public class GameController : NetworkBehaviour
             StartVoteInitTimerServerRpc();
         
         Debug.Log("Voting competed3");
-
         playerObj.GetComponent<PlayerController>().EndVoteClientRpc();
+        CheckForEndOfGameServerRpc();
 
     }
 
