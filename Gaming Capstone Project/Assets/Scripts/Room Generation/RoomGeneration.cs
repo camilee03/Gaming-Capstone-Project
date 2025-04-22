@@ -1,13 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using Unity.Netcode;
 using Unity.VisualScripting;
+using UnityEditor.Rendering;
 using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.InputSystem.XR;
-using UnityEngine.Rendering;
-using UnityEngine.SceneManagement;
 
 public class RoomGeneration : NetworkBehaviour
 {
@@ -60,6 +58,7 @@ public class RoomGeneration : NetworkBehaviour
         GenerateMultipleRooms();
         RoomManager.Instance.InitializeSpawnPoints();
         taskManager.CreateTasks();
+        taskManager.CreateTasksClientRpc();
         mcam.Setup();
         RoomManager.Instance.ChangeWalls();
     }
@@ -75,18 +74,12 @@ public class RoomGeneration : NetworkBehaviour
         RoomManager.Instance.rooms.Add(newRoom);
         GameObject room1 = newRoom.parent;
 
-        // Find and spawn lobby
-        //GameObject room1 = GameObject.Find("Room0");
-
-
         int index = 1;
 
         while (numRooms > 0)
         {
             // choose a random room from room1 to edit
             GameObject chosenRoom = RoomFunctions.GetRootChild(room1, "WallParent", 0, true)[0];
-            //bool isLobby = chosenRoom.name == "Room0";
-            bool isLobby = false;
 
             // Spawn next room
             Room room2 = new(scale, tiles, walls, roomObject, roomParentObject);
@@ -96,8 +89,8 @@ public class RoomGeneration : NetworkBehaviour
 
             // Get new doors
             doorAndRoom = new();
-            ReplaceWallWithDoor(chosenRoom.transform.GetChild(0).gameObject, room1, isLobby);
-            ReplaceWallWithDoor(room2.wallParent, room2.parent, false);
+            ReplaceWallWithDoor(chosenRoom.transform.GetChild(0).gameObject, room1);
+            ReplaceWallWithDoor(room2.wallParent, room2.parent);
 
             // Link two rooms together
             room1 = RotateRooms();
@@ -134,18 +127,10 @@ public class RoomGeneration : NetworkBehaviour
     // -- DOOR GENERATION -- //
 
     /// <summary> Chooses random walls to replace with a door </summary>
-    void ReplaceWallWithDoor(GameObject wallParent, GameObject room, bool isLobby)
+    void ReplaceWallWithDoor(GameObject wallParent, GameObject room)
     {
         bool findWall = true;
         int index = 0;
-
-        // Go one step deeper if lobby
-        if (isLobby)
-        {
-            index = Random.Range(0, wallParent.transform.childCount - 1); // find random wall edge
-            wallParent = wallParent.transform.GetChild(index).gameObject;
-        }
-
 
         findWall = true;
         while (findWall)
@@ -154,22 +139,18 @@ public class RoomGeneration : NetworkBehaviour
             findWall = wallParent.transform.GetChild(index).gameObject.name[0] != 'W'; // while isn't a wall
         }
 
-        // set door rotation as same as wall
+        // set door positon as same as wall
         Transform wallTransform = wallParent.transform.GetChild(index);
         Vector3 wallPosition = wallTransform.position;
 
-
+        // set door rotation as same as wall
         Vector3 outwardDir = -wallTransform.right; // Wall's right vector
         Quaternion wallRotation = Quaternion.LookRotation(outwardDir, Vector3.up) * Quaternion.Euler(-90, 0, 90);
 
         // find direction based on name
         string name = wallParent.transform.GetChild(index).gameObject.name;
-        char lastChar = name[name.Length - 1]; 
-        
-        Vector3 wallForward = wallTransform.right;
-        int direction = (wallForward == Vector3.left) ? 0 :
-                        (wallForward == Vector3.back) ? 1 :
-                        (wallForward == Vector3.right) ? 2 : 3;
+        char lastChar = name[name.Length - 1];
+        int direction = System.Convert.ToInt16(lastChar);
 
         // replace wall with door
         wallParent.transform.GetChild(index).GetComponent<NetworkObject>().Despawn(true);
@@ -245,7 +226,7 @@ public class RoomGeneration : NetworkBehaviour
 
         dar2.room.transform.Translate(displacement);
 
-        // Determine each door’s direction
+        // Determine each doorï¿½s direction
         Vector3 meetingDir1 = -dar1.door.transform.up.normalized;
         Vector3 meetingDir2 = -dar2.door.transform.up.normalized;
 
@@ -288,7 +269,7 @@ public class RoomGeneration : NetworkBehaviour
         {
             SpawnNetworkedObject(hallwayParent.transform, tiles, hallwayPath[i], Quaternion.identity);
             List<Vector3> wallPositions = RoomFunctions.GetAllWallPositions();
-            //DrawWallsAroundDoors(prevPos, hallwayPath[i], hallwayPath[i + 1], hallwayParent, wallPositions);
+            DrawWallsAroundDoors(prevPos, hallwayPath[i], hallwayPath[i + 1], hallwayParent, wallPositions);
             prevPos = hallwayPath[i];
         }
 
@@ -298,39 +279,45 @@ public class RoomGeneration : NetworkBehaviour
     /// <summary> Compute the tile outside the given door </summary>
     Vector3 ComputeDoorTile(GameObject door)
     {
-        // Assume the door's down should point toward where the floor tile should be placed.
+        // Assume the door's up should point away from where the floor tile should be placed.
         Vector3 doorDir = -door.transform.up.normalized;
         Vector3 tilePos = door.transform.position + doorDir * scale/2;
         return tilePos; 
     }
 
     /// <summary> Outlines a hallway with walls </summary>
-    void DrawWallsAroundDoors(Vector3 prevPos, Vector3 pos, Vector3 nextPos, GameObject parent, List<Vector3> wallPos)
+    void DrawWallsAroundDoors(Vector3 prevPos, Vector3 pos, Vector3 nextPos, GameObject parent, List<Vector3> wallPositions)
     {
         List<Vector3> positions = new List<Vector3>{pos+Vector3.left*scale, pos+Vector3.back*scale, 
             pos+Vector3.right*scale,  pos+Vector3.forward*scale};
 
         // Define outward directions for walls
         Vector3[] outwardDirections = new Vector3[4] {
-        Vector3.left,    // Pointing West
-        Vector3.back,    // Pointing North
-        Vector3.right,   // Pointing East
-        Vector3.forward  // Pointing South
+            Vector3.left,    // Pointing West
+            Vector3.back,    // Pointing North
+            Vector3.right,   // Pointing East
+            Vector3.forward  // Pointing South
         };
 
-        Vector3 spawnLeft = new Vector3(pos.x + scale / 2, 2.5f, pos.z);
-        Vector3 spawnBelow = new Vector3(pos.x, 2.5f, pos.z - scale / 2);
-        Vector3 spawnRight = new Vector3(pos.x - scale / 2, 2.5f, pos.z);
-        Vector3 spawnAbove = new Vector3(pos.x, 2.5f, pos.z + scale / 2);
-        Vector3[] spawnPos = new Vector3[4] { spawnLeft, spawnBelow, spawnRight, spawnAbove };
+        Vector3[] spawnPos = new Vector3[4] {
+            new(pos.x - scale / 2, 2.5f, pos.z), // floor to right (spawn left)
+            new(pos.x, 2.5f, pos.z - scale / 2), // floor above (spawn below)
+            new(pos.x + scale / 2, 2.5f, pos.z), // floor to left (spawn right)
+            new(pos.x, 2.5f, pos.z + scale / 2) // floor below (spawn up)
+        };
 
         for (int i=0; i<positions.Count; i++)
         {
-            if (!wallPos.Contains(RoomFunctions.RoundVector3(spawnPos[i])) && positions[i] != prevPos && positions[i] != nextPos)
+            bool collided = false;
+            foreach (Vector3 wallPos in wallPositions)
             {
-                GameObject newObject = SpawnNetworkedObject(parent.transform, walls, Vector3.zero, Quaternion.identity);
-                newObject.transform.position = spawnPos[i];
-                newObject.transform.rotation = Quaternion.LookRotation(outwardDirections[i], Vector3.up) * Quaternion.Euler(-90, 0, 0);
+                if ((wallPos - spawnPos[i]).sqrMagnitude < 10) { collided = true; continue; }
+            }
+
+            if (!collided && positions[i] != prevPos && positions[i] != nextPos)
+            {
+                Quaternion rotation = Quaternion.LookRotation(outwardDirections[i], Vector3.up) * Quaternion.Euler(-90, 0, 0);
+                GameObject newObject = SpawnNetworkedObject(parent.transform, walls, spawnPos[i], rotation);
             }
         }
     }

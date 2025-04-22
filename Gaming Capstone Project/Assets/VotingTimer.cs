@@ -12,7 +12,7 @@ public class VotingTimer : MonoBehaviour
         {
 
 
-            TextField.text = GameController.Instance.TimeLeftInVoting.ToString() ;
+            TextField.text = GameController.Instance.TimeLeftInVoting.Value.ToString() ;
         }
     }
 }

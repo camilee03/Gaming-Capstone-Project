@@ -5,7 +5,7 @@ using Unity.Netcode;
 using UnityEngine;
 using static TaskManager;
 
-public class TaskManager : MonoBehaviour
+public class TaskManager : NetworkBehaviour
 {
     [Header("UI")]
     TMP_Text taskCommand;
@@ -62,6 +62,12 @@ public class TaskManager : MonoBehaviour
         
         //Debug.Log("NUM TASKS: " + taskList.Count);
     }
+    [ClientRpc]
+    public void CreateTasksClientRpc()
+    {
+        CreateTasks();  // Populate taskList on clients
+    }
+
 
     void CreateInteractTasks(GameObject[] useables, GameObject[] buttons)
     {
@@ -189,12 +195,19 @@ public class TaskManager : MonoBehaviour
         {
             objectData1 = new ObjectData[gameObject1.Length];
 
-            for (int i = 0; i < gameObject1.Length - 1; i++)
+            for (int i = 0; i < gameObject1.Length; i++)
             {
                 objectData1[i] = gameObject1[i].GetComponent<ObjectData>();
                 Room room = RoomFunctions.FindRoomOfObject(gameObject1[i]);
                 rooms1.Add(room);
+                Debug.Log("HERE");
             }
+        }
+
+        Debug.Log("BEINGS");
+        foreach (Room room in rooms1)
+        {
+            Debug.Log(room.roomName);
         }
 
         // Find data & location of objects 2 list
@@ -203,7 +216,7 @@ public class TaskManager : MonoBehaviour
         {
             objectData2 = new ObjectData[gameObject2.Length];
 
-            for (int i=0; i<gameObject2.Length-1; i++)
+            for (int i=0; i<gameObject2.Length; i++)
             {
                 objectData2[i] = gameObject2[i].GetComponent<ObjectData>();
                 Room room = RoomFunctions.FindRoomOfObject(gameObject2[i]);

@@ -4,15 +4,18 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
+using System.Collections;
 
 public class HostHittingEnter : NetworkBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     GameController controller;
     public Button StartButton;
-    public Canvas LobbyMenu;
+    public GameObject LobbyMenu;
+    public LobbyFadeScript LobbyFadeScript;
 
-    public TMP_Text text;
+    public LobbyTextAnimation text;
 
     private void Update()
     {
@@ -27,7 +30,7 @@ public class HostHittingEnter : NetworkBehaviour
 
         controller = GameController.Instance;
 
-        controller.setLobby(LobbyMenu.gameObject);
+        controller.setLobby(LobbyMenu);
     }
     private void LateUpdate()
     {
@@ -40,20 +43,39 @@ public class HostHittingEnter : NetworkBehaviour
     {
         if(IsHost)
         {
-            controller.HostSelectsStart();
-            controller.DisableLobbyCanvasClientRpc();
+            StartCoroutine(CheckPlayerCountBeforeStart());
         }
         else
         {
-            text.transform.DOMoveY(300, 5).OnComplete(() =>
-            {
-                text.transform.DOMoveY(75, 0.25f);
-            });
-            text.DOFade(1, 3).OnComplete(() => {
-                text.DOFade(0, 2);
-            });
+            text.ShowError(0);
         }
             Debug.Log("Button has been pressed!");
         Cursor.lockState = CursorLockMode.Locked;
+    }
+
+    IEnumerator CheckPlayerCountBeforeStart()
+    {
+        float timer = 0f;
+        float maxWaitTime = 10f; // optional: limit how long to check
+
+        while (timer < 5f && maxWaitTime > 0f)
+        {
+            if (NetworkManager.Singleton.ConnectedClients.Count < 2)
+            {
+                text.ShowError(1);
+                yield break;
+            }
+            LobbyFadeScript.LevelFade();
+
+            StartButton.interactable = false;
+            StartButton.GetComponentInChildren<TMP_Text>().text = "Loading...";
+            timer += Time.deltaTime;
+            maxWaitTime -= Time.deltaTime;
+            yield return null;
+        }
+
+        controller.HostSelectsStart();
+        controller.DisableLobbyCanvasClientRpc();
+        this.enabled = false;
     }
 }

@@ -139,10 +139,10 @@ public class Room : NetworkBehaviour
 
         // Define outward directions for walls
         Vector3[] outwardDirections = new Vector3[4] {
-        Vector3.left,    // Pointing West
-        Vector3.back,    // Pointing North
-        Vector3.right,   // Pointing East
-        Vector3.forward  // Pointing South
+            Vector3.left,    // Pointing West
+            Vector3.back,    // Pointing North
+            Vector3.right,   // Pointing East
+            Vector3.forward  // Pointing South
         };
 
         bool[] locations = new bool[4] { // conditions to spawn
@@ -162,7 +162,6 @@ public class Room : NetworkBehaviour
                 // Combine -90 degrees on x-axis with outward direction rotation
                 Quaternion wallRotation = Quaternion.LookRotation(outwardDir, Vector3.up) * Quaternion.Euler(-90, 0, 0);
                 newObject = SpawnNetworkedObject(parent, child, RoomFunctions.ConvertTileToPos(x, y, i, true, scale), wallRotation);
-
 
                 newObject.name = "Wall" + i;
 

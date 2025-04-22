@@ -142,6 +142,8 @@ MonoBehaviour:
     obj: {fileID: 607777774246203299, guid: 491e0b8b2ef77154e82d29005daf935f, type: 3}
   - name: paper
     obj: {fileID: 2340950732892518580, guid: dac31d909daca27498212ea04c1514f3, type: 3}
+  - name: poster
+    obj: {fileID: 8434211146768594839, guid: e68fd0bc65f48e144887b33093d6f80f, type: 3}
   - name: radio
     obj: {fileID: 7378980975851388449, guid: 548016657dcbe6a448425ceac9f0bd99, type: 3}
   - name: speaker

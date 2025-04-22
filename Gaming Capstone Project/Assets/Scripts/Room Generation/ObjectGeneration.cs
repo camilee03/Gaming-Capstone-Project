@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.ConstrainedExecution;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Xml.Serialization;
 using Unity.Netcode;
 using Unity.VisualScripting;
@@ -20,7 +21,7 @@ public class ObjectGeneration : NetworkBehaviour
     List<Vector3> tilePositions = new();
     List<Vector3> wallPositions = new();
     List<Vector3> doorPositions = new();
-    Dictionary<Vector3, Quaternion> wallRotations = new();
+    Dictionary<Vector3, GameObject> wallDict = new();
 
     [Header("Existing Room")]
     char[,] descripterTiles; // what each tile has on it
@@ -69,14 +70,14 @@ public class ObjectGeneration : NetworkBehaviour
 
         // Create viable locations lists
         wallPositions = new();
-        wallRotations = new();
+        wallDict = new();
         for (int i = 0; i < room.wallParent.transform.childCount - 1; i++)
         {
             Transform newWall = room.wallParent.transform.GetChild(i);
             if (newWall.gameObject.name.StartsWith('W'))
             {
                 wallPositions.Add(newWall.position);
-                wallRotations[newWall.position] = newWall.rotation;
+                wallDict[RoomFunctions.RoundVector3(newWall.position)] = newWall.gameObject;
             }
             else { doorPositions.Add(newWall.position); }
         }
@@ -110,8 +111,10 @@ public class ObjectGeneration : NetworkBehaviour
 
         foreach (char identifier in objectList)
         {
+            if (identifier == '\0' || identifier == ' ') { continue; }
+
             Object newObject = CreateObject(identifier);
-            if (newObject.domains == null) { continue; }
+            if (newObject == null) { continue; }
 
             else if (newObject.constraint == Constraints.None && numTilePositions > 0) // check that can still place on tiles
             {
@@ -136,10 +139,17 @@ public class ObjectGeneration : NetworkBehaviour
 
         foreach (Object newObject in assignedObjects)
         {
-            if (!doorPositions.Contains(newObject.domains[0]))
+            if (newObject.domains.Count == 0) { continue; }
+            bool collided = false;
+            foreach (Vector3 doorPos in doorPositions)
             {
-                PlaceObjects2(newObject.identifier, newObject.domains[0], scale, objectParent);
+                if ((doorPos - newObject.domains[0]).sqrMagnitude < 10) { collided = true; continue; }
             }
+
+            // Check condition for dictionary
+            if (newObject.constraint == Constraints.Ceiling) { if (!wallDict.Keys.Contains(newObject.domains[0])) { Debug.Log(newObject.domains[0]); continue; } }
+
+            if (!collided) { PlaceObjects(newObject.identifier, newObject.domains[0], scale, objectParent); }
         }
 
         return objectParent;
@@ -207,7 +217,12 @@ public class ObjectGeneration : NetworkBehaviour
             if (obj.constraint == Constraints.Ceiling) { continue; }
 
             // Check that no assigned spot has the same pos as current
-            if (obj.domains.Contains(domain)) { return false; }
+            bool collided = false;
+            foreach (Vector3 position in obj.domains)
+            {
+                if ((domain - position).sqrMagnitude < 10) { collided = true; continue; }
+            }
+            if (collided) { return false; }
 
             // Check pairing
             if (hasPairing && obj.identifier.Equals(unassigned.pairedIdentifier))
@@ -234,7 +249,7 @@ public class ObjectGeneration : NetworkBehaviour
         Queue<(Object, Object)> arcs = new Queue<(Object, Object)>();
         for (int i = 0; i < objects.Count; i++)
         {
-            for (int j = 0; j < objects.Count; j++)
+            for (int j = i; j < objects.Count; j++)
             {
                 if (i != j)
                     arcs.Enqueue((objects[i], objects[j]));
@@ -301,7 +316,7 @@ public class ObjectGeneration : NetworkBehaviour
             return true;
 
         // Standard constraint: two objects (non-ceiling) should not occupy the same position.
-        if (value1.Equals(value2))
+        if ((value1 -value2).sqrMagnitude < 10)
             return false;
 
         // Check the pairing constraint if applicable.
@@ -323,14 +338,17 @@ public class ObjectGeneration : NetworkBehaviour
 
 
     // -- Object Creation -- //
-    private void PlaceObjects2(char type, Vector3 tilePos, int scale, GameObject parent)
+    private void PlaceObjects(char type, Vector3 tilePos, int scale, GameObject parent)
     {
+        tilePos = RoomFunctions.RoundVector3(tilePos);
+
         GameObject newObject = null;
         Vector3 ceilingHeight = Vector3.up * 12;
 
-        Vector3[] displacementVector = new Vector3[4] {Vector3.left, Vector3.up, Vector3.right, Vector3.down };
+        Vector3[] displacementVector = new Vector3[4] {Vector3.left, Vector3.down, Vector3.right, Vector3.up };
         Vector3 disp = Vector3.zero;
-        if (wallRotations.Keys.Contains(tilePos)) { disp = displacementVector[FindWallDirection(wallRotations[tilePos], tilePos, roomParent)]; }
+
+        if (wallDict.Keys.Contains(tilePos)) { disp = displacementVector[FindWallDirection(tilePos)]; }
 
         float[] randomRotationsY = new float[4] { 90, 0, 180, -90 };
         int i = Random.Range(0, 4);
@@ -338,7 +356,7 @@ public class ObjectGeneration : NetworkBehaviour
         switch (type)
         {
             case 'B': // button
-                newObject = SpawnNetworkedObject(parent.transform, objects["button"], tilePos + disp, wallRotations[tilePos]);
+                newObject = SpawnNetworkedObject(parent.transform, objects["button"], tilePos + disp, wallDict[tilePos].transform.rotation);
                 break;
             case 'b': // box
                 newObject = SpawnNetworkedObject(parent.transform, objects["box"], tilePos, Quaternion.Euler(-90, 0, randomRotationsY[i]));
@@ -363,7 +381,16 @@ public class ObjectGeneration : NetworkBehaviour
                 newObject = SpawnNetworkedObject(parent.transform, objects["light"], tilePos + ceilingHeight, Quaternion.Euler(-90, 0, 0));
                 break;
             case 'l': // lever
-                newObject = SpawnNetworkedObject(parent.transform, objects["lever"], tilePos + disp + Vector3.up * 3, wallRotations[tilePos]);
+                if (wallDict.Keys.Contains(tilePos))
+                {
+                    newObject = SpawnNetworkedObject(parent.transform, objects["lever"], tilePos + disp + Vector3.up * 3, wallDict[tilePos].transform.rotation);
+                }
+                break;
+            case 'P': // Poster
+                if (wallDict.Keys.Contains(tilePos))
+                {
+                    newObject = SpawnNetworkedObject(parent.transform, objects["poster"], tilePos + disp * 0.5f + Vector3.up * 5, Quaternion.LookRotation(wallDict[tilePos].transform.right) * Quaternion.Euler(-90, 0, 90));
+                }
                 break;
             case 'p': // paper
                 newObject = SpawnNetworkedObject(parent.transform, objects["paper"], tilePos, Quaternion.identity);
@@ -372,7 +399,10 @@ public class ObjectGeneration : NetworkBehaviour
                 newObject = SpawnNetworkedObject(parent.transform, objects["radio"], tilePos, Quaternion.Euler(0, randomRotationsY[i], 0));
                 break;
             case 's': // speaker
-                newObject = SpawnNetworkedObject(parent.transform, objects["speaker"], tilePos + disp + Vector3.up * 3, wallRotations[tilePos]);
+                if (wallDict.Keys.Contains(tilePos))
+                {
+                    newObject = SpawnNetworkedObject(parent.transform, objects["speaker"], tilePos + disp + Vector3.up * 3, Quaternion.LookRotation(wallDict[tilePos].transform.forward) * Quaternion.Euler(0, 90, 0));
+                }
                 break;
             case 'T': // Table
                 newObject = SpawnNetworkedObject(parent.transform, objects["table"], tilePos, Quaternion.Euler(-90, randomRotationsY[i], 0));
@@ -383,13 +413,22 @@ public class ObjectGeneration : NetworkBehaviour
                 newObject.transform.localScale /= 1.1f;
                 break;
             case 'v': // vent
-                newObject = SpawnNetworkedObject(parent.transform, objects["vent"], tilePos + disp * 0.5f + Vector3.up, wallRotations[tilePos]);
+                if (wallDict.Keys.Contains(tilePos))
+                {
+                    newObject = SpawnNetworkedObject(parent.transform, objects["vent"], tilePos + disp * 0.5f + Vector3.up, Quaternion.LookRotation(wallDict[tilePos].transform.right) * Quaternion.Euler(-90, 0, 90));
+                }
                 break;
             case 'W': // Chute
-                newObject = SpawnNetworkedObject(parent.transform, objects["chute"], tilePos + disp, wallRotations[tilePos]);
+                if (wallDict.Keys.Contains(tilePos))
+                {
+                    newObject = SpawnNetworkedObject(parent.transform, objects["chute"], tilePos + disp, wallDict[tilePos].transform.rotation);
+                }
                 break;
             case 'w': // Wires
-                newObject = SpawnNetworkedObject(parent.transform, objects["wires"], tilePos + disp, wallRotations[tilePos]);
+                if (wallDict.Keys.Contains(tilePos))
+                {
+                    newObject = SpawnNetworkedObject(parent.transform, objects["wires"], tilePos + disp, wallDict[tilePos].transform.rotation);
+                }
                 break;
             case 'X': // food
                 newObject = SpawnNetworkedObject(parent.transform, objects["food"], tilePos, Quaternion.Euler(0, randomRotationsY[i], 0));
@@ -407,32 +446,23 @@ public class ObjectGeneration : NetworkBehaviour
         }
 
 
-        spawnedObjects.Add(newObject);
+        if (newObject != null) { spawnedObjects.Add(newObject); }
     }
 
-    int FindWallDirection(Quaternion rotation, Vector3 position, GameObject room)
+    int FindWallDirection(Vector3 position)
     {
-        if (rotation.eulerAngles.y % 180 == 90)
-        {
-            // Direction 0 (left)
-            if (position.x < room.transform.position.x) { return 0; }
+        Vector3 doorDir = -wallDict[position].transform.up;
 
-            // Direction 2 (right)
-            return 2;
-        }
-        else
-        {
-            // Direction 1 (below)
-            if (position.z < room.transform.position.z) { return 1; }
+        int result = doorDir == Vector3.right ? 0 : 
+            doorDir == Vector3.forward ? 1 :
+            doorDir == Vector3.left ? 2 : 3;
 
-            // Direction 3 (above)
-            return 3;
-        }
+        return result;
     }
 
     private Object CreateObject(char identifier)
     {
-        Object newObject = new Object();
+        Object newObject = null;
 
         // Figure out constraints
         switch (identifier)
@@ -451,27 +481,28 @@ public class ObjectGeneration : NetworkBehaviour
             case 'C': // Chair
             case 't': // Table
             case 'r': // Radio
-                newObject = new Object() { identifier = identifier, domains = tilePositions, constraint = Constraints.None };
+                newObject = new Object() { identifier = identifier, domains = new(tilePositions), constraint = Constraints.None };
                 break;
 
             // -- Wall Constraints -- //
             case 'W': // Chute
             case 'l': // Lever
+            case 'P': // Poster
             case 's': // Speaker
             case 'v': // Vent
             case 'w': // Wires
-                newObject = new Object() { identifier = identifier, domains = wallPositions, constraint = Constraints.Wall };
+                newObject = new Object() { identifier = identifier, domains = new(wallPositions), constraint = Constraints.Wall };
                 break;
 
             // -- Ceiling Constraints -- //
             case 'L': // Light
-                newObject = new Object() { identifier = identifier, domains = tilePositions, constraint = Constraints.Ceiling };
+                newObject = new Object() { identifier = identifier, domains = new(tilePositions), constraint = Constraints.Ceiling };
                 break;
 
             // -- Default -- //
             default:
                 Debug.Log($"{identifier} character not found");
-                break;
+                return newObject;
         }
 
         // Figure out properties
@@ -511,19 +542,20 @@ public class ObjectGeneration : NetworkBehaviour
     // -- Object Type Creation -- //
     private char[] CreateObjectList(int numTiles, string[] objects) 
     {
+        int wiggleRoom = 0;
         if (2 * objects.Length > numTiles) { Debug.Log("ERROR: More objects than space"); }
+        else { wiggleRoom = Mathf.Max((numTiles - objects.Length * 2) - 5, 0); }
 
-        char[] roomObjectList = new char[numTiles-1];
-        int wiggleRoom = Mathf.Max((numTiles - objects.Length * 2) - 5, 0);
+        char[] roomObjectList = new char[numTiles - 1];
         int index = 0;
 
         foreach (string obj in objects)
         {
-            int numObjs = NumberOfObjectsToSpawn(obj.ToCharArray()[0], wiggleRoom);
+            int numObjs = NumberOfObjectsToSpawn(obj.ToCharArray()[0], wiggleRoom, numTiles);
             for (int i = 0; i < numObjs; i++)
             {
                 if (obj == "") { continue; }
-                if (index >= roomObjectList.Length) { Debug.Log("Too many spawned objects. Breaking."); continue; }
+                if (index >= numTiles-1) { Debug.Log("Too many spawned objects. Breaking."); break; }
                 roomObjectList[index++] = obj.ToCharArray()[0];
             }
         }
@@ -531,7 +563,7 @@ public class ObjectGeneration : NetworkBehaviour
         return roomObjectList;
     }
 
-    private int NumberOfObjectsToSpawn(char obj, int wiggleRoom)
+    private int NumberOfObjectsToSpawn(char obj, int wiggleRoom, int numTiles)
     {
         switch (obj)
         {
@@ -543,7 +575,7 @@ public class ObjectGeneration : NetworkBehaviour
                 return Mathf.Min(Random.Range(5, 5 + wiggleRoom), 10);
 
             case 'L': // Light
-                return Random.Range(5, 10);
+                return numTiles/3;
 
             // Scarce objects
             case 'B': // Button
@@ -561,17 +593,7 @@ public class ObjectGeneration : NetworkBehaviour
 
     }
 
-   
-    
-    // Each object has a value x,y that determines where it is on the graph
-    // For every x,y certain functions must be applied to make each scenario true
-    // Trim borders to make it easier?
-
-    // Step 1: Choose random point inside room that hasn't been assigned yet (maybe keep a list for simplicity?)
-    // Step 2: Choose an object to place in point that fufills constraints (decide on ordering --> maybe place big items first?)
-    // Step 3: Repeat until no objects are left
-
-    // Some global constraints: objects must be inside room / on wall, objects cannot be assigned to same place as another
+ 
 
     class Object
     {

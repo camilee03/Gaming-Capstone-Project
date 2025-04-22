@@ -56,7 +56,7 @@ public class PlayerController : NetworkBehaviour
     private CameraMovement camMovement;
 
     private bool isTransformed = false;
-    private bool canAttack = true;
+    private bool canAttack = false;
     private float staminaRegenTimer;
     private float attackTimer;                  // Tracks time left before we can attack again
     public bool isGrounded;
@@ -89,6 +89,7 @@ public class PlayerController : NetworkBehaviour
             playerInput.enabled = true;
             cam.gameObject.SetActive(true);
             camMovement.enabled = true;
+            PlayerDisplay.SetActive(true);
         }
         else
         {
@@ -100,6 +101,7 @@ public class PlayerController : NetworkBehaviour
             cam.enabled = false;
             camMovement.enabled = false;
             al.enabled = false;
+            PlayerDisplay.SetActive(false);
         }
     }
 
@@ -136,21 +138,30 @@ public class PlayerController : NetworkBehaviour
     private void ApplyColor(int colorIndex)
     {
 
-        if (gameObject.GetComponent<ColorManager>() != null && colorIndex >= 1 && colorIndex < 13)
+        if (gameObject.GetComponent<ColorManager>() != null)
         {
             ColorManager colormanage = gameObject.GetComponent<ColorManager>();
             colormanage.ChangeSuitColor(colorIndex);
         }
     }
+    private System.Collections.IEnumerator WaitForLocalPlayer()
+    {
+        while (NetworkManager.Singleton.LocalClient == null ||
+               NetworkManager.Singleton.LocalClient.PlayerObject == null)
+        {
+            yield return null;
+        }
+
+    }
 
 
     private void OnColorChanged(int previous, int current)
     {
-        ApplyColor(current);
+        //ApplyColor(current);
 
         if (IsOwner)
         {
-            ColorSelectionUIManager uiManager = FindFirstObjectByType<ColorSelectionUIManager>() ;
+            SelectColorButton uiManager = FindFirstObjectByType<SelectColorButton>() ;
             if (uiManager != null)
             {
                 uiManager.RefreshAll();
@@ -193,7 +204,7 @@ public void ForceSetColorServerRpc(int colorIndex)
         GameController.Instance.LockColor(colorIndex);
 
         // Release previous color (if changing)
-        if (ColorID.Value > 0)
+        if (ColorID.Value >= 0)
         {
             GameController.Instance.UnlockColor(ColorID.Value);
         }
@@ -218,26 +229,31 @@ public void ForceSetColorServerRpc(int colorIndex)
             TeamDeclaration.text = "You are a : Scientist";
     }
 
-
-    public void StartVote()
+    [ClientRpc]
+    public void StartVoteClientRpc()
     {
-        Cursor.lockState = CursorLockMode.None;
-        VotingScreen.gameObject.SetActive(true);
-        VotingScreen.DOFade(1, 3);
-        VotingScreen.GetComponent<VoteManager>().CreateColorButtons();
-        //make color buttons.
-        
-        //start voting timer
+        if (!isDead)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            VotingScreen.gameObject.SetActive(true);
+            VotingScreen.DOFade(1, 3);
+            VotingScreen.GetComponent<VoteManager>().CreateColorButtons();
+            VotingScreen.GetComponent<VoteManager>().SetProximityChatAmount(0);
+        }
+
     }
-
-    public void EndVote()
+    [ClientRpc]
+    public void EndVoteClientRpc()
     {
+        Debug.Log("Voting on client");
+        VotingScreen.GetComponent<VoteManager>().SetProximityChatAmount(1);
 
         VotingScreen.DOFade(0, 3);
         VotingScreen.GetComponent<VoteManager>().ClearButtons();
 
         VotingScreen.gameObject.SetActive(false);
         Cursor.lockState = CursorLockMode.Locked;
+
 
 
 
@@ -249,6 +265,8 @@ public void ForceSetColorServerRpc(int colorIndex)
         Debug.Log($"[ServerRpc] Received vote for color {colorIndex} from {OwnerClientId}");
         GameController.Instance.ReceiveVote(OwnerClientId, colorIndex);
     }
+
+
 
     private void Update()
     {
@@ -394,7 +412,7 @@ public void ForceSetColorServerRpc(int colorIndex)
 
     public void Jump(InputAction.CallbackContext context)
     {
-        if (context.performed && isGrounded)
+        if (context.performed && isGrounded && !isDead)
         {
             // Launch the character upward
             rgd.linearVelocity = new Vector3(rgd.linearVelocity.x, jumpForce, rgd.linearVelocity.z);
@@ -464,7 +482,7 @@ public void ForceSetColorServerRpc(int colorIndex)
         // If you want only Dopples to do this, check isDopple here:
         // if (!isDopple) return;
 
-        if (context.performed && canAttack && IsOwner)
+        if (context.performed && canAttack && IsOwner && isDopple)
         {
             // Start the cooldown
             canAttack = false;
@@ -536,6 +554,10 @@ private IEnumerator EnterGhostMode()
     Collider col = GetComponent<Collider>();
     if (col != null)
         col.enabled = false;
+
+    // Disable gravity
+    Rigidbody rigidbody = GetComponent<Rigidbody>();
+    rigidbody.useGravity = false;
 
     // Disable attacking if you want
     canAttack = false;
