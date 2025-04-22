@@ -22,7 +22,7 @@ public class RoomGeneration : NetworkBehaviour
     [Header("Spawn Data")]
     public float scale = 10; // how many tiles apart are different objects
     public int seed = -1; // set to -1 if no seed wanted
-    public int numRooms = 4;
+    public int numRooms = 12;
     [SerializeField] GameObject tiles;
     [SerializeField] GameObject walls;
     [SerializeField] GameObject doors;

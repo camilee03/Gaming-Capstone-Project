@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine.UI;
 using System;
 using UnityEngine.EventSystems;
+using Unity.Netcode;
 
 public class DOSInteraction : MonoBehaviour
 {
@@ -38,9 +39,8 @@ public class DOSInteraction : MonoBehaviour
     public void SetCam(GameObject cam)
     {
         camera = cam;
-        camera = Camera.main.gameObject;
         CameraMovementScript = camera.GetComponent<CameraMovement>();
-        playerController = camera.transform.parent.parent.parent.parent.parent.parent.GetComponent<PlayerController>();
+        playerController = NetworkManager.Singleton.LocalClient.PlayerObject.gameObject.GetComponent<PlayerController>();
 
     }
 

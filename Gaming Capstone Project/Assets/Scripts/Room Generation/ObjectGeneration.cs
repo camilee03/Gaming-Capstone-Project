@@ -251,7 +251,7 @@ public class ObjectGeneration : NetworkBehaviour
             if (pair != null)
             {
                 // Enforce the distance constraint.
-                if (Vector3.Distance(domain, pair.domains[0]) > 50)
+                if (Vector3.Distance(domain, pair.domains[0]) > 30)
                     return false;
             }
         }
@@ -338,12 +338,12 @@ public class ObjectGeneration : NetworkBehaviour
         // For instance, if obj1 is paired, then when comparing with its paired object, the positions must be within 50 units.
         if (obj1.properties.Contains(Properties.Paired) && obj2.identifier.Equals(obj1.pairedIdentifier))
         {
-            return Vector3.Distance(value1, value2) <= 50;
+            return Vector3.Distance(value1, value2) <= 30;
         }
         // Also check the symmetric case.
         if (obj2.properties.Contains(Properties.Paired) && obj1.identifier.Equals(obj2.pairedIdentifier))
         {
-            return Vector3.Distance(value1, value2) <= 50;
+            return Vector3.Distance(value1, value2) <= 30;
         }
 
         // Otherwise, there’s no additional binary constraint.
@@ -398,7 +398,7 @@ public class ObjectGeneration : NetworkBehaviour
             case 'l': // lever
                 if (wallDict.Keys.Contains(tilePos))
                 {
-                    newObject = SpawnNetworkedObject(parent.transform, objects["lever"], tilePos + disp + Vector3.up * 3, wallDict[tilePos].transform.rotation);
+                    newObject = SpawnNetworkedObject(parent.transform, objects["lever"], tilePos + disp * 0.5f + Vector3.up * 3, Quaternion.LookRotation(wallDict[tilePos].transform.right) * Quaternion.Euler(-90, 0, 90));
                 }
                 break;
             case 'P': // Poster
@@ -416,7 +416,7 @@ public class ObjectGeneration : NetworkBehaviour
             case 's': // speaker
                 if (wallDict.Keys.Contains(tilePos))
                 {
-                    newObject = SpawnNetworkedObject(parent.transform, objects["speaker"], tilePos + disp + Vector3.up * 3, Quaternion.LookRotation(wallDict[tilePos].transform.forward) * Quaternion.Euler(0, 90, 0));
+                    newObject = SpawnNetworkedObject(parent.transform, objects["speaker"], tilePos + disp * 2 + Vector3.up * 4, Quaternion.LookRotation(wallDict[tilePos].transform.right) * Quaternion.Euler(-90, 0, 90));
                 }
                 break;
             case 'T': // Table
@@ -436,13 +436,13 @@ public class ObjectGeneration : NetworkBehaviour
             case 'W': // Chute
                 if (wallDict.Keys.Contains(tilePos))
                 {
-                    newObject = SpawnNetworkedObject(parent.transform, objects["chute"], tilePos + disp, wallDict[tilePos].transform.rotation);
+                    newObject = SpawnNetworkedObject(parent.transform, objects["chute"], tilePos + disp * 0.5f + Vector3.up * 5, Quaternion.LookRotation(wallDict[tilePos].transform.right) * Quaternion.Euler(-90, 0, 90));
                 }
                 break;
             case 'w': // Wires
                 if (wallDict.Keys.Contains(tilePos))
                 {
-                    newObject = SpawnNetworkedObject(parent.transform, objects["wires"], tilePos + disp, wallDict[tilePos].transform.rotation);
+                    newObject = SpawnNetworkedObject(parent.transform, objects["wires"], tilePos + disp * 0.5f + Vector3.up * 5, Quaternion.LookRotation(wallDict[tilePos].transform.right) * Quaternion.Euler(-90, 0, 90));
                 }
                 break;
             case 'X': // food
@@ -543,12 +543,15 @@ public class ObjectGeneration : NetworkBehaviour
     {
         GameObject instance = null;
 
-        instance = Instantiate(child, position, rotation);
-        NetworkObject instanceNetworkObject = instance.GetComponent<NetworkObject>();
-        if (instanceNetworkObject == null) { Debug.LogError(child.name + " needs a NetworkObject"); }
-        instanceNetworkObject.Spawn(true);
+        if (child != null)
+        {
+            instance = Instantiate(child, position, rotation);
+            NetworkObject instanceNetworkObject = instance.GetComponent<NetworkObject>();
+            if (instanceNetworkObject == null) { Debug.LogError(child.name + " needs a NetworkObject"); }
+            instanceNetworkObject.Spawn(true);
 
-        if (parent != null) { instanceNetworkObject.TrySetParent(parent); }
+            if (parent != null) { instanceNetworkObject.TrySetParent(parent); }
+        }
 
         return instance;
     }
