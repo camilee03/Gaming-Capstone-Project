@@ -60,11 +60,13 @@ public class HostHittingEnter : NetworkBehaviour
 
         while (timer < 5f && maxWaitTime > 0f)
         {
+            /*
             if (NetworkManager.Singleton.ConnectedClients.Count < 2)
             {
                 text.ShowError(1);
                 yield break;
             }
+            */
             LobbyFadeScript.LevelFade();
 
             StartButton.interactable = false;

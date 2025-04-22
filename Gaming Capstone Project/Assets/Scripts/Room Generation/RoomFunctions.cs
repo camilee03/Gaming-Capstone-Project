@@ -122,11 +122,13 @@ public class RoomFunctions : ScriptableObject
 
     public static Room FindRoomOfObject(GameObject obj)
     {
-        GameObject roomObject = obj.transform.parent.parent.gameObject;
+        Transform objectParent = obj.transform.parent;
+        GameObject roomParent = null;
+        if (objectParent != null) { roomParent = objectParent.parent.gameObject; }
 
         foreach (Room room in RoomManager.Instance.rooms)
         {
-            if (roomObject == room.parent) { return room; }
+            if (roomParent == room.parent) { return room; }
         }
 
         return null;

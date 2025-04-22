@@ -200,14 +200,7 @@ public class TaskManager : NetworkBehaviour
                 objectData1[i] = gameObject1[i].GetComponent<ObjectData>();
                 Room room = RoomFunctions.FindRoomOfObject(gameObject1[i]);
                 rooms1.Add(room);
-                Debug.Log("HERE");
             }
-        }
-
-        Debug.Log("BEINGS");
-        foreach (Room room in rooms1)
-        {
-            Debug.Log(room.roomName);
         }
 
         // Find data & location of objects 2 list

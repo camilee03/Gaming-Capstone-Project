@@ -113,11 +113,12 @@ public class TaskAssigner : NetworkBehaviour
                 int newTask = Random.Range(0, taskList.Count - 1);
 
                 assignedTasks.Add(taskList[newTask]);
-                taskList.Remove(taskList[newTask]); // make sure other players can't get this task
-                Debug.Log("task added" + taskList[newTask].type + "\n");
+
                 // Add new task checkbox
                 goalTextResult = "Task " + i + ": " + DisplayText(taskList[newTask]) + "\n";
                 CreateCheckboxes(new Vector3(-200, 400 - i * 100, 0), i, goalTextResult);
+
+                taskList.Remove(taskList[newTask]); // make sure other players can't get this task
             }
 
             finishedTasks = new Dictionary<RoomTask, bool>();

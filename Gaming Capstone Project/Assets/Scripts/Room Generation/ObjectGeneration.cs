@@ -146,9 +146,6 @@ public class ObjectGeneration : NetworkBehaviour
                 if ((doorPos - newObject.domains[0]).sqrMagnitude < 10) { collided = true; continue; }
             }
 
-            // Check condition for dictionary
-            if (newObject.constraint == Constraints.Ceiling) { if (!wallDict.Keys.Contains(newObject.domains[0])) { Debug.Log(newObject.domains[0]); continue; } }
-
             if (!collided) { PlaceObjects(newObject.identifier, newObject.domains[0], scale, objectParent); }
         }
 
@@ -167,24 +164,26 @@ public class ObjectGeneration : NetworkBehaviour
         if (assigned.Count == numObjects) { return assigned; }
         if (unassigned.Count == 0) { return bestSolution; }
 
-        // find new unassigned object
-        Object newObject = unassigned[0];
-        List<Vector3> domains = newObject.domains;
+        // ----- MRV: Select unassigned variable with the fewest available domain values -----
+        Object newObject = unassigned.OrderBy(o => o.domains.Count).First();
+        unassigned.Remove(newObject);
+
+        // ----- LCV: Order the domain values by least constraining impact -----
+        var orderedDomains = newObject.domains
+            .OrderBy(domain => CountEliminatedValues(newObject, domain, unassigned))
+            .ThenBy(domain => Random.value)
+            .ToList();
 
         // Find a place for unassigned object
-        while (domains.Count > 0) {
-
-            // Find new possible position
-            int randomDomain = Random.Range(0, domains.Count-1);
-            Vector3 domain = domains[randomDomain];
-            domains.Remove(domain);
+        foreach (Vector3 domain in orderedDomains) {
 
             // Check if can add the value
             if (CheckConstraints(assigned, domain, newObject))
             {
+                // Save a copy of the current domain for backtracking.
+                List<Vector3> originalDomains = new List<Vector3>(newObject.domains);
                 newObject.domains = new List<Vector3>() { domain };
                 assigned.Add(newObject);
-                unassigned.RemoveAt(0);
 
                 // Apply arc consistency to prune domains.
                 if (ArcConsistency(unassigned))
@@ -196,63 +195,83 @@ public class ObjectGeneration : NetworkBehaviour
 
                 // Backtrack if no solution was found.
                 assigned.Remove(newObject);
-                unassigned.Insert(0, newObject);
+                newObject.domains = originalDomains;
             }
 
         }
 
+        unassigned.Add(newObject);
         return bestSolution; // failed
+    }
+
+    // Helper: Count how many domain values would be eliminated in unassigned variables
+    // if we assign 'domain' to the variable 'obj'.
+    private int CountEliminatedValues(Object obj, Vector3 domain, List<Object> unassigned)
+    {
+        int eliminationCount = 0;
+        // For every neighbor of the object (i.e., every unassigned variable)
+        foreach (Object neighbor in unassigned)
+        {
+            foreach (Vector3 neighborValue in neighbor.domains)
+            {
+                // If the binary constraint between obj assigned this domain value and the neighbor's
+                // domain value fails, it would eliminate that neighbor value.
+                if (!CheckBinaryConstraints(obj, domain, neighbor, neighborValue))
+                {
+                    eliminationCount++;
+                }
+            }
+        }
+        return eliminationCount;
     }
 
     private bool CheckConstraints(List<Object> assigned, Vector3 domain, Object unassigned)
     {
         if (assigned.Count == 0) { return true; } // nothing to check against
-        if (unassigned.constraint == Constraints.Ceiling) { return true; } // only lights
 
-        bool hasPairing = unassigned.properties.Contains(Properties.Paired);
-        bool constraintsHold = !hasPairing;
-
+        // Check for collisions
         foreach (Object obj in assigned)
         {
-            if (obj.constraint == Constraints.Ceiling) { continue; }
+            // Different categories are allowed to overlap.
+            if (obj.constraint != unassigned.constraint)
+                continue;  
 
-            // Check that no assigned spot has the same pos as current
-            bool collided = false;
             foreach (Vector3 position in obj.domains)
             {
-                if ((domain - position).sqrMagnitude < 10) { collided = true; continue; }
-            }
-            if (collided) { return false; }
-
-            // Check pairing
-            if (hasPairing && obj.identifier.Equals(unassigned.pairedIdentifier))
-            {
-                if (Vector3.Distance(domain, obj.domains[0]) <= 50)
-                {
-                    constraintsHold = true;
-                }
+                if ((domain - position).sqrMagnitude < 10)
+                    return false;
             }
         }
 
-        return constraintsHold;
+        // Check if two objects are close enough
+        if (unassigned.properties.Contains(Properties.Paired))
+        {
+            // Look up the designated parent by its identifier.
+            Object pair = assigned.FirstOrDefault(o => o.identifier.Equals(unassigned.pairedIdentifier));
+            if (pair != null)
+            {
+                // Enforce the distance constraint.
+                if (Vector3.Distance(domain, pair.domains[0]) > 50)
+                    return false;
+            }
+        }
+
+        return true;
+
     }
 
-    // Assumes your custom object class has at least:
-    //   List<Vector3> domains;
-    //   a constraint field of type Constraints (e.g., Constraints.Ceiling)
-    //   an identifier field (e.g., a string or number)
-    //   a pairedIdentifier field (to match a pair)
-    //   a properties collection (which may contain Properties.Paired)
+    // Performs Arc Consistency to the CSP
     private bool ArcConsistency(List<Object> objects)
     {
         // Build a queue of all arcs (ordered pairs) between distinct objects.
         Queue<(Object, Object)> arcs = new Queue<(Object, Object)>();
         for (int i = 0; i < objects.Count; i++)
         {
-            for (int j = i; j < objects.Count; j++)
+            for (int j = i + 1; j < objects.Count; j++)
             {
-                if (i != j)
-                    arcs.Enqueue((objects[i], objects[j]));
+                // Enqueue both directions, if needed:
+                arcs.Enqueue((objects[i], objects[j]));
+                arcs.Enqueue((objects[j], objects[i]));
             }
         }
 
@@ -282,7 +301,7 @@ public class ObjectGeneration : NetworkBehaviour
     {
         bool revised = false;
         // Collect values to remove so we can iterate safely over xi.domains.
-        List<Vector3> removalList = new List<Vector3>();
+        List<Vector3> removalList = new();
 
         foreach (Vector3 vi in xi.domains)
         {
@@ -311,12 +330,8 @@ public class ObjectGeneration : NetworkBehaviour
 
     private bool CheckBinaryConstraints(Object obj1, Vector3 value1, Object obj2, Vector3 value2)
     {
-        // If either object is of type Ceiling (for lights, for example), we assume constraints do not apply.
-        if (obj1.constraint == Constraints.Ceiling || obj2.constraint == Constraints.Ceiling)
-            return true;
-
-        // Standard constraint: two objects (non-ceiling) should not occupy the same position.
-        if ((value1 -value2).sqrMagnitude < 10)
+        // Standard constraint: two objects of the same constraint should not occupy the same position.
+        if ((value1 - value2).sqrMagnitude < 10 && obj1.constraint == obj2.constraint)
             return false;
 
         // Check the pairing constraint if applicable.
