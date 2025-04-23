@@ -178,6 +178,6 @@ MonoBehaviour:
   PickUpable: 1
   amountOfHandsNeeded: 1
   itemThickness: 1
-  customOffset: 0
+  customOffset: 1
   rotationOffset: {x: 0, y: 0, z: 0}
-  positionOffset: {x: 0, y: 0, z: 0}
+  positionOffset: {x: 0, y: 0.35, z: -0.5}

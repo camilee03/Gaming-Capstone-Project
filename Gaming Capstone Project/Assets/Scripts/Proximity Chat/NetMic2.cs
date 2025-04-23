@@ -5,7 +5,6 @@ using System.Collections.Generic;
 public class NetMic2 : NetworkBehaviour
 {
     public AudioClip micClip;
-    public PlayerController pc;
     public int sampleRate = 16000;
     public int sampleLength = 1024;
     private float[] sampleBuffer;
@@ -16,17 +15,6 @@ public class NetMic2 : NetworkBehaviour
     public float noiseThreshold = 0.002f;
     public bool playback;
     bool playable;
-
-    public static List<NetMic2> allMics = new List<NetMic2>();
-
-    private void OnEnable()
-    {
-        allMics.Add(this);
-    }
-    private void OnDisable()
-    {
-        allMics.Remove(this);
-    }
 
     void Start()
     {
@@ -46,10 +34,6 @@ public class NetMic2 : NetworkBehaviour
     }
     void Update()
     {
-        if (pc.isDead && source.spatialBlend != 0)
-        {
-            source.spatialBlend = 0; //once you die, set spatialblend to 0.
-        }
         if (!IsOwner || micClip == null) return;
 
         sendTimer += Time.deltaTime;
@@ -86,29 +70,7 @@ public class NetMic2 : NetworkBehaviour
     void BroadcastAudio(byte[] audioBytes)
     {
         float[] floats = ByteArrayToFloatArray(audioBytes);
-        float[] denoisedAudio = ApplyNoiseGate(floats, noiseThreshold);
-
-        bool senderIsDead = pc != null && pc.isDead;
-
-        foreach(var mic in allMics)
-        {
-            if (mic == this || mic.pc == null) continue;
-
-            bool receiverIsDead = mic.pc.isDead;
-
-            if (senderIsDead)
-            {
-                if (receiverIsDead)//dead to dead.
-                {
-                    mic.PlayReceivedAudio(denoisedAudio); 
-                }
-                //dead sender audio will only play to dead receivers.
-            }
-            else //alive will send to both alive and dead.
-            {
-                mic.PlayReceivedAudio(denoisedAudio);
-            }
-        }
+        PlayReceivedAudio(ApplyNoiseGate(floats, noiseThreshold));
     }
     private byte[] FloatArrayToByteArray(float[] floats)
     {
@@ -143,12 +105,9 @@ public class NetMic2 : NetworkBehaviour
 
     void PlayReceivedAudio(float[] floats)
     {
-        if (playable)
-        {
-            AudioClip clip = AudioClip.Create("Received", floats.Length, 1, sampleRate, false);
-            clip.SetData(floats, 0);
-            source.clip = clip;
-            source.Play();
-        }
+        AudioClip clip = AudioClip.Create("Received", floats.Length, 1, sampleRate, false);
+        clip.SetData(floats, 0);
+        source.clip = clip;
+        source.Play();
     }
 }

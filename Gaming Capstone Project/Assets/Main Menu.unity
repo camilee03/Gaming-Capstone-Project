@@ -3447,7 +3447,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inputField: {fileID: 928705585}
-  buttons: []
+  buttons:
+  - {fileID: 8558133944708871448}
+  - {fileID: 6989527168681492352}
+  - {fileID: 2337360794276342438}
 --- !u!114 &3899484414228628464
 MonoBehaviour:
   m_ObjectHideFlags: 0
