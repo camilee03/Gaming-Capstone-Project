@@ -51,7 +51,16 @@ public class EnergyCore : MonoBehaviour
     void Start()
     {
         GenerateCode();
+        ResetReceivedCode();
         RandomizeButtons();
+    }
+    public void ResetReceivedCode()
+    {
+        inputtedCode = "";
+        foreach (Renderer r in receivedRenderer)
+        {
+            r.material.color = Color.white;
+        }
     }
 
     public void PushButton(char c)
@@ -85,7 +94,7 @@ public class EnergyCore : MonoBehaviour
                 else
                 {
                     Debug.Log("incorrect code."); //maybe play an error sound effect
-                    inputtedCode = "";
+                    ResetReceivedCode();
                 }
             }
         }
