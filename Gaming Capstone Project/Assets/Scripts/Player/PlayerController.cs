@@ -65,7 +65,9 @@ public class PlayerController : NetworkBehaviour
     public bool useAnimator = true;
     public GameObject PlayerDisplay;
     public NetworkVariable<Vector3> LastAssignedSpawnPos = new NetworkVariable<Vector3>();
-    public NetworkVariable<int> ColorID = new NetworkVariable<int>(-1);
+    public int ColorID = -1;
+
+    public string playerName;
 
     [Header("Death Visuals")]
     public GameObject playerModel; // Assign in Inspector: this should be the mesh or object representing the visible character
@@ -155,50 +157,6 @@ public class PlayerController : NetworkBehaviour
     }
 
 
-    private void OnColorChanged(int previous, int current)
-    {
-        //ApplyColor(current);
-
-        if (IsOwner)
-        {
-            SelectColorButton uiManager = FindFirstObjectByType<SelectColorButton>() ;
-            if (uiManager != null)
-            {
-                uiManager.RefreshAll();
-            }
-        }
-    }
-
-
-    [ServerRpc(RequireOwnership = false)]
-public void ForceSetColorServerRpc(int colorIndex)
-{
-    if (!GameController.Instance.usedColors.Contains(colorIndex))
-    {
-        GameController.Instance.LockColor(colorIndex);
-    }
-
-    if (ColorID.Value > 0)
-    {
-        GameController.Instance.UnlockColor(ColorID.Value);
-    }
-
-    ColorID.Value = colorIndex;
-}
-
-
-
-    public void RequestColorSelection(int colorIndex)
-    {
-        if (IsOwner)
-        {
-            TrySetColorServerRpc(colorIndex);
-        }
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    private void TrySetColorServerRpc(int colorIndex, ServerRpcParams rpcParams = default)
-    {
         if (!GameController.Instance.IsColorAvailable(colorIndex)) return;
 
         GameController.Instance.LockColor(colorIndex);
@@ -215,7 +173,6 @@ public void ForceSetColorServerRpc(int colorIndex)
     {
         rgd = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
-        ColorID.OnValueChanged += OnColorChanged;
 
         if (ColorID.Value >= 0)
         {
@@ -598,6 +555,36 @@ private IEnumerator EnterGhostMode()
     private void OnDestroy()
     {
         ColorID.OnValueChanged -= OnColorChanged;
+        transform.name = name;
+    }
 
+    public void ExternalSetColor(int colorIndex)
+    {
+        if (IsOwner)
+        {
+            if (IsServer) { SetColorClientRpc(colorIndex); }
+            else { SetColorServerRpc(colorIndex); }
+        }
+    }
+    [ClientRpc]
+    public void SetColorClientRpc(int colorIndex)
+    {
+        SetColor(colorIndex);
+    }
+    [ServerRpc]
+    public void SetColorServerRpc(int colorIndex)
+    {
+        SetColorClientRpc(colorIndex);
+    }
+    void SetColor(int colorIndex)
+    {
+        if (!GameController.Instance.usedColors.Contains(colorIndex))
+        {
+            Debug.Log("Setting Color!");
+            GameController.Instance.usedColors.Remove(ColorID);
+            ColorID = colorIndex;
+            GameController.Instance.usedColors.Add(ColorID);
+            ApplyColor(ColorID);            
+        }
     }
 }

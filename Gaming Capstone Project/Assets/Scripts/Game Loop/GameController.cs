@@ -18,7 +18,7 @@ public class GameController : NetworkBehaviour
     [Header("Spawn Points")]
     public Transform LobbySpawnPoint;
     public Transform GameSpawnPoint;
-    public NetworkList<int> usedColors = new NetworkList<int>();
+    public List<int> usedColors = new List<int>();
     public NetworkList<int> votesCasted = new NetworkList<int>();
 
     public NetworkVariable<int> TimeLeftInVoting = new NetworkVariable<int>();
@@ -29,7 +29,7 @@ public class GameController : NetworkBehaviour
     private int numberOfDopples = 1;
     public GameObject LobbyCanvas;
     [Header("Voting")]
-    private float voteStartDelay = 120f; // Total time until voting starts
+    private float voteStartDelay = 20f; // Total time until voting starts
     public NetworkVariable<int> secondsRemainingUntilVote;      // Countdown shown publicly
     public Canvas VotingCanvas;
     public GameObject playerObj;
@@ -63,7 +63,7 @@ public class GameController : NetworkBehaviour
         }
         if (IsClient)
         {
-            usedColors.OnListChanged += OnUsedColorsChanged;
+            //usedColors.OnListChanged += OnUsedColorsChanged;
         }
 
     }
@@ -82,7 +82,7 @@ public class GameController : NetworkBehaviour
 
     public override void OnNetworkDespawn()
     {
-        usedColors.OnListChanged -= OnUsedColorsChanged;
+        //usedColors.OnListChanged -= OnUsedColorsChanged;
 
         if (IsServer)
         {
@@ -92,14 +92,6 @@ public class GameController : NetworkBehaviour
 
     }
     #endregion
-
-    private void OnUsedColorsChanged(NetworkListEvent<int> change)
-    {
-        // Refresh UI if needed
-        var uiManager = FindFirstObjectByType<SelectColorButton>();
-        if (uiManager != null)
-            uiManager.RefreshAll();
-    }
 
     // -------------------------------------------------------
     // Client (Player) Connect / Disconnect
@@ -127,9 +119,9 @@ public class GameController : NetworkBehaviour
         if (Players.TryGetValue(clientId, out var player))
         {
             var pc = player.GetComponent<PlayerController>();
-            if (pc != null && pc.ColorID.Value >= 1)
+            if (pc != null && pc.ColorID >= 1)
             {
-                UnlockColor(pc.ColorID.Value);
+                UnlockColor(pc.ColorID);
             }
         }
 
@@ -357,7 +349,7 @@ public class GameController : NetworkBehaviour
             {
                 var pc = kvp.Value.GetComponent<PlayerController>();
                 usedColors.Remove(winningColor);
-                if (pc.ColorID.Value == winningColor)
+                if (pc.ColorID == winningColor)
                 {
                     pc.KillClientRpc();
                     break;
@@ -477,24 +469,24 @@ public class GameController : NetworkBehaviour
 
     private void AssignRandomColorsToUnpickedPlayers()
     {
-        List<int> availableColors = Enumerable.Range(1, 12)
+        List<int> availableColors = Enumerable.Range(0, 11)
             .Where(c => IsColorAvailable(c))
             .ToList();
 
         foreach (var kvp in Players)
         {
             var player = kvp.Value.GetComponent<PlayerController>();
-            if (player.ColorID.Value < 1)
+            if (player.ColorID == -1)
             {
+                Debug.Log("Color Not Added yet.");
                 if (availableColors.Count == 0)
                 {
                     Debug.LogWarning("No colors left to assign!");
                     return;
                 }
 
-                int chosen = availableColors[Random.Range(0, availableColors.Count)];
-                player.ForceSetColorServerRpc(chosen); // <--- Let the RPC handle LockColor()
-                availableColors.Remove(chosen);
+                player.ExternalSetColor(availableColors[0]);
+                availableColors.RemoveAt(0);
             }
         }
     }
