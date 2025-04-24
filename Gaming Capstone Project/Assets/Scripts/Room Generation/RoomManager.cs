@@ -71,9 +71,9 @@ public class RoomManager : NetworkBehaviour
         foreach (Renderer r in t.GetChild(0).GetComponentsInChildren<Renderer>())
         {
             int i = Mathf.RoundToInt(Random.Range(0, wallDamageTextures.Length));
-            r.material.SetColor("_Color", c);
-            r.material.SetTexture("_Wallpaper", wallPaper);
-            r.material.SetTexture("_Damage", wallDamageTextures[i]);
+            r.materials[0].SetColor("_Color", c);
+            r.materials[0].SetTexture("_Wallpaper", wallPaper);
+            r.materials[0].SetTexture("_Damage", wallDamageTextures[i]);
         }
     }
 }
