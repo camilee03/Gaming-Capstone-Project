@@ -30,7 +30,7 @@ public class GameController : NetworkBehaviour
     private int numberOfDopples = 1;
     public GameObject LobbyCanvas;
     [Header("Voting")]
-    private float voteStartDelay = 20f; // Total time until voting starts
+    private float voteStartDelay = 120f; // Total time until voting starts
     public NetworkVariable<int> secondsRemainingUntilVote;      // Countdown shown publicly
     public Canvas VotingCanvas;
     public GameObject playerObj;
