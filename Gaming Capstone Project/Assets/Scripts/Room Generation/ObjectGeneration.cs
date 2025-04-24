@@ -385,13 +385,13 @@ public class ObjectGeneration : NetworkBehaviour
                 newObject = SpawnNetworkedObject(parent.transform, objects["coal" + chooseRandomObject], tilePos + fallHeight, Quaternion.identity);
                 break;
             case 'e': // EnergyCore
-                newObject = SpawnNetworkedObject(parent.transform, objects["energy core"], tilePos, Quaternion.identity);
+                newObject = SpawnNetworkedObject(parent.transform, objects["energy core"], tilePos, Quaternion.Euler(-90, randomRotationsY[i], 0));
                 break;
             case 'F': // Furnace
                 newObject = SpawnNetworkedObject(parent.transform, objects["furnace"], tilePos, Quaternion.Euler(-90, 0, randomRotationsY[i]));
                 break;
             case 'f': // fan
-                newObject = SpawnNetworkedObject(parent.transform, objects["fan"], tilePos + Vector3.up * 6, Quaternion.Euler(0, randomRotationsY[i], 0));
+                newObject = SpawnNetworkedObject(parent.transform, objects["fan"], tilePos + Vector3.up * 3, Quaternion.Euler(0, randomRotationsY[i], 0));
                 break;
             case 'L': // light
                 newObject = SpawnNetworkedObject(parent.transform, objects["light"], tilePos + ceilingHeight, Quaternion.Euler(-90, 0, 0));
@@ -410,9 +410,6 @@ public class ObjectGeneration : NetworkBehaviour
                 break;
             case 'p': // paper
                 newObject = SpawnNetworkedObject(parent.transform, objects["paper"], tilePos + fallHeight, Quaternion.identity);
-                break;
-            case 'r': // radio
-                newObject = SpawnNetworkedObject(parent.transform, objects["radio"], tilePos, Quaternion.Euler(0, randomRotationsY[i], 0));
                 break;
             case 's': // speaker
                 if (wallDict.Keys.Contains(tilePos))
@@ -451,6 +448,9 @@ public class ObjectGeneration : NetworkBehaviour
                 break;
             case 'x': // clothes
                 newObject = SpawnNetworkedObject(parent.transform, objects["glove"], tilePos + fallHeight, Quaternion.Euler(0, randomRotationsY[i], 0));
+                break;
+            case 'Z': // trash-can
+                newObject = SpawnNetworkedObject(parent.transform, objects["trash can"], tilePos, Quaternion.Euler(-90, randomRotationsY[i], 0));
                 break;
             case 'z': // trash
                 newObject = SpawnNetworkedObject(parent.transform, objects["trash"], tilePos + fallHeight, Quaternion.Euler(0, randomRotationsY[i], 0));
@@ -496,7 +496,8 @@ public class ObjectGeneration : NetworkBehaviour
             case 'x': // Clothes
             case 'C': // Chair
             case 't': // Table
-            case 'r': // Radio
+            case 'z': // Trasj
+            case 'Z': // Trash Can
                 newObject = new Object() { identifier = identifier, domains = new(tilePositions), constraint = Constraints.None };
                 break;
 
@@ -603,6 +604,7 @@ public class ObjectGeneration : NetworkBehaviour
             case 't': // Table
             case 'T': // Terminal
             case 'e': // Energy Core
+            case 'Z': // Trash can
                 return 1;
 
             // Default for objects without these properties

@@ -26,6 +26,7 @@ public class TaskManager : NetworkBehaviour
     GameObject[] buttons;
     GameObject[] terminals;
     GameObject[] useables;
+    GameObject[] energyCores;
 
     public int completedTasks = 0;
     GameObject canvas;
@@ -50,6 +51,7 @@ public class TaskManager : NetworkBehaviour
         buttons = GameObject.FindGameObjectsWithTag("Button");
         terminals = GameObject.FindGameObjectsWithTag("DOS Terminal");
         useables = GameObject.FindGameObjectsWithTag("Useable");
+        energyCores = GameObject.FindGameObjectsWithTag("EnergyCore");
         //papers = GameObject.FindGameObjectsWithTag("Paper");
 
         taskList = new List<RoomTask>();
@@ -59,6 +61,7 @@ public class TaskManager : NetworkBehaviour
         CreatePickupTasks(selectables);
         CreateTerminalTasks();
         CreatePaperTasks();
+        CreateEnergyCoreTasks(energyCores);
         
         //Debug.Log("NUM TASKS: " + taskList.Count);
     }
@@ -166,28 +169,20 @@ public class TaskManager : NetworkBehaviour
 
     }
 
+    void CreateEnergyCoreTasks(GameObject[] energyCores)
+    {
+        foreach (GameObject obj in energyCores)
+        {
+            taskList.Add(CreateTask(TaskType.EnergyCore, new GameObject[] { obj }, null));
+        }
+    }
+
     private RoomTask CreateTask(TaskType taskType, GameObject[] gameObject1, GameObject[] gameObject2)
     {
         // Find position and room if needed
         Vector3 position = Vector3.zero;
         List<Room> rooms1 = new List<Room>();
         List<Room> rooms2 = new List<Room>();
-        if (taskType == TaskType.Pickup || taskType == TaskType.Paper)
-        {
-            bool keepLooking = true;
-            int debugInt = 0;
-            while (keepLooking && debugInt < 100) // find a location far enough away from current object
-            {
-                int randomRoom = Random.Range(0, rooms.Count - 1);
-                rooms2.Add(rooms[randomRoom]);
-
-                int randomTile = Random.Range(0, rooms[randomRoom].tileParent.transform.childCount - 1);
-                position = rooms[randomRoom].tileParent.transform.GetChild(randomTile).position;
-
-                keepLooking = Vector3.Distance(position, gameObject1[0].transform.position) < 50;
-                debugInt++;
-            }
-        }
 
         // Find data & location of objects 1 list
         ObjectData[] objectData1 = null;
@@ -209,7 +204,7 @@ public class TaskManager : NetworkBehaviour
         {
             objectData2 = new ObjectData[gameObject2.Length];
 
-            for (int i=0; i<gameObject2.Length; i++)
+            for (int i = 0; i < gameObject2.Length; i++)
             {
                 objectData2[i] = gameObject2[i].GetComponent<ObjectData>();
                 Room room = RoomFunctions.FindRoomOfObject(gameObject2[i]);
@@ -217,12 +212,86 @@ public class TaskManager : NetworkBehaviour
             }
         }
 
+        // For Energy Core Tasks
+        EnergyCore core = null;
+        if (taskType == TaskType.EnergyCore)
+        {
+            core = gameObject1[0].GetComponent<EnergyCore>();
+        }
+
+        // Find locations
+        if (taskType == TaskType.Pickup || taskType == TaskType.Paper)
+        {
+            bool keepLooking = true;
+            int debugInt = 0;
+
+            string objectName = gameObject1[0].name.Replace("(Clone)", "").Replace(" 1", "").Replace(" 2", "");
+
+            switch (objectName)
+            {
+                case "Paper":
+                    for (int i=0; i < rooms1[0].objectParent.transform.childCount; i++)
+                    {
+                        if (rooms1[0].objectParent.transform.GetChild(i).name.Replace("(Clone)", "") == "Trash Can")
+                        {
+                            rooms2.Add(rooms1[0]);
+                            position = rooms1[0].objectParent.transform.GetChild(i).transform.position;
+                            break;
+                        }
+                    }
+                    if (position == Vector3.zero) { Debug.Log("ERROR: Position for Paper Task not set"); }
+                    break;
+                case "Coal":
+                    for (int i = 0; i < rooms1[0].objectParent.transform.childCount; i++)
+                    {
+                        if (rooms1[0].objectParent.transform.GetChild(i).name.Replace("(Clone)", "") == "Furnace")
+                        {
+                            rooms2.Add(rooms1[0]);
+                            position = rooms1[0].objectParent.transform.GetChild(i).transform.position;
+                            break;
+                        }
+                    }
+                    if (position == Vector3.zero) { Debug.Log("ERROR: Position for Coal Task not set"); }
+                    break;
+                case "Glove":
+                case "Sock":
+                    for (int i = 0; i < rooms1[0].objectParent.transform.childCount; i++)
+                    {
+                        if (rooms1[0].objectParent.transform.GetChild(i).name.Replace("(Clone)", "") == "Laundry Chute")
+                        {
+                            rooms2.Add(rooms1[0]);
+                            position = rooms1[0].objectParent.transform.GetChild(i).transform.position;
+                            break;
+                        }
+                    }
+                    if (position == Vector3.zero) { Debug.Log("ERROR: Position for Clothes Task not set"); }
+                    break;
+                default:
+                    // find a location far enough away from current object
+                    while (keepLooking && debugInt < 100) 
+                    {
+                        int randomRoom = Random.Range(0, rooms.Count - 1);
+
+                        int randomTile = Random.Range(0, rooms[randomRoom].tileParent.transform.childCount - 1);
+                        position = rooms[randomRoom].tileParent.transform.GetChild(randomTile).position;
+
+                        keepLooking = Vector3.Distance(position, gameObject1[0].transform.position) < 50;
+
+                        if (!keepLooking) { rooms2.Add(rooms[randomRoom]); }
+                        debugInt++;
+                    }
+                    break;
+            }
+        }
+
+
         // Create task 
         RoomTask task = new RoomTask() { 
             type = taskType,
             triggerGameObject = gameObject1,
             data1 = objectData1,
             rooms1 = rooms1,
+            core = core,
             resultGameObject = gameObject2,
             data2 = objectData2,
             rooms2 = rooms2,
@@ -237,6 +306,7 @@ public struct RoomTask
     public TaskType type;
     public GameObject[] triggerGameObject;
     public ObjectData[] data1;
+    public EnergyCore core;
     public List<Room> rooms1;
     public GameObject[] resultGameObject;
     public ObjectData[] data2;
@@ -246,5 +316,5 @@ public struct RoomTask
 
 public enum TaskType
 {
-    None, Pickup, Interact, Terminal, Paper
+    None, Pickup, Interact, Terminal, Paper, EnergyCore
 }

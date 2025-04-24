@@ -31,12 +31,8 @@ public class DOSCommandController : MonoBehaviour
         {
             case "/spook":
                 break;
-            case "/map":
-                break;
             case "/help":
-                break;
-            case "/comms":
-                break;
+                return "/help";
             default:
                 if (target.Length > 0)
                 {
@@ -46,14 +42,19 @@ public class DOSCommandController : MonoBehaviour
 
                     switch (command)
                     {
-                        case "/lights":
-                            foreach (Light light in currentRoom.GetAllLights())
+                        case "/comms":
+                            List<AudioSource> speakerList = currentRoom.GetAllSpeakers();
+                            if (speakerList.Count != 0)
                             {
-                                light.enabled = !light.enabled;
+                                foreach (AudioSource speaker in currentRoom.GetAllSpeakers())
+                                {
+                                    // Play person's voice
+                                }
                             }
+                            else { return "ERROR: code ___\n No speakers found in " + currentRoom.roomName; }
                             break;
                         case "/fan":
-                                List<NetworkAnimator> fanList = currentRoom.GetAllFans();
+                            List<NetworkAnimator> fanList = currentRoom.GetAllFans();
                             if (fanList.Count != 0)
                             {
                                 foreach (NetworkAnimator fan in fanList)
@@ -61,10 +62,10 @@ public class DOSCommandController : MonoBehaviour
                                     fan.Animator.SetBool("Toggle", !fan.Animator.GetBool("Toggle"));
                                 }
                             }
-                            else { return "ERROR: code ___\n No fans in " + currentRoom.roomName; }
+                            else { return "ERROR: code ___\n No fans found in " + currentRoom.roomName; }
                             break;
                         case "/jazz":
-                            List<AudioSource> speakerList = currentRoom.GetAllSpeakers();
+                            speakerList = currentRoom.GetAllSpeakers();
                             if (speakerList.Count != 0)
                             {
                                 foreach (AudioSource speaker in currentRoom.GetAllSpeakers())
@@ -75,6 +76,12 @@ public class DOSCommandController : MonoBehaviour
                             }
                             else { return "ERROR: code ___\n No speakers found in " + currentRoom.roomName; }
                             break;
+                        case "/lights":
+                            foreach (Light light in currentRoom.GetAllLights())
+                            {
+                                light.enabled = !light.enabled;
+                            }
+                            break;
                         default:
                             return "ERROR: code 117\nNot a viable code";
                     }
@@ -83,9 +90,10 @@ public class DOSCommandController : MonoBehaviour
                 {
                     switch (command)
                     {
-                        case "/lights":
+                        case "/comms":
                         case "/fan":
                         case "/jazz":
+                        case "/lights":
                             return "ERROR: code 59\n No room name entered";
                         default:
                             return "ERROR: code 117\nNot a viable code";
