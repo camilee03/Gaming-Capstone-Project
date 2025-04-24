@@ -157,26 +157,16 @@ public class PlayerController : NetworkBehaviour
     }
 
 
-        if (!GameController.Instance.IsColorAvailable(colorIndex)) return;
 
-        GameController.Instance.LockColor(colorIndex);
 
-        // Release previous color (if changing)
-        if (ColorID.Value >= 0)
-        {
-            GameController.Instance.UnlockColor(ColorID.Value);
-        }
-
-        ColorID.Value = colorIndex;
-    }
     private void Start()
     {
         rgd = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
 
-        if (ColorID.Value >= 0)
+        if (ColorID >= 0)
         {
-            ApplyColor(ColorID.Value);
+            ApplyColor(ColorID);
         }
         currentStamina = maxStamina;
 
@@ -552,9 +542,27 @@ private IEnumerator EnterGhostMode()
         else
             TeamDeclaration.text = "You are a : Scientist";
     }
-    private void OnDestroy()
+    public void ExternalSetName(string name)
     {
-        ColorID.OnValueChanged -= OnColorChanged;
+        if (IsOwner)
+        {
+            if (IsServer) { SetNameClientRpc(name); }
+            else { SetNameServerRpc(name); }
+        }
+    }
+    [ClientRpc]
+    public void SetNameClientRpc(string name)
+    {
+        SetName(name);
+    }
+    [ServerRpc]
+    public void SetNameServerRpc(string name)
+    {
+        SetNameClientRpc(name);
+    }
+    void SetName(string name)
+    {
+        playerName = name;
         transform.name = name;
     }
 
