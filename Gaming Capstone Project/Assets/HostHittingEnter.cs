@@ -36,7 +36,7 @@ public class HostHittingEnter : NetworkBehaviour
     private void Start()
     {
         Cursor.lockState = CursorLockMode.None;
-
+    }
 
 
     void ButtonPressed()
