@@ -68,7 +68,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -6478536213147159724, guid: 2a33e7835cd8c9e42a4f869a590afa01, type: 3}
+  - {fileID: 2100000, guid: 115f1d1593ba13a46942e9a3d7173f61, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -178,6 +178,6 @@ MonoBehaviour:
   PickUpable: 1
   amountOfHandsNeeded: 1
   itemThickness: 1
-  customOffset: 0
+  customOffset: 1
   rotationOffset: {x: 0, y: 0, z: 0}
-  positionOffset: {x: 0, y: 0, z: 0}
+  positionOffset: {x: 0, y: 0.35, z: -0.5}

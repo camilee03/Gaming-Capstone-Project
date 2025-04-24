@@ -32,7 +32,7 @@ public class HostHittingEnter : NetworkBehaviour
 
         controller.setLobby(LobbyMenu);
     }
-    private void LateUpdate()
+    private void Start()
     {
         Cursor.lockState = CursorLockMode.None;
 
@@ -68,6 +68,8 @@ public class HostHittingEnter : NetworkBehaviour
             }
             */
             LobbyFadeScript.LevelFade();
+
+            Cursor.lockState = CursorLockMode.Locked;
 
             StartButton.interactable = false;
             StartButton.GetComponentInChildren<TMP_Text>().text = "Loading...";
