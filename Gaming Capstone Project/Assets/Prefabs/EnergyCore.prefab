@@ -100,9 +100,10 @@ GameObject:
   - component: {fileID: 2303149790747788965}
   - component: {fileID: 6464574909294347793}
   - component: {fileID: 7844586384277256713}
+  - component: {fileID: -2512685055396572018}
   m_Layer: 0
   m_Name: EnergyCore
-  m_TagString: Untagged
+  m_TagString: EnergyCore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -205,6 +206,7 @@ MonoBehaviour:
   - {fileID: 7033270353859816615}
   - {fileID: 3765043435718635991}
   - {fileID: 6110219736551976434}
+  taskIsDone: 0
   buttons:
   - {fileID: 2747643608128157443}
   - {fileID: 6241116368437935298}
@@ -258,6 +260,18 @@ CapsuleCollider:
   m_Height: 0.125
   m_Direction: 2
   m_Center: {x: 0, y: 0, z: 0.040918358}
+--- !u!114 &-2512685055396572018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 214623283874663119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dc71e7837df2c44690ca460e90fb5eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &451434329176491204
 GameObject:
   m_ObjectHideFlags: 0

@@ -28,12 +28,24 @@ public class DOSInteraction : MonoBehaviour
 
     private DOSManager DOSManager;
 
+    bool isHelp;
+    string[] storedCommandLines;
+    string[] helpLines;
+
     void Start()
     {
         DOSManager = DOSManager.Instance;
         DOSController = DOSCommandController.Instance;
         WritingLine = DOSManager.InputField;
         PreviousLines = DOSManager.CommandLines;
+
+        helpLines = new string[6] {
+            "/comms - Connect your voice to room",
+            "/fan - Turns fan/s on/off",
+            "/help - Shows commands",
+            "/jazz - Plays jazz",
+            "/lights - Turns on/off lights",
+            "/spook - Send scary noises to player" };
     }
 
     public void SetCam(GameObject cam)
@@ -53,18 +65,50 @@ public class DOSInteraction : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Return))
             {
-                //send current line to seperate method
-                string possibleError = DOSController.HandleCommand(WritingLine.text);
-                UpdatingCommandLine();
-                if (possibleError != "") { ShowErrorMessage(possibleError); }
+                if (isHelp)
+                {
+                    RestoreCommandLines();
+                    isHelp = false;
+                }
+                else
+                {
+                    //send current line to seperate method
+                    string possibleError = DOSController.HandleCommand(WritingLine.text);
+                    UpdatingCommandLine();
+                    if (possibleError == "/help") { StoreCommandLines(); isHelp = true; }
+                    else if (possibleError != "") { ShowErrorMessage(possibleError); }
+                }
 
             }
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Mouse1))
             {
                 EndInteraction();
             }
 
         }
+    }
+
+    private void StoreCommandLines()
+    {
+        storedCommandLines = new string[PreviousLines.Length];
+        for (int i = PreviousLines.Length-1; i >= 0; i--)
+        {
+            storedCommandLines[i] = PreviousLines[i].text;
+            PreviousLines[i].text = helpLines[i];
+        }
+    }
+
+    private void RestoreCommandLines()
+    {
+        for (int i = PreviousLines.Length - 1; i >= 0; i--)
+        {
+            PreviousLines[i].text = storedCommandLines[i];
+        }
+
+        WritingLine.text = "";
+        WritingLine.interactable = true;
+        WritingLine.ActivateInputField();
+        WritingLine.Select();
     }
 
     private void UpdatingCommandLine()

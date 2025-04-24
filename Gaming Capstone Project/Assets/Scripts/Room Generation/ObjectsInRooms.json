@@ -2,15 +2,15 @@
   "room": [
     {
       "name": "Command Center",
-      "objects": [ "T", "L", "t", "C", "r", "v", "b", "P", "s" ]
+      "objects": [ "T", "L", "t", "C", "e", "v", "b", "P", "s" ]
     },
     {
       "name": "Communication Room",
-      "objects": [ "T", "L", "t", "C", "r", "w", "b", "P", "s" ]
+      "objects": [ "T", "L", "t", "C", "e", "w", "b", "P", "s" ]
     },
     {
       "name": "Operations Room",
-      "objects": [ "T", "L", "t", "C", "r", "b", "P", "s" ]
+      "objects": [ "T", "L", "t", "C", "e", "b", "P", "s" ]
     },
     {
       "name": "Briefing Room",
@@ -18,15 +18,15 @@
     },
     {
       "name": "War Room",
-      "objects": [ "T", "L", "t", "C", "r", "v", "b", "P", "s" ]
+      "objects": [ "T", "L", "t", "C", "e", "v", "b", "P", "s" ]
     },
     {
       "name": "Control Room",
-      "objects": [ "T", "L", "t", "C", "r", "w", "b", "P", "s" ]
+      "objects": [ "T", "L", "t", "C", "e", "w", "b", "P", "s" ]
     },
     {
       "name": "Surveillance Room",
-      "objects": [ "T", "L", "t", "C", "v", "r", "b", "P", "s" ]
+      "objects": [ "T", "L", "t", "C", "v", "e", "b", "P", "s" ]
     },
     {
       "name": "Intelligence",
@@ -54,11 +54,11 @@
     },
     {
       "name": "Security Room",
-      "objects": [ "T", "L", "r", "v", "C", "b", "P", "s" ]
+      "objects": [ "T", "L", "e", "v", "C", "b", "P", "s" ]
     },
     {
       "name": "Armory",
-      "objects": [ "T", "L", "b", "r", "v", "P", "s" ]
+      "objects": [ "T", "L", "b", "e", "v", "P", "s" ]
     },
     {
       "name": "Weapons Storage",
