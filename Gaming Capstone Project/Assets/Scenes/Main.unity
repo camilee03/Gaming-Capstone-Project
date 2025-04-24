@@ -1581,14 +1581,6 @@ PrefabInstance:
       propertyPath: InScenePlacedSourceGlobalObjectIdHash
       value: 4141339745
       objectReference: {fileID: 0}
-    - target: {fileID: 206594615213130685, guid: b572b896af3e8f44f80fe7d19913a74c, type: 3}
-      propertyPath: GlobalObjectIdHash
-      value: 3650772826
-      objectReference: {fileID: 0}
-    - target: {fileID: 206594615213130685, guid: b572b896af3e8f44f80fe7d19913a74c, type: 3}
-      propertyPath: InScenePlacedSourceGlobalObjectIdHash
-      value: 4234800936
-      objectReference: {fileID: 0}
     - target: {fileID: 4517861865285927298, guid: b572b896af3e8f44f80fe7d19913a74c, type: 3}
       propertyPath: m_Name
       value: MapCameras
@@ -1638,6 +1630,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b572b896af3e8f44f80fe7d19913a74c, type: 3}
+--- !u!114 &932653982 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4823729125418139071, guid: b572b896af3e8f44f80fe7d19913a74c, type: 3}
+  m_PrefabInstance: {fileID: 932653981}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ad24e42a06fcb24c95159482d390a01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1015626297
 GameObject:
   m_ObjectHideFlags: 0
@@ -4282,7 +4285,7 @@ PrefabInstance:
     - target: {fileID: 6970827077181135502, guid: 6fd500387efb0554a8b8cee9d31b95ad, type: 3}
       propertyPath: mcam
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 932653982}
     - target: {fileID: 6970827077181135502, guid: 6fd500387efb0554a8b8cee9d31b95ad, type: 3}
       propertyPath: seed
       value: -1
