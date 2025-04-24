@@ -116,7 +116,7 @@ public class Room : NetworkBehaviour
     /// <summary> Creates new bounds for a room </summary>
     void GenerateNewRoom()
     {
-        size = Random.Range(11, 20);
+        size = Random.Range(11, 15);
         objectLocations = new char[size, size]; // set random room size
 
         int numSquares = Random.Range(1, 5); // determine how many squares will be generated
@@ -356,7 +356,7 @@ public class Room : NetworkBehaviour
         speakerList = new List<AudioSource>();
         for (int i = 0; i < objectParent.transform.childCount; i++)
         {
-            if (objectParent.transform.GetChild(i).name.Replace("(Clone)", "") == "Speaker")
+            if (objectParent.transform.GetChild(i).name.Replace("(Clone)", "") == "PA Speaker")
             {
                 speakerList.Add(objectParent.transform.GetChild(i).GetComponent<AudioSource>());
             }

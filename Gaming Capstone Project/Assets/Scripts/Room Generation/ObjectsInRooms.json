@@ -29,7 +29,7 @@
       "objects": [ "T", "L", "t", "C", "v", "r", "b", "P", "s" ]
     },
     {
-      "name": "Intelligence Room",
+      "name": "Intelligence",
       "objects": [ "T", "L", "t", "C", "v", "p", "b", "P", "s" ]
     },
     {
@@ -85,7 +85,7 @@
       "objects": [ "T", "L", "b", "v", "p", "P", "s" ]
     },
     {
-      "name": "Quarantine Room",
+      "name": "Quarantine",
       "objects": [ "T", "L", "f", "b", "v", "P", "s" ]
     },
     {
@@ -101,7 +101,7 @@
       "objects": [ "T", "L", "b", "v", "w", "P", "s" ]
     },
     {
-      "name": "Maintenance Room",
+      "name": "Maintenance",
       "objects": [ "T", "L", "t", "b", "v", "s" ]
     },
     {
@@ -121,7 +121,7 @@
       "objects": [ "T", "L", "F", "c", "b", "v", "P", "s" ]
     },
     {
-      "name": "Water Treatment Room",
+      "name": "Water Treatment",
       "objects": [ "T", "L", "b", "v", "P", "s" ]
     },
     {
@@ -193,11 +193,11 @@
       "objects": [ "T", "L", "b", "v", "s" ]
     },
     {
-      "name": "Air Filtration Room",
+      "name": "Air Filtration",
       "objects": [ "T", "L", "f", "b", "P", "s" ]
     },
     {
-      "name": "Decontamination Room",
+      "name": "Decontamination",
       "objects": [ "T", "L", "f", "b", "v", "P", "s" ]
     }
   ]

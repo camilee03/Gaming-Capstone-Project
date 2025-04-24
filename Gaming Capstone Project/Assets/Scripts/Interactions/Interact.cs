@@ -99,9 +99,9 @@ public class Interact : NetworkBehaviour
                     break;
                 case "DOS Terminal": // access object and perform action
                     DOSInteraction dosInteraction = highlightedObject.GetComponent<DOSInteraction>();
+                    dosInteraction.SetCam(gameObject);
                     dosInteraction.SetInteract(gameObject.GetComponent<Interact>());
                     dosInteraction.ToggleInteraction();
-                    dosInteraction.SetCam(gameObject);
                     break;
                 case "Chair":
                     chairSittingIn = highlightedObject;
@@ -189,7 +189,6 @@ public class Interact : NetworkBehaviour
         //-- Highlights objects to be picked up -- //
         if (Physics.Raycast(transform.position + transform.forward * 2, transform.forward, out hit, 10, ~layerMask) && tags.Contains(hit.collider.tag))
         {
-            Debug.Log("hit scanned something" + hit.collider.gameObject);
             if (highlightedObject == null) { EnableHighlight(hit.collider.gameObject); }
         }
         else if (highlightedObject != null && highlightedObject != pickedupObject)

@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Unity.Netcode;
 using UnityEngine.EventSystems;
+using UnityEditor.Experimental.GraphView;
 
 
 
@@ -85,12 +86,24 @@ public class TaskAssigner : NetworkBehaviour
                 }
             }
             else { numTasksFinished++; }
+
             index++;
         }
 
         tasksCompleted.text = numTasksFinished + "/" + numTasks;
 
         if (numTasksFinished == numTasks) { taskManager.UpdateTasks(); numTasks = -1; }
+
+        // Change to different task if current task is complete
+        else if (finishedTasks.ContainsKey(currentTask) && finishedTasks[currentTask]) 
+        {
+            index = 0;
+            foreach (RoomTask task in assignedTasks)
+            {
+                if (finishedTasks.ContainsKey(task) && !finishedTasks[task]) { toggles[index].isOn = true; currentTask = task; ShowCurrentTask(); break; }
+                index++;
+            }
+        }
     }
 
     [ClientRpc]
@@ -110,7 +123,7 @@ public class TaskAssigner : NetworkBehaviour
                 if (taskList.Count == 0) { break; }
 
                 // Add random tasks from total tasks in task manager
-                int newTask = Random.Range(0, taskList.Count - 1);
+                int newTask = Random.Range(0, taskList.Count);
 
                 assignedTasks.Add(taskList[newTask]);
 
@@ -250,6 +263,7 @@ public class TaskAssigner : NetworkBehaviour
         if (interactManager.pickedupObject != null && currentTask.triggerGameObject.Contains(interactManager.pickedupObject))
         {
             // set location to where that task item needs to be placed
+            taskPointer.gameObject.SetActive(true);
             taskPointer.SetTarget(currentTask.position);
         }
 
@@ -258,6 +272,7 @@ public class TaskAssigner : NetworkBehaviour
             foreach (GameObject trigger in currentTask.triggerGameObject)
             {
                 // set location to first trigger object if not already finished (check condition based on task?)
+                taskPointer.gameObject.SetActive(true);
                 taskPointer.SetTarget(trigger.transform.position);
                 break;
             }

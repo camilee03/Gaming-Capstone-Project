@@ -18,4 +18,20 @@ public class STOPCOLLIDINGWITHDOOR : MonoBehaviour
             else { GameObject.Destroy(collision.gameObject); }
         }
     }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        GameObject parent = collision.gameObject;
+        while (parent.transform.parent != null)
+        {
+            parent = parent.transform.parent.gameObject;
+        }
+
+        if (parent.tag != "Player")
+        {
+            NetworkObject obj = collision.gameObject.GetComponent<NetworkObject>();
+            if (obj != null) { obj.Despawn(true); }
+            else { GameObject.Destroy(collision.gameObject); }
+        }
+    }
 }

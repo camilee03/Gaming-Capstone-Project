@@ -398,7 +398,7 @@ public class GameController : NetworkBehaviour
 
     public bool IsColorAvailable(int colorIndex)
     {
-        Debug.Log($"Checking color availability for {colorIndex}");
+        //Debug.Log($"Checking color availability for {colorIndex}");
 
         return !usedColors.Contains(colorIndex);
     }

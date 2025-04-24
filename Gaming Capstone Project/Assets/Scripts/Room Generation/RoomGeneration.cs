@@ -173,7 +173,7 @@ public class RoomGeneration : NetworkBehaviour
         else
         {
             // rerotate dar to attempt to fit
-            Debug.Log("Rotating room");
+            //Debug.Log("Rotating room");
 
             if (dar1.pos > 1) { dar1.pos -= 2; }
             else { dar1.pos += 2; }

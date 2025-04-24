@@ -49,7 +49,7 @@ public class HostHittingEnter : NetworkBehaviour
         {
             text.ShowError(0);
         }
-            Debug.Log("Button has been pressed!");
+        Debug.Log("Button has been pressed!");
         Cursor.lockState = CursorLockMode.Locked;
     }
 

@@ -19,14 +19,12 @@ public class Poster : NetworkBehaviour
     private void PosterClientRpc(int i)
     {
         SetPosterMat(i);
-        Debug.Log("Client");
     }
 
     [ServerRpc]
     private void PosterServerRpc(int i)
     {
         PosterClientRpc(i);
-        Debug.Log("Server");
     }
 
     private void SetPosterMat(int i)
