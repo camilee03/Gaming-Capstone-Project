@@ -5,6 +5,7 @@ using Unity.Netcode;
 using Unity.Netcode.Components;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering.UI;
 using UnityEngine.Rendering.Universal;
 
 public class GameController : NetworkBehaviour
@@ -191,9 +192,10 @@ public class GameController : NetworkBehaviour
         GameObject.Find("RoomGenerationManager").GetComponent<RoomGeneration>().StartGeneration(numPlayers);
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void CheckForEndOfGameServerRpc()
     {
+        Debug.Log("CheckForEndOfGameServerRpc");
         int deadDopples = 0, deadSci = 0;
         foreach(var kvp in Players)
         {
@@ -216,30 +218,37 @@ public class GameController : NetworkBehaviour
         if(deadDopples >= numberOfDopples)
         {
             Debug.Log("Scientsits Win!");
-            EndGameForScienceWin();
+            EndGameForScienceWinClientRpc();
             return;
         }
         if (numberOfDopples-deadDopples >= (Players.Count-numberOfDopples)-deadSci)
         {
             Debug.Log("Dopples Win!");
-            EndGameForDoppleWin();
+            EndGameForDoppleWinClientRpc();
             return;
         }
         Debug.Log("Nobody Won!");
         //Maybe change Task-based win/loss to into this script? idk
     }
 
-    private void EndGameForScienceWin()
+
+    [ClientRpc]
+    private void EndGameForScienceWinClientRpc()
     {
-        if(IsServer)
-        playerObj.GetComponentInChildren<PlayerDisplayFade>().ScientistWinClientRpc();
+        Debug.Log("aaa");
+        if (playerObj.GetComponentInChildren<PlayerDisplayFade>() == null) Debug.Log("DAmn");
+        else Debug.Log("Shitt");
+
+        playerObj.GetComponentInChildren<PlayerDisplayFade>().ScientistWin();
     }
 
-
-    private void EndGameForDoppleWin()
+    [ClientRpc]
+    private void EndGameForDoppleWinClientRpc()
     {
-        if(IsServer) 
-        playerObj.GetComponentInChildren<PlayerDisplayFade>().DoppleWinClientRpc();
+        Debug.Log("aaa");
+        if (playerObj.GetComponentInChildren<PlayerDisplayFade>() == null) Debug.Log("DAmn");
+        else Debug.Log("Shitt");
+        playerObj.GetComponentInChildren<PlayerDisplayFade>().DoppleWin();
 
     }
 
@@ -477,7 +486,7 @@ public class GameController : NetworkBehaviour
 
     private void AssignRandomColorsToUnpickedPlayers()
     {
-        List<int> availableColors = Enumerable.Range(1, 12)
+        List<int> availableColors = Enumerable.Range(0, 11)
             .Where(c => IsColorAvailable(c))
             .ToList();
 

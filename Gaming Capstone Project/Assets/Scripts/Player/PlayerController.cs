@@ -525,6 +525,8 @@ public void ForceSetColorServerRpc(int colorIndex)
     {
         isDead = true;
         Debug.Log($"[ClientRpc] KillClientRpc => Player {OwnerClientId} is now dead.");
+        GameController.Instance.CheckForEndOfGameServerRpc();
+
         StartCoroutine(EnterGhostMode());
         // The next Update() will show the death screen and disable movement.
     }

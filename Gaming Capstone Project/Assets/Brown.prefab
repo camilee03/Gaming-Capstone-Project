@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 894175513071795344}
   - component: {fileID: 1107711834665426102}
   - component: {fileID: 6287643681144746051}
+  - component: {fileID: -8003002665159136675}
   m_Layer: 5
   m_Name: Brown
   m_TagString: Untagged
@@ -145,3 +146,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba1875d931c901b489558db8541929dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-8003002665159136675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7995679569334201993}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ee338a75b5e97242a6dac4a12a62e50, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colorIndex: 0

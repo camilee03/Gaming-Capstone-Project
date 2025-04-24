@@ -29,6 +29,7 @@ public class HostHittingEnter : NetworkBehaviour
         }
 
         controller = GameController.Instance;
+        Cursor.lockState = CursorLockMode.None;
 
         controller.setLobby(LobbyMenu);
     }
@@ -36,7 +37,6 @@ public class HostHittingEnter : NetworkBehaviour
     {
         Cursor.lockState = CursorLockMode.None;
 
-    }
 
 
     void ButtonPressed()
@@ -77,7 +77,7 @@ public class HostHittingEnter : NetworkBehaviour
             maxWaitTime -= Time.deltaTime;
             yield return null;
         }
-
+        Cursor.lockState = CursorLockMode.Locked;
         controller.HostSelectsStart();
         controller.DisableLobbyCanvasClientRpc();
         this.enabled = false;
