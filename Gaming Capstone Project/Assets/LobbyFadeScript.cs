@@ -6,9 +6,10 @@ using UnityEngine.UI;
 
 public class LobbyFadeScript : MonoBehaviour
 {
-    public Image Lobby;
+    public CanvasGroup Lobby;
     public float FadeInDuration, FadeOutDuration;
     public GameObject parentObj;
+    public Slider slider;
     private void Start()
     {
         FadeOut();
@@ -20,6 +21,8 @@ public class LobbyFadeScript : MonoBehaviour
 
     public void LevelFade()
     {
+        slider.DOValue(1, 5);
+
         Lobby.DOFade(1f, FadeInDuration).OnComplete(() =>
         {
             StartCoroutine(WaitThenFadeOut());
