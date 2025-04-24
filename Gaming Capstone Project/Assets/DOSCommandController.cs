@@ -1,10 +1,11 @@
+using NUnit.Framework;
+using System.Collections.Generic;
+using Unity.Netcode.Components;
 using UnityEngine;
 
 public class DOSCommandController : MonoBehaviour
 {
     public static DOSCommandController Instance { get; private set; }
-
-    [SerializeField] private Room[] Rooms;
 
     private void Awake()
     {
@@ -16,7 +17,7 @@ public class DOSCommandController : MonoBehaviour
         Instance = this;
     }
 
-    public void HandleCommand(string command)
+    public string HandleCommand(string command)
     {
         command = command.ToLower();
         string target = "";
@@ -26,74 +27,94 @@ public class DOSCommandController : MonoBehaviour
             command = command.Substring(0, command.IndexOf(" "));
         }
 
-        if (target.Length > 0)
+        switch (command)
         {
-            switch (command) //Commands with Target Rooms
-            {
-                case "/lights":
-                    Room currentRoom = FindRoomWithName(target);
-                    if (currentRoom != null)
-                    {
-                        // currentRoom.SendCommand(ToggleLights);
-                    }
-                    break;
-                case "/fan":
-                    break;
-                case "/jazz":
-                    Debug.Log("Imagine Jazz rn");
-                    break;
-                case "/spook":
-                    break;
-                case "/vote":
-                    break;
-                case "/help":
-                    break;
-                case "/diagnostic":
-                    break;
-                default:
-                    Debug.Log("Not a Command");
-                    break;
-            }
-        }
-        else
-        {
-            switch (command) //Commands with Target Rooms
-            {
-                case "/lights":
+            case "/spook":
+                break;
+            case "/help":
+                return "/help";
+            default:
+                if (target.Length > 0)
+                {
                     //find current room instead of room with name
                     Room currentRoom = FindRoomWithName(target);
-                    if (currentRoom != null)
+                    if (currentRoom.roomName == null) { return "ERROR: code 6070\n No such room name found."; }
+
+                    switch (command)
                     {
-                        // currentRoom.SendCommand(ToggleLights);
+                        case "/comms":
+                            List<AudioSource> speakerList = currentRoom.GetAllSpeakers();
+                            if (speakerList.Count != 0)
+                            {
+                                foreach (AudioSource speaker in currentRoom.GetAllSpeakers())
+                                {
+                                    // Play person's voice
+                                }
+                            }
+                            else { return "ERROR: code ___\n No speakers found in " + currentRoom.roomName; }
+                            break;
+                        case "/fan":
+                            List<NetworkAnimator> fanList = currentRoom.GetAllFans();
+                            if (fanList.Count != 0)
+                            {
+                                foreach (NetworkAnimator fan in fanList)
+                                {
+                                    fan.Animator.SetBool("Toggle", !fan.Animator.GetBool("Toggle"));
+                                }
+                            }
+                            else { return "ERROR: code ___\n No fans found in " + currentRoom.roomName; }
+                            break;
+                        case "/jazz":
+                            speakerList = currentRoom.GetAllSpeakers();
+                            if (speakerList.Count != 0)
+                            {
+                                foreach (AudioSource speaker in currentRoom.GetAllSpeakers())
+                                {
+                                    if (!speaker.isPlaying) { speaker.Play(); }
+                                    else { speaker.Stop(); }
+                                }
+                            }
+                            else { return "ERROR: code ___\n No speakers found in " + currentRoom.roomName; }
+                            break;
+                        case "/lights":
+                            foreach (Light light in currentRoom.GetAllLights())
+                            {
+                                light.enabled = !light.enabled;
+                            }
+                            break;
+                        default:
+                            return "ERROR: code 117\nNot a viable code";
                     }
-                    break;
-                case "/fan":
-                    break;
-                case "/jazz":
-                    Debug.Log("Imagine Jazz rn");
-                    break;
-                case "/spook":
-                    break;
-                case "/map":
-                    break;
-                case "/help":
-                    break;
-                default:
-                    Debug.Log("Not a Command");
-                    break;
-            }
+                }
+                else
+                {
+                    switch (command)
+                    {
+                        case "/comms":
+                        case "/fan":
+                        case "/jazz":
+                        case "/lights":
+                            return "ERROR: code 59\n No room name entered";
+                        default:
+                            return "ERROR: code 117\nNot a viable code";
+                    }
+                }
+                break;
         }
+
+        return "";
     }
 
     private Room FindRoomWithName(string target)
     {
-        //foreach (Room room in Rooms)
-        //{
-        //    if (room.name.ToLower() == target.ToLower())
-        //    {
-        //        return room;
-        //    }
-        //}
+        foreach (Room room in RoomManager.Instance.rooms)
+        {
+            if (room.roomName.Replace(" ", "").ToLower().Equals(target.Replace(" ", "").ToLower()))
+            {
+                return room;
+            }
+        }
         return null;
     }
+
 }

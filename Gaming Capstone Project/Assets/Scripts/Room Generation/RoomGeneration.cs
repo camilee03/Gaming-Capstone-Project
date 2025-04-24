@@ -21,7 +21,7 @@ public class RoomGeneration : NetworkBehaviour
     [Header("Spawn Data")]
     public float scale = 10; // how many tiles apart are different objects
     public int seed = -1; // set to -1 if no seed wanted
-    public int numRooms = 4;
+    public int numRooms = 12;
     [SerializeField] GameObject tiles;
     [SerializeField] GameObject walls;
     [SerializeField] GameObject doors;
@@ -172,7 +172,7 @@ public class RoomGeneration : NetworkBehaviour
         else
         {
             // rerotate dar to attempt to fit
-            Debug.Log("Rotating room");
+            //Debug.Log("Rotating room");
 
             if (dar1.pos > 1) { dar1.pos -= 2; }
             else { dar1.pos += 2; }

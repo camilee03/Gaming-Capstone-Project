@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Unity.Netcode;
 using UnityEngine.EventSystems;
+using UnityEditor.Experimental.GraphView;
 
 
 
@@ -82,15 +83,28 @@ public class TaskAssigner : NetworkBehaviour
                     case TaskType.Terminal: if (TerminalTask(task, index)) { finishedTasks[task] = true; } break;
                     case TaskType.Pickup: if (PickupTask(task, index)) { finishedTasks[task] = true; } break;
                     case TaskType.Paper: break;
+                    case TaskType.EnergyCore: if (EnergyCoreTask(task, index)) { finishedTasks[task] = true; } break;
                 }
             }
             else { numTasksFinished++; }
+
             index++;
         }
 
         tasksCompleted.text = numTasksFinished + "/" + numTasks;
 
         if (numTasksFinished == numTasks) { taskManager.UpdateTasks(); numTasks = -1; }
+
+        // Change to different task if current task is complete
+        else if (finishedTasks.ContainsKey(currentTask) && finishedTasks[currentTask]) 
+        {
+            index = 0;
+            foreach (RoomTask task in assignedTasks)
+            {
+                if (finishedTasks.ContainsKey(task) && !finishedTasks[task]) { toggles[index].isOn = true; currentTask = task; ShowCurrentTask(); break; }
+                index++;
+            }
+        }
     }
 
     [ClientRpc]
@@ -110,7 +124,7 @@ public class TaskAssigner : NetworkBehaviour
                 if (taskList.Count == 0) { break; }
 
                 // Add random tasks from total tasks in task manager
-                int newTask = Random.Range(0, taskList.Count - 1);
+                int newTask = Random.Range(0, taskList.Count);
 
                 assignedTasks.Add(taskList[newTask]);
 
@@ -134,7 +148,7 @@ public class TaskAssigner : NetworkBehaviour
     {
         foreach (GameObject trigger in task.triggerGameObject)
         {
-            if (Vector3.Distance(trigger.transform.position, task.position) > 30)
+            if (Vector3.Distance(trigger.transform.position, task.position) > 5)
             {
                 return false;
             }
@@ -195,6 +209,16 @@ public class TaskAssigner : NetworkBehaviour
         return isComplete; 
     }
 
+    bool EnergyCoreTask(RoomTask task, int index)
+    {
+        bool completed = task.core.taskIsDone;
+
+        TMP_Text toggleText = toggles[index].GetComponentInChildren<TMP_Text>();
+        toggleText.richText = true;
+        if (!toggleText.text.StartsWith("<") && completed) { toggleText.text = STRIKE_START + toggleText.text + STRIKE_END; }
+
+        return completed;
+    }
 
     // -- UI --//
     string DisplayText(RoomTask task)
@@ -229,6 +253,7 @@ public class TaskAssigner : NetworkBehaviour
         switch (task.type)
         {
             case TaskType.Interact: return "Activate" + results;
+            case TaskType.EnergyCore: return "Activate the energy core in " + triggerRooms;
             case TaskType.Terminal: return "Use the terminal in" + triggerRooms + " to ____";
             case TaskType.Pickup: return "Move" + triggers + " in" + triggerRooms + " to" + resultRooms;
             case TaskType.Paper: return "Piece the papers in " + triggerRooms + " together in" + resultRooms + ".";
@@ -250,6 +275,7 @@ public class TaskAssigner : NetworkBehaviour
         if (interactManager.pickedupObject != null && currentTask.triggerGameObject.Contains(interactManager.pickedupObject))
         {
             // set location to where that task item needs to be placed
+            taskPointer.gameObject.SetActive(true);
             taskPointer.SetTarget(currentTask.position);
         }
 
@@ -258,6 +284,7 @@ public class TaskAssigner : NetworkBehaviour
             foreach (GameObject trigger in currentTask.triggerGameObject)
             {
                 // set location to first trigger object if not already finished (check condition based on task?)
+                taskPointer.gameObject.SetActive(true);
                 taskPointer.SetTarget(trigger.transform.position);
                 break;
             }
@@ -275,7 +302,7 @@ public class TaskAssigner : NetworkBehaviour
         toggleTransform.localRotation = Quaternion.identity;
         toggleTransform.localPosition = Vector3.zero;
 
-        toggleTransform.localScale = new Vector3(6, 2, 2);
+        toggleTransform.localScale = new Vector3(12, 4, 4);
 
         // Get & set components
         Toggle newToggle = newToggleObject.GetComponent<Toggle>();

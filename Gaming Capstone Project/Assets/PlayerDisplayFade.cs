@@ -24,9 +24,9 @@ public class PlayerDisplayFade : NetworkBehaviour
 
     }
 
-    [ClientRpc]
-    public void ScientistWinClientRpc()
+    public void ScientistWin()
     {
+        Debug.Log("Scientsit RPC called");
         image.DOFade(1f, 2.5f).OnComplete(() =>
         {
             disableAllOtherChildren();
@@ -35,9 +35,10 @@ public class PlayerDisplayFade : NetworkBehaviour
         });
     }
 
-    [ClientRpc]
-    public void DoppleWinClientRpc()
+    public void DoppleWin()
     {
+        Debug.Log("Dopple RPC called");
+
         image.DOFade(1f, 2.5f).OnComplete(() =>
         {
             disableAllOtherChildren();
@@ -51,6 +52,8 @@ public class PlayerDisplayFade : NetworkBehaviour
         yield return new WaitForSeconds(5f);
         image.DOFade(0f, 2.5f).OnComplete(() =>
         {
+            Debug.Log("Done RPC called");
+
         });
     }
 }

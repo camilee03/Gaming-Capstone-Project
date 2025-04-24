@@ -4,6 +4,8 @@ using TMPro;
 using UnityEngine.UI;
 using System;
 using UnityEngine.EventSystems;
+using Unity.Netcode;
+using System.Collections.Generic;
 
 public class DOSInteraction : MonoBehaviour
 {
@@ -18,7 +20,7 @@ public class DOSInteraction : MonoBehaviour
 
     private Coroutine interactionCoroutine;
 
-    public TMP_Text[] PreviousLines;
+    private TMP_Text[] PreviousLines;
     public TMP_InputField WritingLine;
     public int maxCharacters = 20;
 
@@ -26,40 +28,59 @@ public class DOSInteraction : MonoBehaviour
 
     private DOSManager DOSManager;
 
+    bool isHelp;
+    string[] storedCommandLines;
+    string[] helpLines;
+
     void Start()
     {
-
+        DOSManager = DOSManager.Instance;
         DOSController = DOSCommandController.Instance;
+        WritingLine = DOSManager.InputField;
+        PreviousLines = DOSManager.CommandLines;
 
-
-
+        helpLines = new string[6] {
+            "/comms - Connect your voice to room",
+            "/fan - Turns fan/s on/off",
+            "/help - Shows commands",
+            "/jazz - Plays jazz",
+            "/lights - Turns on/off lights",
+            "/spook - Send scary noises to player" };
     }
 
     public void SetCam(GameObject cam)
     {
         camera = cam;
-        camera = Camera.main.gameObject;
         CameraMovementScript = camera.GetComponent<CameraMovement>();
-        playerController = camera.transform.parent.parent.parent.parent.parent.parent.GetComponent<PlayerController>();
+        playerController = NetworkManager.Singleton.LocalClient.PlayerObject.gameObject.GetComponent<PlayerController>();
 
     }
 
     private void Update()
     {
-        if(DOSManager == null)
-        {
-            DOSManager = DOSManager.Instance;
-        }
+        if (DOSManager == null) { DOSManager = DOSManager.Instance; WritingLine = DOSManager.InputField; }
+        if (DOSController == null) { DOSController = DOSCommandController.Instance; }
+
         if (InInteraction)
         {
             if (Input.GetKeyDown(KeyCode.Return))
             {
-                //send current line to seperate method
-                DOSController.HandleCommand(WritingLine.text);
-                UpdatingCommandLine();
+                if (isHelp)
+                {
+                    RestoreCommandLines();
+                    isHelp = false;
+                }
+                else
+                {
+                    //send current line to seperate method
+                    string possibleError = DOSController.HandleCommand(WritingLine.text);
+                    UpdatingCommandLine();
+                    if (possibleError == "/help") { StoreCommandLines(); isHelp = true; }
+                    else if (possibleError != "") { ShowErrorMessage(possibleError); }
+                }
 
             }
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Mouse1))
             {
                 EndInteraction();
             }
@@ -67,17 +88,32 @@ public class DOSInteraction : MonoBehaviour
         }
     }
 
-    public void InsertNewLine(string line)
+    private void StoreCommandLines()
     {
-        for (int i = PreviousLines.Length - 1; i > 0; i--)
+        storedCommandLines = new string[PreviousLines.Length];
+        for (int i = PreviousLines.Length-1; i >= 0; i--)
         {
-            PreviousLines[i].text = PreviousLines[i - 1].text;
+            storedCommandLines[i] = PreviousLines[i].text;
+            PreviousLines[i].text = helpLines[i];
         }
+    }
+
+    private void RestoreCommandLines()
+    {
+        for (int i = PreviousLines.Length - 1; i >= 0; i--)
+        {
+            PreviousLines[i].text = storedCommandLines[i];
+        }
+
+        WritingLine.text = "";
+        WritingLine.interactable = true;
+        WritingLine.ActivateInputField();
+        WritingLine.Select();
     }
 
     private void UpdatingCommandLine()
     {
-        for (int i = PreviousLines.Length - 1; i > 0; i--)
+        for (int i = PreviousLines.Length-1; i > 0; i--)
         {
             PreviousLines[i].text = PreviousLines[i - 1].text;
         }
@@ -88,7 +124,19 @@ public class DOSInteraction : MonoBehaviour
         WritingLine.Select();
     }
 
+    private void ShowErrorMessage(string error)
+    {
+        DOSManager.ErrorPopup.SetActive(true);
+        DOSManager.ErrorText.text = error;
 
+        StartCoroutine(RemoveErrorMessage(3));
+    }
+
+    IEnumerator RemoveErrorMessage(int time)
+    {
+        yield return new WaitForSeconds(time);
+        DOSManager.ErrorPopup.SetActive(false);
+    }
 
     #region Entering and Exiting Interaction
     public void ToggleInteraction()

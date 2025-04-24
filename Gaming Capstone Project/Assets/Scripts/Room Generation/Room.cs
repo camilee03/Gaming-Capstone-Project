@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 
 public class Room : NetworkBehaviour
@@ -12,6 +13,9 @@ public class Room : NetworkBehaviour
     public List<GameObject> spawnedWalls = new();
     public GameObject tileParent; // children = all floor tiles
     public GameObject objectParent; // children = all objects
+    private List<Light> lightList; // get with method
+    private List<NetworkAnimator> fanList; // get with method
+    private List<AudioSource> speakerList; // get with method
     public string roomName;
     public char[,] objectLocations;
 
@@ -112,7 +116,7 @@ public class Room : NetworkBehaviour
     /// <summary> Creates new bounds for a room </summary>
     void GenerateNewRoom()
     {
-        size = Random.Range(11, 20);
+        size = Random.Range(11, 15);
         objectLocations = new char[size, size]; // set random room size
 
         int numSquares = Random.Range(1, 5); // determine how many squares will be generated
@@ -311,5 +315,53 @@ public class Room : NetworkBehaviour
         if (parent != null) { instanceNetworkObject.TrySetParent(parent); }
 
         return instance;
+    }
+
+    public List<Light> GetAllLights()
+    {
+        if (lightList != null) { return lightList; }
+
+        lightList = new List<Light>();
+        for (int i = 0; i < objectParent.transform.childCount; i++)
+        {
+            if (objectParent.transform.GetChild(i).name.Replace("(Clone)", "") == "Light")
+            {
+                lightList.Add(objectParent.transform.GetChild(i).GetChild(0).GetComponent<Light>());
+            }
+        }
+
+        return lightList;
+    }
+
+    public List<NetworkAnimator> GetAllFans()
+    {
+        if (fanList != null) { return fanList; }
+
+        fanList = new List<NetworkAnimator>();
+        for (int i = 0; i < objectParent.transform.childCount; i++)
+        {
+            if (objectParent.transform.GetChild(i).name.Replace("(Clone)", "") == "Fan")
+            {
+                fanList.Add(objectParent.transform.GetChild(i).GetComponent<NetworkAnimator>());
+            }
+        }
+
+        return fanList;
+    }
+
+    public List<AudioSource> GetAllSpeakers()
+    {
+        if (speakerList != null) { return speakerList; }
+
+        speakerList = new List<AudioSource>();
+        for (int i = 0; i < objectParent.transform.childCount; i++)
+        {
+            if (objectParent.transform.GetChild(i).name.Replace("(Clone)", "") == "PA Speaker")
+            {
+                speakerList.Add(objectParent.transform.GetChild(i).GetComponent<AudioSource>());
+            }
+        }
+
+        return speakerList;
     }
 }

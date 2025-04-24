@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 public class Interact : NetworkBehaviour
 {
@@ -55,7 +56,6 @@ public class Interact : NetworkBehaviour
             {
                 canPickup = true;
             }
-            if (Input.GetKeyDown(KeyCode.E)) { OnClick(); }
 
             // Shows the pickedup object in hand
             if (!canPickup && pickedupObject != null)
@@ -77,7 +77,7 @@ public class Interact : NetworkBehaviour
 
     }
 
-    public void OnClick()
+    public void OnClick(InputAction.CallbackContext context)
     {
         if (highlightedObject != null)
         {
@@ -98,9 +98,10 @@ public class Interact : NetworkBehaviour
                     toggleAnimatedObject(highlightedObject);
                     break;
                 case "DOS Terminal": // access object and perform action
-                    highlightedObject.GetComponent<DOSInteraction>().SetInteract(gameObject.GetComponent<Interact>());
-                    highlightedObject.GetComponent<DOSInteraction>().ToggleInteraction();
-                    highlightedObject.GetComponent<DOSInteraction>().SetCam(gameObject);
+                    DOSInteraction dosInteraction = highlightedObject.GetComponent<DOSInteraction>();
+                    dosInteraction.SetCam(gameObject);
+                    dosInteraction.SetInteract(gameObject.GetComponent<Interact>());
+                    dosInteraction.ToggleInteraction();
                     break;
                 case "Chair":
                     chairSittingIn = highlightedObject;
@@ -188,7 +189,6 @@ public class Interact : NetworkBehaviour
         //-- Highlights objects to be picked up -- //
         if (Physics.Raycast(transform.position + transform.forward * 2, transform.forward, out hit, 10, ~layerMask) && tags.Contains(hit.collider.tag))
         {
-            Debug.Log("hit scanned something" + hit.collider.gameObject);
             if (highlightedObject == null) { EnableHighlight(hit.collider.gameObject); }
         }
         else if (highlightedObject != null && highlightedObject != pickedupObject)

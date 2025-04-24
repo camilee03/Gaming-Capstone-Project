@@ -127,7 +127,7 @@ MonoBehaviour:
   - name: coal2
     obj: {fileID: 998483663221219533, guid: e321c28ef0f24414dbf6457e1ccb6357, type: 3}
   - name: energy core
-    obj: {fileID: 7378980975851388449, guid: 548016657dcbe6a448425ceac9f0bd99, type: 3}
+    obj: {fileID: 214623283874663119, guid: dce5c9cb12eafbe4a9499144f0bfe8a8, type: 3}
   - name: fan
     obj: {fileID: 6451468868994116537, guid: b56ca83684c27904ba4318612248b185, type: 3}
   - name: food
@@ -144,8 +144,6 @@ MonoBehaviour:
     obj: {fileID: 2340950732892518580, guid: dac31d909daca27498212ea04c1514f3, type: 3}
   - name: poster
     obj: {fileID: 8434211146768594839, guid: e68fd0bc65f48e144887b33093d6f80f, type: 3}
-  - name: radio
-    obj: {fileID: 7378980975851388449, guid: 548016657dcbe6a448425ceac9f0bd99, type: 3}
   - name: speaker
     obj: {fileID: 1070109190271503186, guid: c6be5ccd26911ad4498ac06ec9abb291, type: 3}
   - name: sock
@@ -153,7 +151,9 @@ MonoBehaviour:
   - name: table
     obj: {fileID: 6798747495853143383, guid: f226b0ac3e59104468e17fe4f7df16fc, type: 3}
   - name: trash
-    obj: {fileID: 7378980975851388449, guid: 548016657dcbe6a448425ceac9f0bd99, type: 3}
+    obj: {fileID: 2340950732892518580, guid: ac2c662e159385e4f98b8b89fb877646, type: 3}
+  - name: trash can
+    obj: {fileID: 7328077073068240958, guid: bbd54794df7bba44896d1290a2caea4a, type: 3}
   - name: DOS terminal
     obj: {fileID: 2066796992367776604, guid: f1e7aef730528b142af860f8e6eb94e9, type: 3}
   - name: vent
@@ -172,6 +172,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 246d78e01a78cec4297578ceea95c79f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   wallpaperTextures:
   - {fileID: 2800000, guid: ae9243082136c5442a22cdea5fbb8402, type: 3}
   - {fileID: 2800000, guid: 98622122a5c91de46bdff5a2a8cbd892, type: 3}
@@ -182,7 +183,6 @@ MonoBehaviour:
   - {fileID: 2800000, guid: 92ee3c924045d87439df704339a4fd6c, type: 3}
   - {fileID: 2800000, guid: 230ef15618535f346abf35eab3e8b98e, type: 3}
   - {fileID: 2800000, guid: c29cd08f5e0b1834889f829217683236, type: 3}
-  baseWallMat: {fileID: 2100000, guid: f65fbc4cb9a96904da5b2285217b1e17, type: 2}
   rooms: []
   spawnPoints: []
 --- !u!114 &6757427336724844059
@@ -197,6 +197,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ff8d9d4dc9e2c74a85dbd6c9c26da42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   completedTasks: 0
 --- !u!114 &8520993107504177655
 MonoBehaviour:

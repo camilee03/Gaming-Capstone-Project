@@ -251,7 +251,7 @@ public class ObjectGeneration : NetworkBehaviour
             if (pair != null)
             {
                 // Enforce the distance constraint.
-                if (Vector3.Distance(domain, pair.domains[0]) > 50)
+                if (Vector3.Distance(domain, pair.domains[0]) > 30)
                     return false;
             }
         }
@@ -338,12 +338,12 @@ public class ObjectGeneration : NetworkBehaviour
         // For instance, if obj1 is paired, then when comparing with its paired object, the positions must be within 50 units.
         if (obj1.properties.Contains(Properties.Paired) && obj2.identifier.Equals(obj1.pairedIdentifier))
         {
-            return Vector3.Distance(value1, value2) <= 50;
+            return Vector3.Distance(value1, value2) <= 30;
         }
         // Also check the symmetric case.
         if (obj2.properties.Contains(Properties.Paired) && obj1.identifier.Equals(obj2.pairedIdentifier))
         {
-            return Vector3.Distance(value1, value2) <= 50;
+            return Vector3.Distance(value1, value2) <= 30;
         }
 
         // Otherwise, there’s no additional binary constraint.
@@ -359,6 +359,7 @@ public class ObjectGeneration : NetworkBehaviour
 
         GameObject newObject = null;
         Vector3 ceilingHeight = Vector3.up * 12;
+        Vector3 fallHeight = Vector3.up * 2;
 
         Vector3[] displacementVector = new Vector3[4] {Vector3.left, Vector3.down, Vector3.right, Vector3.up };
         Vector3 disp = Vector3.zero;
@@ -374,23 +375,23 @@ public class ObjectGeneration : NetworkBehaviour
                 newObject = SpawnNetworkedObject(parent.transform, objects["button"], tilePos + disp, wallDict[tilePos].transform.rotation);
                 break;
             case 'b': // box
-                newObject = SpawnNetworkedObject(parent.transform, objects["box"], tilePos, Quaternion.Euler(-90, 0, randomRotationsY[i]));
+                newObject = SpawnNetworkedObject(parent.transform, objects["box"], tilePos + fallHeight, Quaternion.Euler(-90, 0, randomRotationsY[i]));
                 break;
             case 'C': // Chair
                 newObject = SpawnNetworkedObject(parent.transform, objects["chair"], tilePos, Quaternion.Euler(-90, 0, randomRotationsY[i]));
                 break;
             case 'c': // Coal
                 int chooseRandomObject = Random.Range(0, 3);
-                newObject = SpawnNetworkedObject(parent.transform, objects["coal" + chooseRandomObject], tilePos, Quaternion.identity);
+                newObject = SpawnNetworkedObject(parent.transform, objects["coal" + chooseRandomObject], tilePos + fallHeight, Quaternion.identity);
                 break;
             case 'e': // EnergyCore
-                newObject = SpawnNetworkedObject(parent.transform, objects["energy core"], tilePos, Quaternion.identity);
+                newObject = SpawnNetworkedObject(parent.transform, objects["energy core"], tilePos, Quaternion.Euler(-90, randomRotationsY[i], 0));
                 break;
             case 'F': // Furnace
                 newObject = SpawnNetworkedObject(parent.transform, objects["furnace"], tilePos, Quaternion.Euler(-90, 0, randomRotationsY[i]));
                 break;
             case 'f': // fan
-                newObject = SpawnNetworkedObject(parent.transform, objects["fan"], tilePos + Vector3.up * 10, Quaternion.Euler(0, randomRotationsY[i], 0));
+                newObject = SpawnNetworkedObject(parent.transform, objects["fan"], tilePos + Vector3.up * 3, Quaternion.Euler(0, randomRotationsY[i], 0));
                 break;
             case 'L': // light
                 newObject = SpawnNetworkedObject(parent.transform, objects["light"], tilePos + ceilingHeight, Quaternion.Euler(-90, 0, 0));
@@ -398,7 +399,7 @@ public class ObjectGeneration : NetworkBehaviour
             case 'l': // lever
                 if (wallDict.Keys.Contains(tilePos))
                 {
-                    newObject = SpawnNetworkedObject(parent.transform, objects["lever"], tilePos + disp + Vector3.up * 3, wallDict[tilePos].transform.rotation);
+                    newObject = SpawnNetworkedObject(parent.transform, objects["lever"], tilePos + disp * 0.5f + Vector3.up * 3, Quaternion.LookRotation(wallDict[tilePos].transform.right) * Quaternion.Euler(-90, 0, 90));
                 }
                 break;
             case 'P': // Poster
@@ -408,22 +409,19 @@ public class ObjectGeneration : NetworkBehaviour
                 }
                 break;
             case 'p': // paper
-                newObject = SpawnNetworkedObject(parent.transform, objects["paper"], tilePos, Quaternion.identity);
-                break;
-            case 'r': // radio
-                newObject = SpawnNetworkedObject(parent.transform, objects["radio"], tilePos, Quaternion.Euler(0, randomRotationsY[i], 0));
+                newObject = SpawnNetworkedObject(parent.transform, objects["paper"], tilePos + fallHeight, Quaternion.identity);
                 break;
             case 's': // speaker
                 if (wallDict.Keys.Contains(tilePos))
                 {
-                    newObject = SpawnNetworkedObject(parent.transform, objects["speaker"], tilePos + disp + Vector3.up * 3, Quaternion.LookRotation(wallDict[tilePos].transform.forward) * Quaternion.Euler(0, 90, 0));
+                    newObject = SpawnNetworkedObject(parent.transform, objects["speaker"], tilePos + disp * 1.6f + Vector3.up * 4, Quaternion.LookRotation(wallDict[tilePos].transform.right) * Quaternion.Euler(-90, 0, 90));
                 }
                 break;
-            case 'T': // Table
+            case 't': // Table
                 newObject = SpawnNetworkedObject(parent.transform, objects["table"], tilePos, Quaternion.Euler(-90, randomRotationsY[i], 0));
                 newObject.transform.localScale /= 1.1f;
                 break;
-            case 't': // DOS terminal
+            case 'T': // DOS terminal
                 newObject = SpawnNetworkedObject(parent.transform, objects["DOS terminal"], tilePos, Quaternion.Euler(-90, randomRotationsY[i], 0));
                 newObject.transform.localScale /= 1.1f;
                 break;
@@ -436,23 +434,26 @@ public class ObjectGeneration : NetworkBehaviour
             case 'W': // Chute
                 if (wallDict.Keys.Contains(tilePos))
                 {
-                    newObject = SpawnNetworkedObject(parent.transform, objects["chute"], tilePos + disp, wallDict[tilePos].transform.rotation);
+                    newObject = SpawnNetworkedObject(parent.transform, objects["chute"], tilePos + disp * 0.5f + Vector3.up * 5, Quaternion.LookRotation(wallDict[tilePos].transform.right) * Quaternion.Euler(-90, 0, 90));
                 }
                 break;
             case 'w': // Wires
                 if (wallDict.Keys.Contains(tilePos))
                 {
-                    newObject = SpawnNetworkedObject(parent.transform, objects["wires"], tilePos + disp, wallDict[tilePos].transform.rotation);
+                    newObject = SpawnNetworkedObject(parent.transform, objects["wires"], tilePos + disp * 0.5f + Vector3.up * 5, Quaternion.LookRotation(wallDict[tilePos].transform.right) * Quaternion.Euler(-90, 0, 90));
                 }
                 break;
             case 'X': // food
-                newObject = SpawnNetworkedObject(parent.transform, objects["food"], tilePos, Quaternion.Euler(0, randomRotationsY[i], 0));
+                newObject = SpawnNetworkedObject(parent.transform, objects["food"], tilePos + fallHeight, Quaternion.Euler(0, randomRotationsY[i], 0));
                 break;
             case 'x': // clothes
-                newObject = SpawnNetworkedObject(parent.transform, objects["glove"], tilePos, Quaternion.Euler(0, randomRotationsY[i], 0));
+                newObject = SpawnNetworkedObject(parent.transform, objects["glove"], tilePos + fallHeight, Quaternion.Euler(0, randomRotationsY[i], 0));
+                break;
+            case 'Z': // trash-can
+                newObject = SpawnNetworkedObject(parent.transform, objects["trash can"], tilePos, Quaternion.Euler(-90, randomRotationsY[i], 0));
                 break;
             case 'z': // trash
-                newObject = SpawnNetworkedObject(parent.transform, objects["trash"], tilePos, Quaternion.Euler(0, randomRotationsY[i], 0));
+                newObject = SpawnNetworkedObject(parent.transform, objects["trash"], tilePos + fallHeight, Quaternion.Euler(0, randomRotationsY[i], 0));
                 break;
 
             default:
@@ -495,7 +496,8 @@ public class ObjectGeneration : NetworkBehaviour
             case 'x': // Clothes
             case 'C': // Chair
             case 't': // Table
-            case 'r': // Radio
+            case 'z': // Trasj
+            case 'Z': // Trash Can
                 newObject = new Object() { identifier = identifier, domains = new(tilePositions), constraint = Constraints.None };
                 break;
 
@@ -543,12 +545,15 @@ public class ObjectGeneration : NetworkBehaviour
     {
         GameObject instance = null;
 
-        instance = Instantiate(child, position, rotation);
-        NetworkObject instanceNetworkObject = instance.GetComponent<NetworkObject>();
-        if (instanceNetworkObject == null) { Debug.LogError(child.name + " needs a NetworkObject"); }
-        instanceNetworkObject.Spawn(true);
+        if (child != null)
+        {
+            instance = Instantiate(child, position, rotation);
+            NetworkObject instanceNetworkObject = instance.GetComponent<NetworkObject>();
+            if (instanceNetworkObject == null) { Debug.LogError(child.name + " needs a NetworkObject"); }
+            instanceNetworkObject.Spawn(true);
 
-        if (parent != null) { instanceNetworkObject.TrySetParent(parent); }
+            if (parent != null) { instanceNetworkObject.TrySetParent(parent); }
+        }
 
         return instance;
     }
@@ -599,6 +604,7 @@ public class ObjectGeneration : NetworkBehaviour
             case 't': // Table
             case 'T': // Terminal
             case 'e': // Energy Core
+            case 'Z': // Trash can
                 return 1;
 
             // Default for objects without these properties

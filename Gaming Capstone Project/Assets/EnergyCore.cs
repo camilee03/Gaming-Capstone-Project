@@ -8,6 +8,8 @@ public class EnergyCore : MonoBehaviour
     public Renderer[] expectedRenderer, receivedRenderer;
     bool listeningForCode = true;
 
+    public bool taskIsDone;
+
     public EnergyCoreButton[] buttons;
     void GenerateCode()
     {
@@ -89,6 +91,7 @@ public class EnergyCore : MonoBehaviour
                 {
                     Debug.Log("Correct Code!"); //maybe play a correct sound effect
                     //finish the task here.
+                    taskIsDone = true;
                     listeningForCode = false;
                 }
                 else

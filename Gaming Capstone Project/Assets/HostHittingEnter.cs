@@ -30,6 +30,7 @@ public class HostHittingEnter : NetworkBehaviour
         }
 
         controller = GameController.Instance;
+        Cursor.lockState = CursorLockMode.None;
 
         controller.setLobby(LobbyMenu);
         if (!started)
@@ -53,7 +54,8 @@ public class HostHittingEnter : NetworkBehaviour
         {
             text.ShowError(0);
         }
-            Debug.Log("Button has been pressed!");
+        Debug.Log("Button has been pressed!");
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     IEnumerator CheckPlayerCountBeforeStart()
@@ -81,7 +83,7 @@ public class HostHittingEnter : NetworkBehaviour
             maxWaitTime -= Time.deltaTime;
             yield return null;
         }
-
+        Cursor.lockState = CursorLockMode.Locked;
         controller.HostSelectsStart();
         controller.DisableLobbyCanvasClientRpc();
         this.enabled = false;
