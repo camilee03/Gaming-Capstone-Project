@@ -1715,14 +1715,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 206594615213130685, guid: 82ffffd0b62fa544f99a92a5b64bcaab, type: 3}
-      propertyPath: GlobalObjectIdHash
-      value: 3650772826
-      objectReference: {fileID: 0}
-    - target: {fileID: 206594615213130685, guid: 82ffffd0b62fa544f99a92a5b64bcaab, type: 3}
-      propertyPath: InScenePlacedSourceGlobalObjectIdHash
-      value: 4141339745
-      objectReference: {fileID: 0}
     - target: {fileID: 4517861865285927298, guid: b572b896af3e8f44f80fe7d19913a74c, type: 3}
       propertyPath: m_Name
       value: MapCameras
@@ -1766,6 +1758,14 @@ PrefabInstance:
     - target: {fileID: 7436338773922664227, guid: b572b896af3e8f44f80fe7d19913a74c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 206594615213130685, guid: 82ffffd0b62fa544f99a92a5b64bcaab, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 3650772826
+      objectReference: {fileID: 0}
+    - target: {fileID: 206594615213130685, guid: 82ffffd0b62fa544f99a92a5b64bcaab, type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 4141339745
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2548,7 +2548,7 @@ Transform:
   m_GameObject: {fileID: 1473400438}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 960, y: 540, z: 0}
+  m_LocalPosition: {x: 20960, y: 20540, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
