@@ -79,55 +79,59 @@ public class Interact : NetworkBehaviour
 
     public void OnClick(InputAction.CallbackContext context)
     {
-        if (highlightedObject != null)
+        if (context.performed)
         {
-            switch (highlightedObject.tag)
+            if (highlightedObject != null)
             {
-                case "Selectable": // Pick up object
-                    if (canPickup)
-                    {
-                        canPickup = false;
-                        pickedupObject = highlightedObject;
-                        PickUp();
-                    }
-                    break;
-                case "Button": // Press button / lever
-                    toggleAnimatedObject(highlightedObject);
-                    break;
-                case "Door": // Open / close door
-                    toggleAnimatedObject(highlightedObject);
-                    break;
-                case "DOS Terminal": // access object and perform action
-                    DOSInteraction dosInteraction = highlightedObject.GetComponent<DOSInteraction>();
-                    dosInteraction.SetCam(gameObject);
-                    dosInteraction.SetInteract(gameObject.GetComponent<Interact>());
-                    dosInteraction.ToggleInteraction();
-                    break;
-                case "Chair":
-                    chairSittingIn = highlightedObject;
-                    foreach (Collider col in chairSittingIn.GetComponents<Collider>())
-                        col.enabled = false;
-                    player.canMove = false;
-                    sitting = true;
-                    anim.SetBool("Sitting", true);
-                    player.transform.position = new Vector3(chairSittingIn.transform.position.x, player.transform.position.y,chairSittingIn.transform.position.z) + chairSittingIn.transform.up * 0.36f;
-                    player.transform.rotation = Quaternion.Euler(new Vector3(0, chairSittingIn.transform.rotation.eulerAngles.y, 0));
-                    break;
+                switch (highlightedObject.tag)
+                {
+                    case "Selectable": // Pick up object
+                        if (canPickup)
+                        {
+                            canPickup = false;
+                            pickedupObject = highlightedObject;
+                            PickUp();
+                        }
+                        break;
+                    case "Button": // Press button / lever
+                        toggleAnimatedObject(highlightedObject);
+                        break;
+                    case "Door": // Open / close door
+                        toggleAnimatedObject(highlightedObject);
+                        break;
+                    case "DOS Terminal": // access object and perform action
+                        DOSInteraction dosInteraction = highlightedObject.GetComponent<DOSInteraction>();
+                        dosInteraction.SetCam(gameObject);
+                        dosInteraction.SetInteract(gameObject.GetComponent<Interact>());
+                        dosInteraction.ToggleInteraction();
+                        break;
+                    case "Chair":
+                        chairSittingIn = highlightedObject;
+                        foreach (Collider col in chairSittingIn.GetComponents<Collider>())
+                            col.enabled = false;
+                        player.canMove = false;
+                        sitting = true;
+                        anim.SetBool("Sitting", true);
+                        player.transform.position = new Vector3(chairSittingIn.transform.position.x, player.transform.position.y, chairSittingIn.transform.position.z) + chairSittingIn.transform.up * 0.36f;
+                        player.transform.rotation = Quaternion.Euler(new Vector3(0, chairSittingIn.transform.rotation.eulerAngles.y, 0));
+                        break;
+                }
             }
-        }
-        else {
-            if (pickedupObject != null)
-                Place();
-            else if (sitting)
+            else
             {
-                sitting = false;
-                foreach (Collider col in chairSittingIn.GetComponents<Collider>())
-                    col.enabled = true;
-                player.canMove = true;
-                sitting = false;
-                anim.SetBool("Sitting", false);
-                player.transform.position = new Vector3(chairSittingIn.transform.position.x, player.transform.position.y, chairSittingIn.transform.position.z) + chairSittingIn.transform.up * 1f;
-                chairSittingIn = null;
+                if (pickedupObject != null)
+                    Place();
+                else if (sitting)
+                {
+                    sitting = false;
+                    foreach (Collider col in chairSittingIn.GetComponents<Collider>())
+                        col.enabled = true;
+                    player.canMove = true;
+                    sitting = false;
+                    anim.SetBool("Sitting", false);
+                    player.transform.position = new Vector3(chairSittingIn.transform.position.x, player.transform.position.y, chairSittingIn.transform.position.z) + chairSittingIn.transform.up * 1f;
+                    chairSittingIn = null;
+                }
             }
         }
     }

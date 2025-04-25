@@ -68,6 +68,7 @@ public class PlayerController : NetworkBehaviour
     public int ColorID = -1;
 
     public string playerName;
+    public TextMeshProUGUI nametag;
 
     [Header("Death Visuals")]
     public GameObject playerModel; // Assign in Inspector: this should be the mesh or object representing the visible character
@@ -80,7 +81,7 @@ public class PlayerController : NetworkBehaviour
     {
         playerInput = GetComponent<PlayerInput>();
         camMovement = cam.GetComponent<CameraMovement>();
-        AudioListener al = cam.GetComponent<AudioListener>();        
+        AudioListener al = cam.gameObject.GetComponent<AudioListener>();        
 
         if (IsOwner)
         {
@@ -91,6 +92,8 @@ public class PlayerController : NetworkBehaviour
             playerInput.enabled = true;
             cam.gameObject.SetActive(true);
             camMovement.enabled = true;
+            nametag.enabled = false;
+            al.enabled = true;
             PlayerDisplay.SetActive(true);
         }
         else
@@ -102,6 +105,7 @@ public class PlayerController : NetworkBehaviour
             playerInput.enabled = false;
             cam.enabled = false;
             camMovement.enabled = false;
+            nametag.enabled = true;
             al.enabled = false;
             PlayerDisplay.SetActive(false);
         }
@@ -139,11 +143,18 @@ public class PlayerController : NetworkBehaviour
     }
     private void ApplyColor(int colorIndex)
     {
-
         if (gameObject.GetComponent<ColorManager>() != null)
         {
             ColorManager colormanage = gameObject.GetComponent<ColorManager>();
             colormanage.ChangeSuitColor(colorIndex);
+        }
+    }
+    public void ApplyColor()
+    {
+        if (gameObject.GetComponent<ColorManager>() != null)
+        {
+            ColorManager colormanage = gameObject.GetComponent<ColorManager>();
+            colormanage.ChangeSuitColor(ColorID);
         }
     }
     private System.Collections.IEnumerator WaitForLocalPlayer()
@@ -566,6 +577,7 @@ private IEnumerator EnterGhostMode()
     {
         playerName = name;
         transform.name = name;
+        nametag.text = name;
     }
 
     public void ExternalSetColor(int colorIndex)
@@ -594,7 +606,7 @@ private IEnumerator EnterGhostMode()
             GameController.Instance.usedColors.Remove(ColorID);
             ColorID = colorIndex;
             GameController.Instance.usedColors.Add(ColorID);
-            ApplyColor(ColorID);            
+            ApplyColor();
         }
     }
 }

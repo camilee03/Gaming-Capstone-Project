@@ -497,6 +497,7 @@ public class GameController : NetworkBehaviour
                 player.ExternalSetColor(availableColors[0]);
                 availableColors.RemoveAt(0);
             }
+            player.ApplyColor();
         }
     }
 
