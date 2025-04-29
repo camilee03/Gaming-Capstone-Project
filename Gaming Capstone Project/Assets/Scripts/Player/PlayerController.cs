@@ -58,7 +58,7 @@ public class PlayerController : NetworkBehaviour
     private bool isTransformed = false;
     private bool canAttack = false;
     private float staminaRegenTimer;
-    private float attackTimer;                  // Tracks time left before we can attack again
+    public float attackTimer;                  // Tracks time left before we can attack again
     public bool isGrounded;
     public bool debugOffline = false;
     public bool canMove = true;

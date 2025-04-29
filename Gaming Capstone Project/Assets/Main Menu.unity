@@ -270,9 +270,10 @@ MonoBehaviour:
   usedColors: 
   TimeLeftInVoting:
     m_InternalValue: 0
-  votingTime: 60
+  votingTime: 30
   Spawnpoints: []
   LobbyCanvas: {fileID: 0}
+  voteStartDelay: 120
   secondsRemainingUntilVote:
     m_InternalValue: 0
   VotingCanvas: {fileID: 0}
