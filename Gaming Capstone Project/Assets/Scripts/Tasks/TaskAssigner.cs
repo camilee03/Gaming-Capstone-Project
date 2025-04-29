@@ -6,7 +6,6 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Unity.Netcode;
 using UnityEngine.EventSystems;
-using UnityEditor.Experimental.GraphView;
 
 
 
@@ -267,6 +266,7 @@ public class TaskAssigner : NetworkBehaviour
 
         if (notebook.activeSelf) { Cursor.lockState = CursorLockMode.Locked; }
         else { Cursor.lockState = CursorLockMode.None; }
+        taskLayoutGroup.SetActive(notebook.activeSelf);
     }
 
     void ShowCurrentTask()
@@ -302,7 +302,7 @@ public class TaskAssigner : NetworkBehaviour
         toggleTransform.localRotation = Quaternion.identity;
         toggleTransform.localPosition = Vector3.zero;
 
-        toggleTransform.localScale = new Vector3(12, 4, 4);
+        toggleTransform.localScale = new Vector3(6, 2, 2);
 
         // Get & set components
         Toggle newToggle = newToggleObject.GetComponent<Toggle>();
