@@ -16,7 +16,6 @@ public class HostHittingEnter : NetworkBehaviour
     public LobbyFadeScript LobbyFadeScript;
 
     public LobbyTextAnimation text;
-    bool started;
 
     private void Update()
     {
@@ -33,10 +32,6 @@ public class HostHittingEnter : NetworkBehaviour
         Cursor.lockState = CursorLockMode.None;
 
         controller.setLobby(LobbyMenu);
-        if (!started)
-        {
-            Cursor.lockState = CursorLockMode.None;
-        }
     }
     private void Start()
     {
@@ -60,7 +55,6 @@ public class HostHittingEnter : NetworkBehaviour
 
     IEnumerator CheckPlayerCountBeforeStart()
     {
-        started = true;
         float timer = 0f;
         float maxWaitTime = 10f; // optional: limit how long to check
 

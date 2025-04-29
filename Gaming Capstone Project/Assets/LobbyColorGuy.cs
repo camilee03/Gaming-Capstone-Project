@@ -28,7 +28,7 @@ public class LobbyColorGuy : MonoBehaviour
     public IEnumerator GetColorID(System.Action<int> callback)
     {
         yield return new WaitForSeconds(0.25f);
-        callback?.Invoke(localPlayer.ColorID);
+        callback?.Invoke(localPlayer.ColorID.Value);
     }
 
     public void UpdateColor()

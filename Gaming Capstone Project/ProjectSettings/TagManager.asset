@@ -14,7 +14,6 @@ TagManager:
   - Useable
   - Chair
   - EnergyCore
-  - ToggledButton
   layers:
   - Default
   - TransparentFX

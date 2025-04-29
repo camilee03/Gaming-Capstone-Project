@@ -24,6 +24,7 @@ public class ColorManager : MonoBehaviour
     {
         if (index < colors.Length && index > -1)
         {
+            Debug.Log("WTF " + index);
             hazmatSuit1.material.SetColor("_Color", colors[index]);
             hazmatSuit2.material.SetColor("_Color", colors[index]);
             if (indicator != null)

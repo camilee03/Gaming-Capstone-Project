@@ -34,14 +34,12 @@ public class VoteManager : NetworkBehaviour
     {
         ClearButtons();
 
-        foreach (NetworkClient c in NetworkManager.Singleton.ConnectedClientsList)
+        foreach (int color in Controller.usedColors)
         {
-            PlayerController pc = c.PlayerObject.GetComponent<PlayerController>();
             GameObject button = Instantiate(Colorbutton, HorizontalLayoutGroup.transform);
-            button.GetComponent<Image>().color = Controller.getColorByIndex(pc.ColorID);
-            button.transform.GetComponentInChildren<TextMeshProUGUI>().text = pc.playerName;
+            button.GetComponent<Image>().color = Controller.getColorByIndex(color);
 
-            int capturedColor = pc.ColorID;
+            int capturedColor = color;
             button.GetComponent<Button>().onClick.AddListener(() =>
             {
                 OnColorButtonClicked(capturedColor);

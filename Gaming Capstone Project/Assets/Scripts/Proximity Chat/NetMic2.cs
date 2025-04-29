@@ -70,8 +70,7 @@ public class NetMic2 : NetworkBehaviour
     void BroadcastAudio(byte[] audioBytes)
     {
         float[] floats = ByteArrayToFloatArray(audioBytes);
-        if (playable)
-            PlayReceivedAudio(ApplyNoiseGate(floats, noiseThreshold));
+        PlayReceivedAudio(ApplyNoiseGate(floats, noiseThreshold));
     }
     private byte[] FloatArrayToByteArray(float[] floats)
     {

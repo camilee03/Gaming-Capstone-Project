@@ -190,7 +190,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
-  m_Spacing: 50
+  m_Spacing: 10
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
@@ -360,7 +360,6 @@ MonoBehaviour:
   Controller: {fileID: 0}
   Colorbutton: {fileID: 7995679569334201993, guid: fc4db147a3f51b84bb992969da3124b7, type: 3}
   HorizontalLayoutGroup: {fileID: 2864931876513613920}
-  PlayerAudioSource: {fileID: 0}
 --- !u!1 &4544370375387068027
 GameObject:
   m_ObjectHideFlags: 0

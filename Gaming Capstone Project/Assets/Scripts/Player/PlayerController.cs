@@ -65,10 +65,7 @@ public class PlayerController : NetworkBehaviour
     public bool useAnimator = true;
     public GameObject PlayerDisplay;
     public NetworkVariable<Vector3> LastAssignedSpawnPos = new NetworkVariable<Vector3>();
-    public int ColorID = -1;
-
-    public string playerName;
-    public TextMeshProUGUI nametag;
+    public NetworkVariable<int> ColorID = new NetworkVariable<int>(-1);
 
     [Header("Death Visuals")]
     public GameObject playerModel; // Assign in Inspector: this should be the mesh or object representing the visible character
@@ -81,7 +78,7 @@ public class PlayerController : NetworkBehaviour
     {
         playerInput = GetComponent<PlayerInput>();
         camMovement = cam.GetComponent<CameraMovement>();
-        AudioListener al = cam.gameObject.GetComponent<AudioListener>();        
+        AudioListener al = cam.GetComponent<AudioListener>();        
 
         if (IsOwner)
         {
@@ -92,8 +89,6 @@ public class PlayerController : NetworkBehaviour
             playerInput.enabled = true;
             cam.gameObject.SetActive(true);
             camMovement.enabled = true;
-            nametag.enabled = false;
-            al.enabled = true;
             PlayerDisplay.SetActive(true);
         }
         else
@@ -105,7 +100,6 @@ public class PlayerController : NetworkBehaviour
             playerInput.enabled = false;
             cam.enabled = false;
             camMovement.enabled = false;
-            nametag.enabled = true;
             al.enabled = false;
             PlayerDisplay.SetActive(false);
         }
@@ -143,18 +137,11 @@ public class PlayerController : NetworkBehaviour
     }
     private void ApplyColor(int colorIndex)
     {
+
         if (gameObject.GetComponent<ColorManager>() != null)
         {
             ColorManager colormanage = gameObject.GetComponent<ColorManager>();
             colormanage.ChangeSuitColor(colorIndex);
-        }
-    }
-    public void ApplyColor()
-    {
-        if (gameObject.GetComponent<ColorManager>() != null)
-        {
-            ColorManager colormanage = gameObject.GetComponent<ColorManager>();
-            colormanage.ChangeSuitColor(ColorID);
         }
     }
     private System.Collections.IEnumerator WaitForLocalPlayer()
@@ -168,16 +155,71 @@ public class PlayerController : NetworkBehaviour
     }
 
 
+    private void OnColorChanged(int previous, int current)
+    {
+        //ApplyColor(current);
+
+        if (IsOwner)
+        {
+            SelectColorButton uiManager = FindFirstObjectByType<SelectColorButton>() ;
+            if (uiManager != null)
+            {
+                uiManager.RefreshAll();
+            }
+        }
+    }
 
 
+    [ServerRpc(RequireOwnership = false)]
+public void ForceSetColorServerRpc(int colorIndex)
+{
+    if (!GameController.Instance.usedColors.Contains(colorIndex))
+    {
+        GameController.Instance.LockColor(colorIndex);
+    }
+
+    if (ColorID.Value > 0)
+    {
+        GameController.Instance.UnlockColor(ColorID.Value);
+    }
+
+    ColorID.Value = colorIndex;
+}
+
+
+
+    public void RequestColorSelection(int colorIndex)
+    {
+        if (IsOwner)
+        {
+            TrySetColorServerRpc(colorIndex);
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void TrySetColorServerRpc(int colorIndex, ServerRpcParams rpcParams = default)
+    {
+        if (!GameController.Instance.IsColorAvailable(colorIndex)) return;
+
+        GameController.Instance.LockColor(colorIndex);
+
+        // Release previous color (if changing)
+        if (ColorID.Value >= 0)
+        {
+            GameController.Instance.UnlockColor(ColorID.Value);
+        }
+
+        ColorID.Value = colorIndex;
+    }
     private void Start()
     {
         rgd = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
+        ColorID.OnValueChanged += OnColorChanged;
 
-        if (ColorID >= 0)
+        if (ColorID.Value >= 0)
         {
-            ApplyColor(ColorID);
+            ApplyColor(ColorID.Value);
         }
         currentStamina = maxStamina;
 
@@ -555,58 +597,9 @@ private IEnumerator EnterGhostMode()
         else
             TeamDeclaration.text = "You are a : Scientist";
     }
-    public void ExternalSetName(string name)
+    private void OnDestroy()
     {
-        if (IsOwner)
-        {
-            if (IsServer) { SetNameClientRpc(name); }
-            else { SetNameServerRpc(name); }
-        }
-    }
-    [ClientRpc]
-    public void SetNameClientRpc(string name)
-    {
-        SetName(name);
-    }
-    [ServerRpc]
-    public void SetNameServerRpc(string name)
-    {
-        SetNameClientRpc(name);
-    }
-    void SetName(string name)
-    {
-        playerName = name;
-        transform.name = name;
-        nametag.text = name;
-    }
+        ColorID.OnValueChanged -= OnColorChanged;
 
-    public void ExternalSetColor(int colorIndex)
-    {
-        if (IsOwner)
-        {
-            if (IsServer) { SetColorClientRpc(colorIndex); }
-            else { SetColorServerRpc(colorIndex); }
-        }
-    }
-    [ClientRpc]
-    public void SetColorClientRpc(int colorIndex)
-    {
-        SetColor(colorIndex);
-    }
-    [ServerRpc]
-    public void SetColorServerRpc(int colorIndex)
-    {
-        SetColorClientRpc(colorIndex);
-    }
-    void SetColor(int colorIndex)
-    {
-        if (!GameController.Instance.usedColors.Contains(colorIndex))
-        {
-            Debug.Log("Setting Color!");
-            GameController.Instance.usedColors.Remove(ColorID);
-            ColorID = colorIndex;
-            GameController.Instance.usedColors.Add(ColorID);
-            ApplyColor();
-        }
     }
 }
