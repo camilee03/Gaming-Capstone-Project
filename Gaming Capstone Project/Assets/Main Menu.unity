@@ -267,6 +267,7 @@ MonoBehaviour:
   numPlayers: 1
   LobbySpawnPoint: {fileID: 0}
   GameSpawnPoint: {fileID: 0}
+  usedColors: 
   TimeLeftInVoting:
     m_InternalValue: 0
   votingTime: 30
