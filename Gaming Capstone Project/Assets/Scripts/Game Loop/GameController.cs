@@ -260,9 +260,22 @@ public class GameController : NetworkBehaviour
         AssignRandomColorsToUnpickedPlayers();
         AssignTeams();
         AssignTasks();
+        AssignAllColorsAndNames();
         DisableLobbyCanvasClientRpc();
         StartVoteInitTimerServerRpc();
     }
+    public void AssignAllColorsAndNames()
+    {
+        foreach (NetworkClient c in NetworkManager.Singleton.ConnectedClientsList)
+        {
+            Debug.Log("Client Found.");
+            PlayerController pc = c.PlayerObject.GetComponent<PlayerController>();
+            pc.ExternalSetColor();
+            pc.ExternalSetName();
+            pc.ExternalEnableGravity();
+        }
+    }
+
     [ServerRpc]
     private void StartVoteInitTimerServerRpc()
     {

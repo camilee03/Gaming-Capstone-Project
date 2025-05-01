@@ -4,7 +4,7 @@ using UnityEngine;
 public class ColorManager : MonoBehaviour
 {
 
-    public Color[] colors = {
+    public static Color[] colors = {
         Color.HSVToRGB(0/360f,1,1), //Red
         Color.HSVToRGB(25/360f,1,1), //Orange
         Color.HSVToRGB(50/360f,1,1), //Yellow
@@ -17,6 +17,10 @@ public class ColorManager : MonoBehaviour
         Color.HSVToRGB(0,0,.5f), //Gray
         Color.HSVToRGB(0,0,.1f), //Black
         Color.HSVToRGB(30/360f,.9f,.4f), //Brown
+    };
+    public static string[] defaultColorNames =
+    {
+        "Rudolf", "Orville", "Yelena", "Greg", "Thalia", "Baloo", "Pavel", "Pinka", "Wyatt", "Gray", "Blake", "Bron"
     };
     public Renderer hazmatSuit1, hazmatSuit2, indicator;
 
