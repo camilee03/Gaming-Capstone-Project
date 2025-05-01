@@ -36,7 +36,7 @@ public class TaskAssigner : NetworkBehaviour
     [SerializeField] TaskPointer taskPointer;
     [SerializeField] GameObject defaultToggle;
     ToggleGroup toggleGroup;
-    List<Toggle> toggles = new List<Toggle>();
+    public List<Toggle> toggles = new List<Toggle>();
     public Animator anim;
 
     const string STRIKE_START = "<s>";
@@ -49,21 +49,21 @@ public class TaskAssigner : NetworkBehaviour
 
     private void Update()
     {
-            if (start)
+        if (start)
+        {
+            if (false && playerController.isDopple) { tasksCompleted.text = "You have no tasks, you are a dopple."; }
+            else
             {
-                if (false && playerController.isDopple) { tasksCompleted.text = "You have no tasks, you are a dopple."; }
-                else
-                {
-                    AssignTasksClientRpc();
-                    start = false;
-                    donow = true;
-                }
+                AssignTasksClientRpc();
+                start = false;
+                donow = true;
             }
-            else if (donow)
-            {
-                UpdateTasks();
-                CheckCheckboxes();
-            }
+        }
+        else if (donow)
+        {
+            UpdateTasks();
+            CheckCheckboxes();
+        }
     }
 
     void UpdateTasks()
@@ -231,7 +231,7 @@ public class TaskAssigner : NetworkBehaviour
         string triggerRooms = "";
         foreach (Room room in task.rooms1)
         {
-            triggerRooms += " " + room.roomName;
+            if (room != null) { triggerRooms += " " + room.roomName; }
         }
 
         string results = "";
@@ -293,13 +293,16 @@ public class TaskAssigner : NetworkBehaviour
 
     void CreateCheckboxes(Vector3 position, int number, string description)
     {
+        Debug.Log("Creating Checkbox" + OwnerClientId);
+
         // Instantiate toggle
-        GameObject newToggleObject = SpawnNetworkedObject(taskLayoutGroup.transform, defaultToggle, Vector3.zero, Quaternion.identity);
+        GameObject newToggleObject = Instantiate(defaultToggle); 
         newToggleObject.name = number.ToString();
 
         RectTransform toggleTransform = newToggleObject.GetComponent<RectTransform>();
         toggleTransform.localRotation = Quaternion.identity;
         toggleTransform.localPosition = Vector3.zero;
+        //toggleTransform.SetParent(taskLayoutGroup.transform);
 
         toggleTransform.localScale = new Vector3(6, 2, 2);
 
@@ -312,12 +315,12 @@ public class TaskAssigner : NetworkBehaviour
         if (toggleGroup == null) { toggleGroup = notebook.AddComponent<ToggleGroup>(); toggleGroup.allowSwitchOff = true; }
         newToggle.group = toggleGroup;
 
-        //EventSystem.current.firstSelectedGameObject = newToggleObject;
+        EventSystem.current.firstSelectedGameObject = newToggleObject;
     }
 
     void CheckCheckboxes()
     {
-        if (toggleGroup.AnyTogglesOn())
+        if (toggleGroup != null && toggleGroup.AnyTogglesOn())
         {
             currentTask = assignedTasks[int.Parse(toggleGroup.GetFirstActiveToggle().name)];
             ShowCurrentTask();
@@ -325,21 +328,4 @@ public class TaskAssigner : NetworkBehaviour
             // something to move the toggle if task already completed?
         }
     }
-    GameObject SpawnNetworkedObject(Transform parent, GameObject child, Vector3 position, Quaternion rotation)
-    {
-        GameObject instance = null;
-
-        if (child != null)
-        {
-            instance = Instantiate(child, position, rotation);
-            NetworkObject instanceNetworkObject = instance.GetComponent<NetworkObject>();
-            if (instanceNetworkObject == null) { Debug.LogError(child.name + " needs a NetworkObject"); }
-            instanceNetworkObject.Spawn(true);
-
-            if (parent != null) { instanceNetworkObject.TrySetParent(parent); }
-        }
-
-        return instance;
-    }
-
 }

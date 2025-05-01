@@ -2,6 +2,7 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using Unity.Netcode.Components;
 using UnityEngine;
+using WebSocketSharp;
 
 public class DOSCommandController : MonoBehaviour
 {
@@ -37,8 +38,8 @@ public class DOSCommandController : MonoBehaviour
                 if (target.Length > 0)
                 {
                     //find current room instead of room with name
-                    Room currentRoom = FindRoomWithName(target);
-                    if (currentRoom.roomName == null) { return "ERROR: code 6070\n No such room name found."; }
+                    (bool hasRoom, Room currentRoom) = FindRoomWithName(target);
+                    if (!hasRoom || currentRoom.roomName == null) { return "ERROR: code 6070\n No such room name found."; }
 
                     switch (command)
                     {
@@ -105,16 +106,17 @@ public class DOSCommandController : MonoBehaviour
         return "";
     }
 
-    private Room FindRoomWithName(string target)
+    private (bool, Room) FindRoomWithName(string target)
     {
         foreach (Room room in RoomManager.Instance.rooms)
         {
             if (room.roomName.Replace(" ", "").ToLower().Equals(target.Replace(" ", "").ToLower()))
             {
-                return room;
+                return (true, room);
             }
         }
-        return null;
+
+        return (false, null);
     }
 
 }

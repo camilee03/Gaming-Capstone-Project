@@ -47,26 +47,29 @@ public class TaskManager : NetworkBehaviour
 
     public void CreateTasks()
     {
-        selectables = GameObject.FindGameObjectsWithTag("Selectable");
-        buttons = GameObject.FindGameObjectsWithTag("Button");
-        terminals = GameObject.FindGameObjectsWithTag("DOS Terminal");
-        useables = GameObject.FindGameObjectsWithTag("Useable");
-        energyCores = GameObject.FindGameObjectsWithTag("EnergyCore");
-        //papers = GameObject.FindGameObjectsWithTag("Paper");
+        if (IsHost)
+        {
+            selectables = GameObject.FindGameObjectsWithTag("Selectable");
+            buttons = GameObject.FindGameObjectsWithTag("Button");
+            terminals = GameObject.FindGameObjectsWithTag("DOS Terminal");
+            useables = GameObject.FindGameObjectsWithTag("Useable");
+            energyCores = GameObject.FindGameObjectsWithTag("EnergyCore");
+            //papers = GameObject.FindGameObjectsWithTag("Paper");
 
-        taskList = new List<RoomTask>();
-        rooms = RoomManager.Instance.rooms;
+            taskList = new List<RoomTask>();
+            rooms = RoomManager.Instance.rooms;
 
-        CreateInteractTasks(useables, buttons);
-        CreatePickupTasks(selectables);
-        CreateTerminalTasks();
-        CreatePaperTasks();
-        CreateEnergyCoreTasks(energyCores);
-        
-        //Debug.Log("NUM TASKS: " + taskList.Count);
+            CreateInteractTasks(useables, buttons);
+            CreatePickupTasks(selectables);
+            CreateTerminalTasks();
+            CreatePaperTasks();
+            CreateEnergyCoreTasks(energyCores);
+
+            //Debug.Log("NUM TASKS: " + taskList.Count);
+        }
     }
-    [ClientRpc]
-    public void CreateTasksClientRpc()
+    [ServerRpc]
+    public void CreateTasksServerRpc()
     {
         CreateTasks();  // Populate taskList on clients
     }
@@ -230,9 +233,10 @@ public class TaskManager : NetworkBehaviour
             switch (objectName)
             {
                 case "Paper":
+                    if (rooms1[0] == null) { break; }
                     for (int i=0; i < rooms1[0].objectParent.transform.childCount; i++)
                     {
-                        if (rooms1[0].objectParent.transform.GetChild(i).name.Replace("(Clone)", "") == "Trash Can")
+                        if (rooms1 != null && rooms1[0].objectParent.transform.GetChild(i).name.Replace("(Clone)", "") == "Trash Can")
                         {
                             rooms2.Add(rooms1[0]);
                             position = rooms1[0].objectParent.transform.GetChild(i).transform.position;
@@ -242,6 +246,7 @@ public class TaskManager : NetworkBehaviour
                     if (position == Vector3.zero) { Debug.Log("ERROR: Position for Paper Task not set"); }
                     break;
                 case "Coal":
+                    if (rooms1[0] == null) { break; }
                     for (int i = 0; i < rooms1[0].objectParent.transform.childCount; i++)
                     {
                         if (rooms1[0].objectParent.transform.GetChild(i).name.Replace("(Clone)", "") == "Furnace")

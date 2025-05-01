@@ -57,7 +57,7 @@ public class RoomGeneration : NetworkBehaviour
         GenerateMultipleRooms();
         RoomManager.Instance.InitializeSpawnPoints();
         taskManager.CreateTasks();
-        taskManager.CreateTasksClientRpc();
+        taskManager.CreateTasksServerRpc();
         mcam.Setup();
         RoomManager.Instance.ChangeWalls();
     }
@@ -306,6 +306,7 @@ public class RoomGeneration : NetworkBehaviour
             new(pos.x, 2.5f, pos.z + scale / 2) // floor below (spawn up)
         };
 
+
         for (int i=0; i<floorPositions.Count; i++)
         {
             bool collided = false;
@@ -314,7 +315,7 @@ public class RoomGeneration : NetworkBehaviour
                 if ((wallPos - spawnPos[i]).sqrMagnitude < 10) { collided = true; continue; }
             }
 
-            if (!collided && floorPositions[i] != prevPos && floorPositions[i] != nextPos)
+            if (!collided && (floorPositions[i] - prevPos).magnitude > 5f && (floorPositions[i] - nextPos).magnitude > 5f)
             {
                 Quaternion rotation = Quaternion.LookRotation(-outwardDirections[i], Vector3.up) * Quaternion.Euler(-90, 0, 0);
                 GameObject newObject = SpawnNetworkedObject(parent.transform, walls, spawnPos[i], rotation);
