@@ -5,6 +5,7 @@ using System.Net;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
+using static RoomTypeJSON;
 
 public class RoomGeneration : NetworkBehaviour
 {
@@ -56,6 +57,7 @@ public class RoomGeneration : NetworkBehaviour
 
         GenerateMultipleRooms();
         RoomManager.Instance.InitializeSpawnPoints();
+        Debug.Log("creating tasks");
         taskManager.CreateTasks();
         taskManager.CreateTasksClientRpc();
         mcam.Setup();
@@ -338,4 +340,46 @@ public class RoomGeneration : NetworkBehaviour
 
         return instance;
     }
+
+    // Network Fucntions
+    [System.Serializable]
+    public struct RoomReferenceData : INetworkSerializable
+    {
+        public NetworkObjectReference roomObjectRef;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref roomObjectRef);
+        }
+    }
+
+    public void createNetworkRef()
+    {
+        List<RoomReferenceData> roomRefs = new List<RoomReferenceData>();
+        foreach (var room in RoomManager.Instance.rooms)
+        {
+            roomRefs.Add(new RoomReferenceData
+            {
+                roomObjectRef = room.GetComponent<NetworkObject>()
+            });
+        }
+
+        SendRoomRefsClientRpc(roomRefs.ToArray());
+
+    }
+
+    [ClientRpc]
+    void SendRoomRefsClientRpc(RoomReferenceData[] roomRefs)
+    {
+        RoomManager.Instance.rooms = new List<Room>();
+        foreach (var refData in roomRefs)
+        {
+            if (refData.roomObjectRef.TryGet(out NetworkObject netObj))
+            {
+                Room room = netObj.GetComponent<Room>();
+                RoomManager.Instance.rooms.Add(room);
+            }
+        }
+    }
+
 }
