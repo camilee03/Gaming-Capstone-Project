@@ -1807,6 +1807,7 @@ MonoBehaviour:
     m_InternalValue: {x: 0, y: 0, z: 0}
   ColorID: -1
   playerName: 
+  netTransform: {fileID: 917763358606224804}
   nametag: {fileID: 8633211073688300634}
   playerModel: {fileID: 2047307553679736061}
   VotingScreen: {fileID: 3785841075656554597}

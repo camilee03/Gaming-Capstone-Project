@@ -68,6 +68,7 @@ public class PlayerController : NetworkBehaviour
     public int ColorID = -1;
 
     public string playerName;
+    public NetworkTransform netTransform;
     public TextMeshProUGUI nametag;
 
     [Header("Death Visuals")]
@@ -175,6 +176,7 @@ public class PlayerController : NetworkBehaviour
         rgd = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
 
+
         if (ColorID >= 0)
         {
             ApplyColor(ColorID);
@@ -216,6 +218,34 @@ public class PlayerController : NetworkBehaviour
 
 
     }
+    [ServerRpc(RequireOwnership = false)]
+    public void TeleportServerRpc(Vector3 newPosition, Quaternion newRotation)
+    {
+        // Teleport using NetworkTransform
+        Debug.Log("&& Server RPC");
+        if (netTransform != null)
+        {
+            Debug.Log("&& True");
+            RequestTeleportClientRpc(newPosition, newRotation);
+        }
+        else
+        {
+            Debug.Log("&& False");
+
+            transform.SetPositionAndRotation(newPosition, newRotation);
+        }
+        // Legal: server is allowed to write to NetworkVariable
+        LastAssignedSpawnPos.Value = newPosition;
+
+
+    }
+    [ClientRpc]
+    void RequestTeleportClientRpc(Vector3 position, Quaternion rotation)
+    {
+        if (IsOwner && netTransform != null)
+            netTransform.Teleport(position, rotation, Vector3.one * 0.75f);
+    }
+
 
     [ServerRpc(RequireOwnership = false)]
     public void CastVoteServerRpc(int colorIndex, ServerRpcParams rpcParams = default)

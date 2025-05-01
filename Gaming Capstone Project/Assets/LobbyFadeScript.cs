@@ -1,15 +1,17 @@
 using System.Collections;
 using DG.Tweening;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class LobbyFadeScript : MonoBehaviour
+public class LobbyFadeScript : NetworkBehaviour
 {
     public CanvasGroup Lobby;
     public float FadeInDuration, FadeOutDuration;
     public GameObject parentObj;
     public Slider slider;
+    public GameObject LobbyRender;
     private void Start()
     {
         FadeOut();
@@ -18,14 +20,15 @@ public class LobbyFadeScript : MonoBehaviour
     {
         Lobby.DOFade(1f, FadeInDuration);
     }
-
-    public void LevelFade()
+    [ClientRpc]
+    public void LevelFadeClientRpc()
     {
         slider.DOValue(1, 5);
 
         Lobby.DOFade(1f, FadeInDuration).OnComplete(() =>
         {
             StartCoroutine(WaitThenFadeOut());
+            LobbyRender.gameObject.SetActive(false);
         });
     }
 

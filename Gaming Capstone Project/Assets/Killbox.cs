@@ -1,38 +1,30 @@
-using System.Globalization;
 using Unity.Netcode;
-using Unity.Netcode.Components;
 using UnityEngine;
 
 public class Killbox : NetworkBehaviour
 {
-
     public RoomManager roomManager;
-    private void Start()
-    {
-    }
-    private void OnCollisionEnter(Collision collision)
-    {
 
-        if(collision.gameObject.tag == "Player")
+    private void OnCollisionStay(Collision collision)
+    {
+        Debug.Log("&& Collided with " +  collision.gameObject);
+        if (!IsServer) return;
+
+        if (collision.gameObject.CompareTag("Player"))
         {
-            if (roomManager.spawnPoints.Count == 0) roomManager.InitializeSpawnPoints();
-                GameObject obj = collision.gameObject;
-            Transform spawnpoint = roomManager.spawnPoints[Random.Range(0, roomManager.spawnPoints.Count)].transform;
-                 if (IsOwner)
-                {
-                var netTransform = obj.GetComponent<NetworkTransform>();
-                if (netTransform != null)
-                {
-                    netTransform.Teleport(spawnpoint.position, spawnpoint.rotation, Vector3.one * 0.75f);
-                }
-                else
-                {
-                    obj.transform.position = spawnpoint.position;
-                    obj.transform.rotation = spawnpoint.rotation;
-                }
+            Debug.Log("&& Collided with actual player");
 
+            if (roomManager.spawnPoints.Count <= 0)
+                roomManager.InitializeSpawnPoints();
+
+            var spawnpoint = roomManager.spawnPoints[Random.Range(0, roomManager.spawnPoints.Count)].transform;
+            var playerController = collision.gameObject.GetComponent<PlayerController>();
+
+            if (playerController != null)
+            {
+                Debug.Log("&& IS VALID");
+                playerController.TeleportServerRpc(spawnpoint.position, spawnpoint.rotation);
             }
         }
-
     }
 }

@@ -346,7 +346,12 @@ public class GameController : NetworkBehaviour
             if (topColors.Count > 1)
             {
                 Debug.Log("Vote tied. No one is eliminated.");
-                return;
+            secondsRemainingUntilVote.Value = Mathf.CeilToInt(voteStartDelay);
+            StartVoteInitTimerServerRpc();
+
+            Debug.Log("Voting competed3");
+            playerObj.GetComponent<PlayerController>().EndVoteClientRpc();
+            return;
             }
 
             int winningColor = topColors.First().Color;
