@@ -95,7 +95,7 @@ public class TaskAssigner : NetworkBehaviour
         if (numTasksFinished == numTasks) { taskManager.UpdateTasks(); numTasks = -1; }
 
         // Change to different task if current task is complete
-        else if (finishedTasks.ContainsKey(currentTask) && finishedTasks[currentTask]) 
+        else if (finishedTasks != null && finishedTasks.ContainsKey(currentTask) && finishedTasks[currentTask]) 
         {
             index = 0;
             foreach (RoomTask task in assignedTasks)
@@ -294,9 +294,8 @@ public class TaskAssigner : NetworkBehaviour
     void CreateCheckboxes(Vector3 position, int number, string description)
     {
         // Instantiate toggle
-        GameObject newToggleObject = GameObject.Instantiate(defaultToggle);
+        GameObject newToggleObject = SpawnNetworkedObject(taskLayoutGroup.transform, defaultToggle, Vector3.zero, Quaternion.identity);
         newToggleObject.name = number.ToString();
-        newToggleObject.transform.SetParent(taskLayoutGroup.transform); // gets canvas
 
         RectTransform toggleTransform = newToggleObject.GetComponent<RectTransform>();
         toggleTransform.localRotation = Quaternion.identity;
@@ -326,4 +325,21 @@ public class TaskAssigner : NetworkBehaviour
             // something to move the toggle if task already completed?
         }
     }
+    GameObject SpawnNetworkedObject(Transform parent, GameObject child, Vector3 position, Quaternion rotation)
+    {
+        GameObject instance = null;
+
+        if (child != null)
+        {
+            instance = Instantiate(child, position, rotation);
+            NetworkObject instanceNetworkObject = instance.GetComponent<NetworkObject>();
+            if (instanceNetworkObject == null) { Debug.LogError(child.name + " needs a NetworkObject"); }
+            instanceNetworkObject.Spawn(true);
+
+            if (parent != null) { instanceNetworkObject.TrySetParent(parent); }
+        }
+
+        return instance;
+    }
+
 }
