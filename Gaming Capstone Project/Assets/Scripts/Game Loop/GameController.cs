@@ -209,12 +209,15 @@ public class GameController : NetworkBehaviour
 
         if(deadDopples >= numberOfDopples)
         {
+            Cursor.lockState = CursorLockMode.None;
             Debug.Log("Scientsits Win!");
             EndGameForScienceWinClientRpc();
             return;
         }
-        if (numberOfDopples-deadDopples >= (Players.Count-numberOfDopples)-deadSci)
+        if ((Players.Count-numberOfDopples) >= deadSci)
         {
+            Cursor.lockState = CursorLockMode.None;
+
             Debug.Log("Dopples Win!");
             EndGameForDoppleWinClientRpc();
             return;
@@ -256,12 +259,13 @@ public class GameController : NetworkBehaviour
 
         Debug.Log("[Server] HostSelectsStart() => AssignTeams()");
         StartRoomGeneration();
-        SpawnPlayersAtRandomPoints();
         AssignRandomColorsToUnpickedPlayers();
         AssignTeams();
         AssignTasks();
         DisableLobbyCanvasClientRpc();
         StartVoteInitTimerServerRpc();
+        SpawnPlayersAtRandomPoints();
+
     }
     [ServerRpc]
     private void StartVoteInitTimerServerRpc()

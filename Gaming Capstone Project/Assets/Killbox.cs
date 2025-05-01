@@ -5,20 +5,25 @@ public class Killbox : NetworkBehaviour
 {
     public RoomManager roomManager;
 
-    private void OnCollisionStay(Collision collision)
+    private void OnCollisionEnter(Collision other)
     {
-        Debug.Log("&& Collided with " +  collision.gameObject);
+        Debug.Log("&& Collided with " +  other.gameObject);
         if (!IsServer) return;
 
-        if (collision.gameObject.CompareTag("Player"))
+        if (other.gameObject.CompareTag("Player"))
         {
             Debug.Log("&& Collided with actual player");
 
             if (roomManager.spawnPoints.Count <= 0)
+            {
+                Debug.Log("No Spawn Points");
                 roomManager.InitializeSpawnPoints();
+            }
+            int randomnum = Random.Range(0, roomManager.spawnPoints.Count);
+            Debug.Log(roomManager.spawnPoints.Count + " " + randomnum);
 
-            var spawnpoint = roomManager.spawnPoints[Random.Range(0, roomManager.spawnPoints.Count)].transform;
-            var playerController = collision.gameObject.GetComponent<PlayerController>();
+            var spawnpoint = roomManager.spawnPoints[randomnum].transform;
+            var playerController = other.gameObject.GetComponent<PlayerController>();
 
             if (playerController != null)
             {
