@@ -73,7 +73,7 @@ public class HostHittingEnter : NetworkBehaviour
                 yield break;
             }
             */
-            LobbyFadeScript.LevelFade();
+            LobbyFadeScript.LevelFadeClientRpc();
 
             Cursor.lockState = CursorLockMode.Locked;
 
