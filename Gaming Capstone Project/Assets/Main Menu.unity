@@ -3141,10 +3141,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 3861092862101946727}
-        m_TargetAssemblyTypeName: CustomSessionStuff, Assembly-CSharp
-        m_MethodName: Yell
-        m_Mode: 5
+      - m_Target: {fileID: 6034124494324559387}
+        m_TargetAssemblyTypeName: ExitGame, Assembly-CSharp
+        m_MethodName: Exit
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3549,6 +3549,7 @@ GameObject:
   - component: {fileID: 1491069501743576800}
   - component: {fileID: 6034124494324559386}
   - component: {fileID: 3861092862101946727}
+  - component: {fileID: 6034124494324559387}
   m_Layer: 5
   m_Name: Buttons
   m_TagString: Untagged
@@ -4210,6 +4211,18 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &6034124494324559387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3453273999786213527}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84d9bedeef8986b449cc1607b8edd75c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &6386107287433149462
 RectTransform:
   m_ObjectHideFlags: 0
