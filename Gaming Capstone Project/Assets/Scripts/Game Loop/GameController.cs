@@ -180,7 +180,7 @@ public class GameController : NetworkBehaviour
         }
     }
 
-    private void StartRoomGeneration(bool temp)
+    private void StartRoomGeneration()
     {
         GameObject.Find("RoomGenerationManager").GetComponent<RoomGeneration>().StartGeneration(numPlayers, temp);
     }
@@ -254,17 +254,17 @@ public class GameController : NetworkBehaviour
     // Start of Game
     // -------------------------------------------------------
     // Called ONLY by the server/host to assign teams and spawn players in the game
-    public void HostSelectsStart(bool temp)
+    public void HostSelectsStart()
     {
         if (!IsServer) return; // only the server/host does team assignment
 
         Debug.Log("[Server] HostSelectsStart() => AssignTeams()");
-        try { StartRoomGeneration(temp); }
+        try { StartRoomGeneration(); }
         catch (NullReferenceException e)
         {
-            // If room generation can't find a path
+            // If room generation can't find an astar path
             Debug.Log("CAUGHT:" + e.Message);
-            HostSelectsStart(false);
+            HostSelectsStart();
         }
 
         SpawnPlayersAtRandomPoints();
