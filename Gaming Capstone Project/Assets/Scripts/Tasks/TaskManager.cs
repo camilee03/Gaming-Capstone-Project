@@ -56,8 +56,20 @@ public class TaskManager : NetworkBehaviour
             energyCores = GameObject.FindGameObjectsWithTag("EnergyCore");
             //papers = GameObject.FindGameObjectsWithTag("Paper");
 
-            taskList = new List<RoomTask>();
-            rooms = RoomManager.Instance.rooms;
+        taskList = new List<RoomTask>();
+        rooms = RoomManager.Instance.rooms;
+        if (rooms.Count == 0)
+        {
+            Debug.Log("Room list empty");
+        }
+        else
+        {
+            Debug.Log("Room list not null");
+            foreach (Room room in rooms)
+            {
+                Debug.Log("Room: " + room.roomName);
+            }
+        }
 
             CreateInteractTasks(useables, buttons);
             CreatePickupTasks(selectables);
