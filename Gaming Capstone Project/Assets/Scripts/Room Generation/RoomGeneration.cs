@@ -36,6 +36,7 @@ public class RoomGeneration : NetworkBehaviour
     [Header("Collision Data")]
     bool collided;
     bool coroutineRunning;
+    bool breakGeneration;
 
     private void Start()
     {
@@ -49,8 +50,9 @@ public class RoomGeneration : NetworkBehaviour
 
     // -- ROOM GENERATION -- //
 
-    public void StartGeneration(int numPlayers)
+    public void StartGeneration(int numPlayers, bool temp)
     {
+        breakGeneration = temp;
         numRooms = numPlayers * 2;
         if (seed != -1) { Random.InitState(seed); }
 
@@ -256,7 +258,8 @@ public class RoomGeneration : NetworkBehaviour
         // Create a path in between doors
         List<Vector3> hallwayPath = GeneralFunctions.FindShortestAvoidingTiles(tile1, tile2, scale);
 
-        if (hallwayPath != null) { hallwayPath.Insert(0, tile1); hallwayPath.Insert(hallwayPath.Count - 1, tile2); }
+        if (breakGeneration) { Debug.Log("HERE"); return null; }
+        else if (hallwayPath != null) { hallwayPath.Insert(0, tile1); hallwayPath.Insert(hallwayPath.Count - 1, tile2); }
         else { Debug.Log("A* couldn't find a path"); }
 
         // Spawn hallway

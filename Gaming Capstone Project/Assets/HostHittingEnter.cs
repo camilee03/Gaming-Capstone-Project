@@ -84,7 +84,7 @@ public class HostHittingEnter : NetworkBehaviour
             yield return null;
         }
         Cursor.lockState = CursorLockMode.Locked;
-        controller.HostSelectsStart();
+        controller.HostSelectsStart(true);
         controller.DisableLobbyCanvasClientRpc();
         this.enabled = false;
     }

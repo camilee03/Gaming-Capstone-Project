@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -159,7 +160,7 @@ public class GameController : NetworkBehaviour
         }
 
         // Shuffle the players
-        var shuffledPlayers = Players.Values.OrderBy(p => Random.value).ToList();
+        var shuffledPlayers = Players.Values.OrderBy(p => UnityEngine.Random.value).ToList();
 
         // Assign the first 'numberOfDopples' as Dopples
         for (int i = 0; i < numberOfDopples && i < shuffledPlayers.Count; i++)
@@ -179,9 +180,9 @@ public class GameController : NetworkBehaviour
         }
     }
 
-    private void StartRoomGeneration()
+    private void StartRoomGeneration(bool temp)
     {
-        GameObject.Find("RoomGenerationManager").GetComponent<RoomGeneration>().StartGeneration(numPlayers);
+        GameObject.Find("RoomGenerationManager").GetComponent<RoomGeneration>().StartGeneration(numPlayers, temp);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -250,12 +251,19 @@ public class GameController : NetworkBehaviour
     // Start of Game
     // -------------------------------------------------------
     // Called ONLY by the server/host to assign teams and spawn players in the game
-    public void HostSelectsStart()
+    public void HostSelectsStart(bool temp)
     {
         if (!IsServer) return; // only the server/host does team assignment
 
         Debug.Log("[Server] HostSelectsStart() => AssignTeams()");
-        StartRoomGeneration();
+        try { StartRoomGeneration(temp); }
+        catch (NullReferenceException e)
+        {
+            // If room generation can't find a path
+            Debug.Log("CAUGHT:" + e.Message);
+            HostSelectsStart(false);
+        }
+
         SpawnPlayersAtRandomPoints();
         AssignRandomColorsToUnpickedPlayers();
         AssignTeams();
@@ -450,7 +458,7 @@ public class GameController : NetworkBehaviour
             return;
         }
 
-        var shuffledSpawnpoints = Spawnpoints.OrderBy(x => Random.value).ToList();
+        var shuffledSpawnpoints = Spawnpoints.OrderBy(x => UnityEngine.Random.value).ToList();
         int i = 0;
 
         foreach (var kvp in Players)
