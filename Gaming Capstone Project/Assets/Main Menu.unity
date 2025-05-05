@@ -273,7 +273,7 @@ MonoBehaviour:
   votingTime: 30
   Spawnpoints: []
   LobbyCanvas: {fileID: 0}
-  voteStartDelay: 120
+  voteStartDelay: 20
   secondsRemainingUntilVote:
     m_InternalValue: 0
   VotingCanvas: {fileID: 0}

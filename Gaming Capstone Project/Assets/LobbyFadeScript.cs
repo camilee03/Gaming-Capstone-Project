@@ -28,13 +28,14 @@ public class LobbyFadeScript : NetworkBehaviour
         Lobby.DOFade(1f, FadeInDuration).OnComplete(() =>
         {
             StartCoroutine(WaitThenFadeOut());
-            LobbyRender.gameObject.SetActive(false);
         });
     }
 
     private IEnumerator WaitThenFadeOut()
     {
         yield return new WaitForSeconds(5f);
+        LobbyRender.gameObject.SetActive(false);
+
         Lobby.DOFade(0f, FadeOutDuration).OnComplete(() =>
         {
             parentObj.SetActive(false);

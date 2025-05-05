@@ -152,6 +152,7 @@ GameObject:
   - component: {fileID: 3287670252972713280}
   - component: {fileID: 4356565615585168000}
   - component: {fileID: 1238525325206112707}
+  - component: {fileID: -3005063339703078354}
   m_Layer: 3
   m_Name: Voting Screen 1
   m_TagString: Untagged
@@ -300,6 +301,18 @@ MonoBehaviour:
   Colorbutton: {fileID: 7995679569334201993, guid: fc4db147a3f51b84bb992969da3124b7, type: 3}
   HorizontalLayoutGroup: {fileID: 878490402760272440}
   PlayerAudioSource: {fileID: 0}
+--- !u!114 &-3005063339703078354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1639263181387124365}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a0b1c5c89316ea4f8e6c01386569a4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1992516730637067338
 GameObject:
   m_ObjectHideFlags: 0
