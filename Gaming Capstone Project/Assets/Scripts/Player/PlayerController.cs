@@ -68,6 +68,7 @@ public class PlayerController : NetworkBehaviour
     public int ColorID = -1;
 
     public string playerName;
+    string defaultName;
     public NetworkTransform netTransform;
     public TextMeshProUGUI nametag;
 
@@ -173,6 +174,7 @@ public class PlayerController : NetworkBehaviour
 
     private void Start()
     {
+        defaultName = playerName;
         rgd = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
 
@@ -585,21 +587,29 @@ private IEnumerator EnterGhostMode()
         else
             TeamDeclaration.text = "You are a : Scientist";
     }
+    public void ExternalSetName()
+    {
+        Debug.Log("Player Attempting to set Name");
+        if (playerName == defaultName)
+        {
+            Debug.Log("Player Name Is Null");
+            playerName = ColorManager.defaultColorNames[ColorID];
+        }
+        if (IsServer) { SetNameClientRpc(playerName); }
+        else { SetNameServerRpc(playerName); }
+    }
     public void ExternalSetName(string name)
     {
-        if (IsOwner)
-        {
-            if (IsServer) { SetNameClientRpc(name); }
-            else { SetNameServerRpc(name); }
-        }
+        if (IsServer) { SetNameClientRpc(name); }
+        else { SetNameServerRpc(name); }
     }
     [ClientRpc]
-    public void SetNameClientRpc(string name)
+    void SetNameClientRpc(string name)
     {
         SetName(name);
     }
-    [ServerRpc]
-    public void SetNameServerRpc(string name)
+    [ServerRpc(RequireOwnership =false)]
+    void SetNameServerRpc(string name)
     {
         SetNameClientRpc(name);
     }
@@ -610,21 +620,43 @@ private IEnumerator EnterGhostMode()
         nametag.text = name;
     }
 
-    public void ExternalSetColor(int colorIndex)
+    public void ExternalEnableGravity()
     {
-        if (IsOwner)
-        {
-            if (IsServer) { SetColorClientRpc(colorIndex); }
-            else { SetColorServerRpc(colorIndex); }
-        }
+        if (IsServer) { EnableGravityClientRpc(); }
+        else { EnableGravityServerRpc(); }
     }
     [ClientRpc]
-    public void SetColorClientRpc(int colorIndex)
+    void EnableGravityClientRpc()
+    {
+        EnableGravity();
+    }
+    [ServerRpc(RequireOwnership = false)]
+    void EnableGravityServerRpc()
+    {
+        EnableGravityClientRpc();
+    }
+    void EnableGravity()
+    {
+        rgd.useGravity = true;
+    }
+
+    public void ExternalSetColor()
+    {
+        if (IsServer) { SetColorClientRpc(ColorID); }
+        else { SetColorServerRpc(ColorID); }
+    }
+    public void ExternalSetColor(int colorIndex)
+    {
+        if (IsServer) { SetColorClientRpc(colorIndex); }
+        else { SetColorServerRpc(colorIndex); }
+    }
+    [ClientRpc]
+    void SetColorClientRpc(int colorIndex)
     {
         SetColor(colorIndex);
     }
-    [ServerRpc]
-    public void SetColorServerRpc(int colorIndex)
+    [ServerRpc(RequireOwnership = false)]
+    void SetColorServerRpc(int colorIndex)
     {
         SetColorClientRpc(colorIndex);
     }

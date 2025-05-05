@@ -25,7 +25,7 @@ public class RoomGeneration : NetworkBehaviour
     public int numRooms = 12;
     [SerializeField] GameObject tiles;
     [SerializeField] GameObject walls;
-    [SerializeField] GameObject doors;
+    [SerializeField] GameObject[] doors;
     [SerializeField] GameObject roomObject;
     [SerializeField] GameObject roomParentObject;
     List<(GameObject door, int pos, GameObject room)> doorAndRoom;
@@ -157,7 +157,8 @@ public class RoomGeneration : NetworkBehaviour
 
         // replace wall with door
         wallParent.transform.GetChild(index).GetComponent<NetworkObject>().Despawn(true);
-        GameObject newDoor = SpawnNetworkedObject(wallParent.transform, doors, wallPosition, wallRotation);
+        GameObject door = doors[Mathf.RoundToInt(Random.Range(0, doors.Length))];
+        GameObject newDoor = SpawnNetworkedObject(wallParent.transform, door, wallPosition, wallRotation);
         newDoor.name = "Door" + direction;
 
         doorAndRoom.Add((newDoor, direction, room));
