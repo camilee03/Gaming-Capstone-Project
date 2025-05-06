@@ -11,6 +11,7 @@ public class RoomManager : NetworkBehaviour
 
     private void Awake()
     {
+        if (Instance == null) { Instance = (RoomManager)GameObject.FindFirstObjectByType<RoomManager>();}
         if (Instance != null && Instance != this) { Destroy(this); }
         else { Instance = this; }
     }

@@ -1,10 +1,13 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
+using UnityEngine.UIElements;
 
-public class Room : NetworkBehaviour
+public class Room : NetworkBehaviour, IEquatable<Room>, INetworkSerializable
 {
 
     [Header("Public variables")]
@@ -38,6 +41,14 @@ public class Room : NetworkBehaviour
 
 
     // -- Public Functions -- //
+    public bool Equals([AllowNull] Room otherRoom)
+    {
+        return (this.parent == otherRoom.parent);
+    }
+    public void NetworkSerialize<Room>(BufferSerializer<Room> serializer) where Room : IReaderWriter
+    {
+        serializer.SerializeValue(ref roomName);
+    }
 
     public Room(float scale, GameObject tile, GameObject wall, GameObject roomObject, GameObject roomParentObject)
     {
@@ -116,17 +127,17 @@ public class Room : NetworkBehaviour
     /// <summary> Creates new bounds for a room </summary>
     void GenerateNewRoom()
     {
-        size = Random.Range(11, 15);
+        size = UnityEngine.Random.Range(11, 15);
         objectLocations = new char[size, size]; // set random room size
 
-        int numSquares = Random.Range(1, 5); // determine how many squares will be generated
+        int numSquares = UnityEngine.Random.Range(1, 5); // determine how many squares will be generated
 
         for (int i = 0; i < numSquares; i++) // for each square, place randomly in the grid
         {
-            int x0 = Random.Range(4, size - 6); // leave gap on edges
-            int y0 = Random.Range(3, size - 6);
-            int width = Random.Range(3, size - (x0 + 3)); // at least 3 w&h to prevent small rooms
-            int height = Random.Range(3, size - (y0 + 3));
+            int x0 = UnityEngine.Random.Range(4, size - 6); // leave gap on edges
+            int y0 = UnityEngine.Random.Range(3, size - 6);
+            int width = UnityEngine.Random.Range(3, size - (x0 + 3)); // at least 3 w&h to prevent small rooms
+            int height = UnityEngine.Random.Range(3, size - (y0 + 3));
 
             PlaceSquare(x0, y0, width, height); // for each square generated, place tile in array
         }
