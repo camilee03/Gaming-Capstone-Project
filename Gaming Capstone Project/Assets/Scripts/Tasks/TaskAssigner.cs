@@ -51,7 +51,7 @@ public class TaskAssigner : NetworkBehaviour
     {
         if (start)
         {
-            if (false && playerController.isDopple) { tasksCompleted.text = "You have no tasks, you are a dopple."; }
+            if (playerController.isDopple) { tasksCompleted.text = "You have no tasks, you are a dopple."; }
             else
             {
                 AssignTasksClientRpc();

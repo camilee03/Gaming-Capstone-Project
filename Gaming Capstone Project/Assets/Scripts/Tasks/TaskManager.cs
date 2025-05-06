@@ -47,29 +47,27 @@ public class TaskManager : NetworkBehaviour
 
     public void CreateTasks()
     {
-        if (IsHost)
-        {
-            selectables = GameObject.FindGameObjectsWithTag("Selectable");
-            buttons = GameObject.FindGameObjectsWithTag("Button");
-            terminals = GameObject.FindGameObjectsWithTag("DOS Terminal");
-            useables = GameObject.FindGameObjectsWithTag("Useable");
-            energyCores = GameObject.FindGameObjectsWithTag("EnergyCore");
-            //papers = GameObject.FindGameObjectsWithTag("Paper");
+        selectables = GameObject.FindGameObjectsWithTag("Selectable");
+        buttons = GameObject.FindGameObjectsWithTag("Button");
+        terminals = GameObject.FindGameObjectsWithTag("DOS Terminal");
+        useables = GameObject.FindGameObjectsWithTag("Useable");
+        energyCores = GameObject.FindGameObjectsWithTag("EnergyCore");
+        //papers = GameObject.FindGameObjectsWithTag("Paper");
 
-            taskList = new List<RoomTask>();
-            rooms = RoomManager.Instance.rooms;
+        taskList = new List<RoomTask>();
+        rooms = RoomManager.Instance.rooms;
 
-            CreateInteractTasks(useables, buttons);
-            CreatePickupTasks(selectables);
-            CreateTerminalTasks();
-            CreatePaperTasks();
-            CreateEnergyCoreTasks(energyCores);
+        CreateInteractTasks(useables, buttons);
+        CreatePickupTasks(selectables);
+        CreateTerminalTasks();
+        CreatePaperTasks();
+        CreateEnergyCoreTasks(energyCores);
 
-            //Debug.Log("NUM TASKS: " + taskList.Count);
-        }
+        //Debug.Log("NUM TASKS: " + taskList.Count);
+
     }
-    [ServerRpc]
-    public void CreateTasksServerRpc()
+    [ClientRpc]
+    public void CreateTasksClientRpc()
     {
         CreateTasks();  // Populate taskList on clients
     }
@@ -273,7 +271,7 @@ public class TaskManager : NetworkBehaviour
                     break;
                 default:
                     // find a location far enough away from current object
-                    while (keepLooking && debugInt < 100) 
+                    while (rooms.Count > 0 && keepLooking && debugInt < 100) 
                     {
                         int randomRoom = Random.Range(0, rooms.Count - 1);
 

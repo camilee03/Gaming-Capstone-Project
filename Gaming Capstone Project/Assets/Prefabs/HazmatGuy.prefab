@@ -2648,6 +2648,7 @@ GameObject:
   - component: {fileID: 9057876150206813182}
   - component: {fileID: 2771745561360260867}
   - component: {fileID: 4980911588182948685}
+  - component: {fileID: 8097050787080318895}
   m_Layer: 5
   m_Name: DeathScreen
   m_TagString: Untagged
@@ -2725,6 +2726,18 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &8097050787080318895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2053537871204417702}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7434930130a35ab40bed93546e6725fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2188100362177176285
 GameObject:
   m_ObjectHideFlags: 0
@@ -5106,6 +5119,7 @@ GameObject:
   - component: {fileID: 8510745881688636197}
   - component: {fileID: 7102038493186329159}
   - component: {fileID: 647394133422252513}
+  - component: {fileID: 681943100093759908}
   m_Layer: 5
   m_Name: DoppleWin
   m_TagString: Untagged
@@ -5173,6 +5187,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &681943100093759908
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5901130611831853956}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7434930130a35ab40bed93546e6725fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5948610907646290204
 GameObject:
   m_ObjectHideFlags: 0
@@ -5565,6 +5591,7 @@ GameObject:
   - component: {fileID: 986548160497751341}
   - component: {fileID: 235059718870335999}
   - component: {fileID: 3359038056992389715}
+  - component: {fileID: 3982644133808137985}
   m_Layer: 5
   m_Name: ScientistWin
   m_TagString: Untagged
@@ -5632,6 +5659,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3982644133808137985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6254424574636085551}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7434930130a35ab40bed93546e6725fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6389260070017975325
 GameObject:
   m_ObjectHideFlags: 0

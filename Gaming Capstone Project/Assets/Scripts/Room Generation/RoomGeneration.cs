@@ -33,6 +33,8 @@ public class RoomGeneration : NetworkBehaviour
     TaskManager taskManager;
     public MapCam mcam;
 
+    Room currentRoom;
+
 
     [Header("Collision Data")]
     bool collided;
@@ -58,9 +60,11 @@ public class RoomGeneration : NetworkBehaviour
         GenerateMultipleRooms();
         RoomManager.Instance.InitializeSpawnPoints();
         taskManager.CreateTasks();
-        taskManager.CreateTasksServerRpc();
+        taskManager.CreateTasksClientRpc();
         mcam.Setup();
         RoomManager.Instance.ChangeWalls();
+
+        //RoomListClientRPC(RoomManager.Instance.rooms);
     }
 
     /// <summary> Use the room procedure to create multiple rooms </summary>
@@ -72,6 +76,8 @@ public class RoomGeneration : NetworkBehaviour
         Room newRoom = new(scale, tiles, walls, roomObject, roomParentObject);
         newRoom.RoomProcedure(0, objectGen);
         RoomManager.Instance.rooms.Add(newRoom);
+        currentRoom = newRoom;
+        AddNewRoomClientRpc();
         GameObject room1 = newRoom.parent;
 
         int index = 1;
@@ -85,6 +91,8 @@ public class RoomGeneration : NetworkBehaviour
             Room room2 = new(scale, tiles, walls, roomObject, roomParentObject);
             room2.RoomProcedure(index, objectGen);
             RoomManager.Instance.rooms.Add(room2);
+            currentRoom = room2;
+            AddNewRoomClientRpc();
             numRooms--;
 
             // Get new doors
@@ -105,6 +113,12 @@ public class RoomGeneration : NetworkBehaviour
         {
             objectGen.GenerationProcedure(room);
         }
+    }
+
+    [ClientRpc]
+    public void AddNewRoomClientRpc()
+    {
+        RoomManager.Instance.rooms.Add(currentRoom);
     }
 
 
@@ -340,47 +354,6 @@ public class RoomGeneration : NetworkBehaviour
         if (parent != null) { instanceNetworkObject.TrySetParent(parent); }
 
         return instance;
-    }
-
-    // Network Fucntions
-    [System.Serializable]
-    public struct RoomReferenceData : INetworkSerializable
-    {
-        public NetworkObjectReference roomObjectRef;
-
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-        {
-            serializer.SerializeValue(ref roomObjectRef);
-        }
-    }
-
-    public void createNetworkRef()
-    {
-        List<RoomReferenceData> roomRefs = new List<RoomReferenceData>();
-        foreach (var room in RoomManager.Instance.rooms)
-        {
-            roomRefs.Add(new RoomReferenceData
-            {
-                roomObjectRef = room.GetComponent<NetworkObject>()
-            });
-        }
-
-        SendRoomRefsClientRpc(roomRefs.ToArray());
-
-    }
-
-    [ClientRpc]
-    void SendRoomRefsClientRpc(RoomReferenceData[] roomRefs)
-    {
-        RoomManager.Instance.rooms = new List<Room>();
-        foreach (var refData in roomRefs)
-        {
-            if (refData.roomObjectRef.TryGet(out NetworkObject netObj))
-            {
-                Room room = netObj.GetComponent<Room>();
-                RoomManager.Instance.rooms.Add(room);
-            }
-        }
     }
 
 }
