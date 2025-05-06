@@ -15,11 +15,10 @@ public class MapCam : NetworkBehaviour
             midPoint += pt;
             if (IsOwner)
             {
-                Debug.Log("Setting up Room Text");
+                if (DebugGen.Instance.doDebug) { Debug.Log("Setting up Room Text"); }
                 if (IsServer) { setUpRoomTextClientRpc(rm.rooms[i].roomName, pt, i); }
                 else { setUpRoomTextServerRpc(rm.rooms[i].roomName, pt, i); }
             }
-            else Debug.Log("Not Owner.");
         }
         midPoint = midPoint / rm.spawnPoints.Count;
         float maxDistance = 0;
@@ -37,11 +36,10 @@ public class MapCam : NetworkBehaviour
         }
         if (IsOwner)
         {
-            Debug.Log("Setting Up Cams");
+            if (DebugGen.Instance.doDebug) Debug.Log("Setting Up Cams");
             if (IsServer) { setUpCamClientRpc(maxDistance, maxDistanceSize, midPoint); }
             else { setUpCamServerRpc(maxDistance, maxDistanceSize, midPoint); }
         }
-        else Debug.Log("Not Owner.");
     }
     [ClientRpc]
     public void setUpRoomTextClientRpc(string text, Vector3 point, int index)
@@ -77,6 +75,6 @@ public class MapCam : NetworkBehaviour
             cam.orthographicSize = maxDistance + maxDistanceSize / 4;
         }
         transform.position = new Vector3(midPoint.x, 30, midPoint.z);
-        Debug.Log("Mid Position: " + transform.position);
+        if (DebugGen.Instance.doDebug) Debug.Log("Mid Position: " + transform.position);
     }
 }

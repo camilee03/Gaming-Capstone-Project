@@ -15,13 +15,13 @@ public class ClientNetworkAnimator : NetworkAnimator
     [ServerRpc(RequireOwnership = false)]
     public void AnimToggleServerRpc()
     {
-        Debug.Log(gameObject.name + " to be toggled");
+        if (DebugGen.Instance.doDebug) Debug.Log(gameObject.name + " to be toggled");
         if (toggleable)
         {
             Animator.SetBool("Toggled", !Animator.GetBool("Toggled"));
-            Debug.Log("Trying to toggle " + gameObject.name);
+            if (DebugGen.Instance.doDebug) Debug.Log("Trying to toggle " + gameObject.name);
         }
-        else Debug.Log(gameObject.name + " not toggleable");
+        else if (DebugGen.Instance.doDebug) Debug.Log(gameObject.name + " not toggleable");
     }
 
 }

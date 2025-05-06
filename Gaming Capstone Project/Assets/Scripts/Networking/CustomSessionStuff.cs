@@ -17,14 +17,10 @@ public class CustomSessionStuff : MonoBehaviour
         }
         inputField.text = finalString;
         inputField.onEndEdit.Invoke(finalString);
-        Debug.Log("Creating Session with the name: " + finalString);
+        if (DebugGen.Instance.doDebug) { Debug.Log("Creating Session with the name: " + finalString); }
         foreach (Button button in buttons)
         {
             button.enabled = false;
         }
-    }
-    public void Yell(string yellWhat)
-    {
-        Debug.Log("I'm Yelling, \"" + yellWhat + "\".");
     }
 }

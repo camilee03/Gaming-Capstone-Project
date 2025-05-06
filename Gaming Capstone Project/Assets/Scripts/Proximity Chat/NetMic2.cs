@@ -57,14 +57,12 @@ public class NetMic2 : NetworkBehaviour
     void SendAudioClientRpc(byte[] audioBytes)
     {
         BroadcastAudio(audioBytes);
-        //Debug.Log("Client");
     }
 
     [ServerRpc]
     void SendAudioServerRpc(byte[] audioBytes)
     {
         SendAudioClientRpc(audioBytes);
-        Debug.Log("server");
     }
 
     void BroadcastAudio(byte[] audioBytes)

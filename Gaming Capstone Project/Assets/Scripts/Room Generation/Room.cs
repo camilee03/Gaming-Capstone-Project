@@ -340,7 +340,7 @@ public class Room : NetworkBehaviour
         fanList = new List<NetworkAnimator>();
         for (int i = 0; i < objectParent.transform.childCount; i++)
         {
-            if (objectParent.transform.GetChild(i).name.Replace("(Clone)", "") == "Fan")
+            if (objectParent.transform.GetChild(i).name.Replace("(Clone)", "") == "Big Fan")
             {
                 fanList.Add(objectParent.transform.GetChild(i).GetComponent<NetworkAnimator>());
             }

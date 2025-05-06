@@ -63,10 +63,11 @@ public class ObjectGeneration : NetworkBehaviour
         roomParentObject = room.roomParentObject;
 
         // Figure out what objects to spawn
-        var roomTypeList = roomTypeJSON.rooms.room;
-        int randomList = Random.Range(0, roomTypeList.Length - 1);
+        List<RoomTypeJSON.MapRoom> roomTypeList = roomTypeJSON.rooms.room;
+        int randomList = Random.Range(0, roomTypeList.Count - 1);
         string[] objectsToSpawn = roomTypeList[randomList].objects;
         room.roomName = roomTypeList[randomList].name;
+        roomTypeJSON.rooms.room.RemoveAt(randomList);
 
         // Create viable locations lists
         wallPositions = new();
@@ -399,7 +400,7 @@ public class ObjectGeneration : NetworkBehaviour
             case 'l': // lever
                 if (wallDict.Keys.Contains(tilePos))
                 {
-                    newObject = SpawnNetworkedObject(parent.transform, objects["lever"], tilePos + disp * 0.5f + Vector3.up * 3, Quaternion.LookRotation(wallDict[tilePos].transform.right) * Quaternion.Euler(-90, 0, 90));
+                    newObject = SpawnNetworkedObject(parent.transform, objects["lever"], tilePos + disp * 0.5f + Vector3.up * 3, Quaternion.LookRotation(wallDict[tilePos].transform.right) * Quaternion.Euler(0, 90, 0));
                 }
                 break;
             case 'P': // Poster
@@ -414,7 +415,7 @@ public class ObjectGeneration : NetworkBehaviour
             case 's': // speaker
                 if (wallDict.Keys.Contains(tilePos))
                 {
-                    newObject = SpawnNetworkedObject(parent.transform, objects["speaker"], tilePos + disp * 1.6f + Vector3.up * 4, Quaternion.LookRotation(wallDict[tilePos].transform.right) * Quaternion.Euler(-90, 0, 90));
+                    newObject = SpawnNetworkedObject(parent.transform, objects["speaker"], tilePos + disp * 1.5f + Vector3.up * 6, Quaternion.LookRotation(wallDict[tilePos].transform.right) * Quaternion.Euler(-90, 0, 90));
                 }
                 break;
             case 't': // Table
@@ -443,17 +444,11 @@ public class ObjectGeneration : NetworkBehaviour
                     newObject = SpawnNetworkedObject(parent.transform, objects["wires"], tilePos + disp * 0.5f + Vector3.up * 5, Quaternion.LookRotation(wallDict[tilePos].transform.right) * Quaternion.Euler(-90, 0, 90));
                 }
                 break;
-            case 'X': // food
-                newObject = SpawnNetworkedObject(parent.transform, objects["food"], tilePos + fallHeight, Quaternion.Euler(0, randomRotationsY[i], 0));
-                break;
             case 'x': // clothes
                 newObject = SpawnNetworkedObject(parent.transform, objects["glove"], tilePos + fallHeight, Quaternion.Euler(0, randomRotationsY[i], 0));
                 break;
             case 'Z': // trash-can
                 newObject = SpawnNetworkedObject(parent.transform, objects["trash can"], tilePos, Quaternion.Euler(-90, randomRotationsY[i], 0));
-                break;
-            case 'z': // trash
-                newObject = SpawnNetworkedObject(parent.transform, objects["trash"], tilePos + fallHeight, Quaternion.Euler(0, randomRotationsY[i], 0));
                 break;
 
             default:
@@ -491,12 +486,10 @@ public class ObjectGeneration : NetworkBehaviour
             case 'e': // Energy Core
             case 'b': // Box
             case 'p': // Paper
-            case 'X': // Food
             case 'c': // Coal
             case 'x': // Clothes
             case 'C': // Chair
             case 't': // Table
-            case 'z': // Trasj
             case 'Z': // Trash Can
                 newObject = new Object() { identifier = identifier, domains = new(tilePositions), constraint = Constraints.None };
                 break;
@@ -523,7 +516,7 @@ public class ObjectGeneration : NetworkBehaviour
         }
 
         // Figure out properties
-        Dictionary<char, char> pairedValues = new() { { 'C', 't'}, { 'c', 'f' }, { 'f', 'c' }, { 'X', 't' }, { 'W', 'C' } };
+        Dictionary<char, char> pairedValues = new() { { 'C', 't'}, { 'c', 'f' }, { 'f', 'c' }, { 'W', 'C' } };
 
         newObject.properties = new();
 
@@ -563,7 +556,7 @@ public class ObjectGeneration : NetworkBehaviour
     private char[] CreateObjectList(int numTiles, string[] objects) 
     {
         int wiggleRoom = 0;
-        if (2 * objects.Length > numTiles) { Debug.Log("ERROR: More objects than space"); }
+        if (2 * objects.Length > numTiles && DebugGen.Instance.doDebug) { Debug.Log("ERROR: More objects than space"); }
         else { wiggleRoom = Mathf.Max((numTiles - objects.Length * 2) - 5, 0); }
 
         char[] roomObjectList = new char[numTiles - 1];
@@ -575,7 +568,7 @@ public class ObjectGeneration : NetworkBehaviour
             for (int i = 0; i < numObjs; i++)
             {
                 if (obj == "") { continue; }
-                if (index >= numTiles-1) { Debug.Log("Too many spawned objects. Breaking."); break; }
+                if (index >= numTiles-1) { if (DebugGen.Instance.doDebug) { Debug.Log("Too many spawned objects. Breaking."); } break; }
                 roomObjectList[index++] = obj.ToCharArray()[0];
             }
         }
@@ -590,7 +583,6 @@ public class ObjectGeneration : NetworkBehaviour
             // Plentiful objects
             case 'x': // Clothes
             case 'c': // Coal
-            case 'X': // Food
             case 'p': // Paper
                 return Mathf.Min(Random.Range(5, 5 + wiggleRoom), 10);
 

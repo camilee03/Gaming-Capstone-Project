@@ -56,20 +56,8 @@ public class TaskManager : NetworkBehaviour
             energyCores = GameObject.FindGameObjectsWithTag("EnergyCore");
             //papers = GameObject.FindGameObjectsWithTag("Paper");
 
-        taskList = new List<RoomTask>();
-        rooms = RoomManager.Instance.rooms;
-        if (rooms.Count == 0)
-        {
-            Debug.Log("Room list empty");
-        }
-        else
-        {
-            Debug.Log("Room list not null");
-            foreach (Room room in rooms)
-            {
-                Debug.Log("Room: " + room.roomName);
-            }
-        }
+            taskList = new List<RoomTask>();
+            rooms = RoomManager.Instance.rooms;
 
             CreateInteractTasks(useables, buttons);
             CreatePickupTasks(selectables);
@@ -255,7 +243,7 @@ public class TaskManager : NetworkBehaviour
                             break;
                         }
                     }
-                    if (position == Vector3.zero) { Debug.Log("ERROR: Position for Paper Task not set"); }
+                    if (position == Vector3.zero && DebugGen.Instance.doDebug) { Debug.Log("ERROR: Position for Paper Task not set"); }
                     break;
                 case "Coal":
                     if (rooms1[0] == null) { break; }
@@ -268,7 +256,7 @@ public class TaskManager : NetworkBehaviour
                             break;
                         }
                     }
-                    if (position == Vector3.zero) { Debug.Log("ERROR: Position for Coal Task not set"); }
+                    if (position == Vector3.zero && DebugGen.Instance.doDebug) { Debug.Log("ERROR: Position for Coal Task not set"); }
                     break;
                 case "Glove":
                 case "Sock":
@@ -281,7 +269,7 @@ public class TaskManager : NetworkBehaviour
                             break;
                         }
                     }
-                    if (position == Vector3.zero) { Debug.Log("ERROR: Position for Clothes Task not set"); }
+                    if (position == Vector3.zero && DebugGen.Instance.doDebug) { Debug.Log("ERROR: Position for Clothes Task not set"); }
                     break;
                 default:
                     // find a location far enough away from current object

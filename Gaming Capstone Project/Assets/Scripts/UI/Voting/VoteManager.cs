@@ -4,6 +4,7 @@ using TMPro;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class VoteManager : NetworkBehaviour
@@ -30,10 +31,24 @@ public class VoteManager : NetworkBehaviour
     private Dictionary<GameObject, int> buttonToColor = new Dictionary<GameObject, int>();
     public AudioSource PlayerAudioSource;
 
+    private PlayerInput playerInput;
+
     private void OnEnable()
     {
         Controller = GameController.Instance;
-        buttons = new List<GameObject>();   
+        buttons = new List<GameObject>();
+
+        foreach (NetworkClient client in NetworkManager.Singleton.ConnectedClientsList)
+        {
+            client.PlayerObject.gameObject.GetComponent<PlayerInput>().enabled = false;
+        }
+    }
+    private void OnDisable()
+    {
+        foreach (NetworkClient client in NetworkManager.Singleton.ConnectedClientsList)
+        {
+            client.PlayerObject.gameObject.GetComponent<PlayerInput>().enabled = true;
+        }
     }
     public void ClearButtons()
     {
@@ -52,7 +67,6 @@ public class VoteManager : NetworkBehaviour
         foreach (NetworkClient c in NetworkManager.Singleton.ConnectedClientsList)
         {
             PlayerController pc = c.PlayerObject.GetComponent<PlayerController>();
-            Debug.Log(pc.name);
             GameObject button = Instantiate(Colorbutton, HorizontalLayoutGroup.transform);
             button.GetComponent<Image>().color = colors[(pc.ColorID)];
             button.transform.GetComponentInChildren<TextMeshProUGUI>().text = pc.playerName;
@@ -85,7 +99,7 @@ public class VoteManager : NetworkBehaviour
 
     private void OnColorButtonClicked(int colorIndex)
     {
-        Debug.Log($"[VoteManager] Color {colorIndex} button clicked.");
+        if (DebugGen.Instance.doDebug) Debug.Log($"[VoteManager] Color {colorIndex} button clicked.");
         updateColors(colorIndex); // pass color index, not button index
         NetworkManager.Singleton.LocalClient.PlayerObject.gameObject.GetComponent<PlayerController>().CastVoteServerRpc(colorIndex);
     }

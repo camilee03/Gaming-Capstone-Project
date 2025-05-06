@@ -129,7 +129,7 @@ public class PlayerController : NetworkBehaviour
                 transform.rotation = rotation;
             }
 
-            LastAssignedSpawnPos.Value = position;
+            //LastAssignedSpawnPos.Value = position;
         }
     }
         [ClientRpc]
@@ -141,7 +141,7 @@ public class PlayerController : NetworkBehaviour
         else
             TeamDeclaration.text = "You are a : Scientist";
 
-        Debug.Log($"[ClientRpc] Player {OwnerClientId} => isDopple={isDopple}");
+        if (DebugGen.Instance.doDebug) { Debug.Log($"[ClientRpc] Player {OwnerClientId} => isDopple={isDopple}"); }
     }
     private void ApplyColor(int colorIndex)
     {
@@ -207,7 +207,7 @@ public class PlayerController : NetworkBehaviour
     [ClientRpc]
     public void EndVoteClientRpc()
     {
-        Debug.Log("Voting on client");
+        if (DebugGen.Instance.doDebug) { Debug.Log("Voting on client"); }
         VotingScreen.GetComponent<VoteManager>().SetProximityChatAmount(1);
 
         VotingScreen.DOFade(0, 3);
@@ -224,16 +224,12 @@ public class PlayerController : NetworkBehaviour
     public void TeleportServerRpc(Vector3 newPosition, Quaternion newRotation)
     {
         // Teleport using NetworkTransform
-        Debug.Log("&& Server RPC");
         if (netTransform != null)
         {
-            Debug.Log("&& True");
             RequestTeleportClientRpc(newPosition, newRotation);
         }
         else
         {
-            Debug.Log("&& False");
-
             transform.SetPositionAndRotation(newPosition, newRotation);
         }
         // Legal: server is allowed to write to NetworkVariable
@@ -252,7 +248,7 @@ public class PlayerController : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void CastVoteServerRpc(int colorIndex, ServerRpcParams rpcParams = default)
     {
-        Debug.Log($"[ServerRpc] Received vote for color {colorIndex} from {OwnerClientId}");
+        if (DebugGen.Instance.doDebug) { Debug.Log($"[ServerRpc] Received vote for color {colorIndex} from {OwnerClientId}"); }
         GameController.Instance.ReceiveVote(OwnerClientId, colorIndex);
     }
 
@@ -483,14 +479,14 @@ public class PlayerController : NetworkBehaviour
             Vector3 direction = shootingPoint.forward;
 
             // Call a ServerRpc, passing in the needed data
-            Debug.Log("Local Attack => calling AttackServerRpc");
+            if (DebugGen.Instance.doDebug) { Debug.Log("Local Attack => calling AttackServerRpc"); }
             AttackServerRpc(origin, direction);
         }
     }
     [ServerRpc]
     private void AttackServerRpc(Vector3 origin, Vector3 direction)
     {
-        Debug.Log("[Server] AttackServerRpc triggered by " + OwnerClientId);
+        if (DebugGen.Instance.doDebug) { Debug.Log("[Server] AttackServerRpc triggered by " + OwnerClientId); }
 
         RaycastHit hit;
         if (Physics.Raycast(origin, direction, out hit, AttackDistance, playerLayerMask))
@@ -499,7 +495,7 @@ public class PlayerController : NetworkBehaviour
             var targetPlayer = hitObject.GetComponent<PlayerController>();
             if (targetPlayer != null && !targetPlayer.isDead)
             {
-                Debug.Log($"[Server] Player {OwnerClientId} killed {targetPlayer.OwnerClientId}");
+                if (DebugGen.Instance.doDebug) { Debug.Log($"[Server] Player {OwnerClientId} killed {targetPlayer.OwnerClientId}"); }
                 // We kill them via a ClientRpc call to the victim
                 targetPlayer.KillClientRpc();
             }
@@ -514,7 +510,7 @@ public class PlayerController : NetworkBehaviour
     public void KillClientRpc()
     {
         isDead = true;
-        Debug.Log($"[ClientRpc] KillClientRpc => Player {OwnerClientId} is now dead.");
+        if (DebugGen.Instance.doDebug) { Debug.Log($"[ClientRpc] KillClientRpc => Player {OwnerClientId} is now dead."); }
         GameController.Instance.CheckForEndOfGameServerRpc();
 
         StartCoroutine(EnterGhostMode());
@@ -589,10 +585,10 @@ private IEnumerator EnterGhostMode()
     }
     public void ExternalSetName()
     {
-        Debug.Log("Player Attempting to set Name");
+        if (DebugGen.Instance.doDebug) { Debug.Log("Player Attempting to set Name"); }
         if (playerName == defaultName)
         {
-            Debug.Log("Player Name Is Null");
+            if (DebugGen.Instance.doDebug) { Debug.Log("Player Name Is Null"); }
             playerName = ColorManager.defaultColorNames[ColorID];
         }
         if (IsServer) { SetNameClientRpc(playerName); }
@@ -664,7 +660,7 @@ private IEnumerator EnterGhostMode()
     {
         if (!GameController.Instance.usedColors.Contains(colorIndex))
         {
-            Debug.Log("Setting Color!");
+            if (DebugGen.Instance.doDebug) { Debug.Log("Setting Color!"); }
             GameController.Instance.usedColors.Remove(ColorID);
             ColorID = colorIndex;
             GameController.Instance.usedColors.Add(ColorID);

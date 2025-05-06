@@ -106,7 +106,7 @@ public class GameController : NetworkBehaviour
         GameObject newplayerObj = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.gameObject;
         Players[clientId] = newplayerObj;
 
-        Debug.Log($"[Server] Player connected => ClientId {clientId}, {newplayerObj.name}");
+        if (DebugGen.Instance.doDebug) { Debug.Log($"[Server] Player connected => ClientId {clientId}, {newplayerObj.name}"); }
     }
 
     private void OnClientDisconnected(ulong clientId)
@@ -115,7 +115,7 @@ public class GameController : NetworkBehaviour
 
         if (Players.ContainsKey(clientId))
         {
-            Debug.Log($"[Server] Player disconnected => ClientId {clientId}, {Players[clientId].name}");
+            if (DebugGen.Instance.doDebug) { Debug.Log($"[Server] Player disconnected => ClientId {clientId}, {Players[clientId].name}"); }
             Players.Remove(clientId);
         }
         if (Players.TryGetValue(clientId, out var player))
@@ -182,7 +182,7 @@ public class GameController : NetworkBehaviour
 
     private void StartRoomGeneration()
     {
-        GameObject.Find("RoomGenerationManager").GetComponent<RoomGeneration>().StartGeneration(numPlayers, temp);
+        GameObject.Find("RoomGenerationManager").GetComponent<RoomGeneration>().StartGeneration(numPlayers);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -258,12 +258,12 @@ public class GameController : NetworkBehaviour
     {
         if (!IsServer) return; // only the server/host does team assignment
 
-        Debug.Log("[Server] HostSelectsStart() => AssignTeams()");
+        if (DebugGen.Instance.doDebug) { Debug.Log("[Server] HostSelectsStart() => AssignTeams()"); }
         try { StartRoomGeneration(); }
         catch (NullReferenceException e)
         {
             // If room generation can't find an astar path
-            Debug.Log("CAUGHT:" + e.Message);
+            if (DebugGen.Instance.doDebug) { Debug.Log("CAUGHT:" + e.Message); }
             HostSelectsStart();
         }
 
@@ -281,7 +281,7 @@ public class GameController : NetworkBehaviour
     {
         foreach (NetworkClient c in NetworkManager.Singleton.ConnectedClientsList)
         {
-            Debug.Log("Client Found.");
+            if (DebugGen.Instance.doDebug) { Debug.Log("Client Found."); }
             PlayerController pc = c.PlayerObject.GetComponent<PlayerController>();
             pc.ExternalSetColor();
             pc.ExternalSetName();
@@ -310,7 +310,7 @@ public class GameController : NetworkBehaviour
     [ServerRpc]
     private void StartVoteServerRpc()
     {
-        Debug.Log("[ClientRpc] Vote started!");
+        if (DebugGen.Instance.doDebug) { Debug.Log("[ClientRpc] Vote started!"); }
 
         var localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerController>();
         localPlayer.StartVoteClientRpc();
@@ -340,67 +340,67 @@ public class GameController : NetworkBehaviour
     }
 
 
-    
+
     private void VotingComplete()
     {
-        Debug.Log("Voting competed");
+        if (DebugGen.Instance.doDebug) { Debug.Log("Voting competed"); }
         votingInProgress = false;
 
-            if (playerVotes.Count == 0)
-            {
-                Debug.Log("No votes were cast.");
+        if (playerVotes.Count == 0)
+        {
+            if (DebugGen.Instance.doDebug) { Debug.Log("No votes were cast."); }
             secondsRemainingUntilVote.Value = Mathf.CeilToInt(voteStartDelay);
             StartVoteInitTimerServerRpc();
 
-            Debug.Log("Voting competed3");
+            if (DebugGen.Instance.doDebug) Debug.Log("Voting competed3");
 
             playerObj.GetComponent<PlayerController>().EndVoteClientRpc();
             return;
-            }
-        Debug.Log("Voting competed LIST");
+        }
+        if (DebugGen.Instance.doDebug) { Debug.Log("Voting competed LIST"); }
 
         var groupedVotes = playerVotes
                 .GroupBy(kv => kv.Value) // group by colorIndex
                 .Select(g => new { Color = g.Key, Count = g.Count() })
                 .OrderByDescending(g => g.Count)
                 .ToList();
-        Debug.Log("Voting competed LIST");
+        if (DebugGen.Instance.doDebug) { Debug.Log("Voting competed LIST"); }
 
         int highestCount = groupedVotes.First().Count;
-            var topColors = groupedVotes.Where(g => g.Count == highestCount).ToList();
+        var topColors = groupedVotes.Where(g => g.Count == highestCount).ToList();
 
-            if (topColors.Count > 1)
-            {
-                Debug.Log("Vote tied. No one is eliminated.");
+        if (topColors.Count > 1)
+        {
+            if (DebugGen.Instance.doDebug) { Debug.Log("Vote tied. No one is eliminated."); }
             secondsRemainingUntilVote.Value = Mathf.CeilToInt(voteStartDelay);
             StartVoteInitTimerServerRpc();
 
-            Debug.Log("Voting competed3");
+            if (DebugGen.Instance.doDebug) { Debug.Log("Voting competed3"); }
             playerObj.GetComponent<PlayerController>().EndVoteClientRpc();
             return;
-            }
+        }
 
-            int winningColor = topColors.First().Color;
-            Debug.Log($"Color {winningColor} wins the vote!");
-            Debug.Log("Voting competed 1");
+        int winningColor = topColors.First().Color;
+        if (DebugGen.Instance.doDebug) { Debug.Log($"Color {winningColor} wins the vote!"); }
+        if (DebugGen.Instance.doDebug) { Debug.Log("Voting competed 1"); }
 
-            // Eliminate the player with that color
-            foreach (var kvp in Players)
+        // Eliminate the player with that color
+        foreach (var kvp in Players)
+        {
+            var pc = kvp.Value.GetComponent<PlayerController>();
+            usedColors.Remove(winningColor);
+            if (pc.ColorID == winningColor)
             {
-                var pc = kvp.Value.GetComponent<PlayerController>();
-                usedColors.Remove(winningColor);
-                if (pc.ColorID == winningColor)
-                {
-                    pc.KillClientRpc();
-                    break;
-                }
+                pc.KillClientRpc();
+                break;
             }
-            Debug.Log("Voting competed2");
+        }
+        if (DebugGen.Instance.doDebug) { Debug.Log("Voting competed2"); }
 
-            secondsRemainingUntilVote.Value = Mathf.CeilToInt(voteStartDelay);
-            StartVoteInitTimerServerRpc();
-        
-        Debug.Log("Voting competed3");
+        secondsRemainingUntilVote.Value = Mathf.CeilToInt(voteStartDelay);
+        StartVoteInitTimerServerRpc();
+
+        if (DebugGen.Instance.doDebug) { Debug.Log("Voting competed3"); }
         playerObj.GetComponent<PlayerController>().EndVoteClientRpc();
         CheckForEndOfGameServerRpc();
 
@@ -415,12 +415,12 @@ public class GameController : NetworkBehaviour
 
         if (playerVotes.ContainsKey(clientId))
         {
-            Debug.Log($"[Server] Player {clientId} changed vote to color {colorIndex}");
+            if (DebugGen.Instance.doDebug) { Debug.Log($"[Server] Player {clientId} changed vote to color {colorIndex}"); }
             playerVotes[clientId] = colorIndex;
         }
         else
         {
-            Debug.Log($"[Server] Player {clientId} voted for color {colorIndex}");
+            if (DebugGen.Instance.doDebug) { Debug.Log($"[Server] Player {clientId} voted for color {colorIndex}"); }
             playerVotes.Add(clientId, colorIndex);
         }
     }
@@ -472,7 +472,7 @@ public class GameController : NetworkBehaviour
     {
         if (Spawnpoints.Count == 0)
         {
-            Debug.LogWarning("No spawn points available.");
+            if (DebugGen.Instance.doDebug) { Debug.LogWarning("No spawn points available."); }
             return;
         }
 
@@ -491,7 +491,7 @@ public class GameController : NetworkBehaviour
                 pc.TeleportClientRpc(spawn.position, spawn.rotation);
             }
 
-            Debug.Log($"[Server] Assigned {player.name} to spawn at {spawn.position}");
+            if (DebugGen.Instance.doDebug) { Debug.Log($"[Server] Assigned {player.name} to spawn at {spawn.position}"); }
         }
     }
 
@@ -518,10 +518,10 @@ public class GameController : NetworkBehaviour
             var player = kvp.Value.GetComponent<PlayerController>();
             if (player.ColorID == -1)
             {
-                Debug.Log("Color Not Added yet.");
+                if (DebugGen.Instance.doDebug) { Debug.Log("Color Not Added yet."); }
                 if (availableColors.Count == 0)
                 {
-                    Debug.LogWarning("No colors left to assign!");
+                    if (DebugGen.Instance.doDebug) { Debug.LogWarning("No colors left to assign!"); }
                     return;
                 }
 
@@ -553,7 +553,7 @@ public class GameController : NetworkBehaviour
         hostSelectedStart = true;
 
 
-        Debug.Log($"[ClientRpc] Player {OwnerClientId} => Successfully deleted canvas");
+        if (DebugGen.Instance.doDebug) { Debug.Log($"[ClientRpc] Player {OwnerClientId} => Successfully deleted canvas"); }
 
     }
     #endregion

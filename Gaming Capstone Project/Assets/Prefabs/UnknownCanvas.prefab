@@ -3035,7 +3035,7 @@ GameObject:
   - component: {fileID: 6024669635032641673}
   - component: {fileID: 8603959635888600228}
   m_Layer: 5
-  m_Name: Purple
+  m_Name: UnknownCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

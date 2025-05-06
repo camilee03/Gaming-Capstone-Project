@@ -4,6 +4,6 @@ public class DebugButton : MonoBehaviour
 {
     public void OnPress()
     {
-        Debug.Log(gameObject.name + "'s Button was pressed!");
+        if (DebugGen.Instance.doDebug) Debug.Log(gameObject.name + "'s Button was pressed!");
     }
 }

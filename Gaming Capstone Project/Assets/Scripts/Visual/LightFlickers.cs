@@ -56,7 +56,7 @@ public class LighFlickers : MonoBehaviour
             return;
 
         // pop off an item if too big
-        while (smoothQueue.Count >= smoothing)
+        while (smoothQueue != null && smoothQueue.Count >= smoothing)
         {
             lastSum -= smoothQueue.Dequeue();
         }

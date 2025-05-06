@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class DebugGen : MonoBehaviour
 {
+    public bool doDebug = false;
     public int seed;
 
     public static DebugGen Instance { get; private set; }

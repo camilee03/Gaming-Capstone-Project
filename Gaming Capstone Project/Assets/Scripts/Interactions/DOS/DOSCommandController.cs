@@ -110,6 +110,7 @@ public class DOSCommandController : MonoBehaviour
     {
         foreach (Room room in RoomManager.Instance.rooms)
         {
+            Debug.Log(room.name);
             if (room.roomName.Replace(" ", "").ToLower().Equals(target.Replace(" ", "").ToLower()))
             {
                 return (true, room);

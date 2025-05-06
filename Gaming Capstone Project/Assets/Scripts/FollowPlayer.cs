@@ -17,13 +17,8 @@ public class FollowPlayer : NetworkBehaviour
             transform.SetParent(null);
         }
     }
-    private void OnDestroy()
-    {
-        Debug.Log("Follower Destroyed.");
-    }
-    // Update is called once per frame
     void Update()
     {
-        transform.position = new Vector3(target.position.x, 20, target.position.z);
+        if (target != null && transform != null) { transform.position = new Vector3(target.position.x, 20, target.position.z); }
     }
 }

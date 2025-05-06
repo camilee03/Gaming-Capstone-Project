@@ -12,7 +12,7 @@ public class DOSInteraction : MonoBehaviour
     public Transform cameraMovementPoint;
     public CameraMovement CameraMovementScript;
     public PlayerController playerController;
-    private GameObject camera;
+    new private GameObject camera;
     private Vector3 originalPosition;
     private Quaternion originalRotation;
     public bool InInteraction = false;

@@ -16,7 +16,10 @@ public class NameTag : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.position = target.position + offset;
-        transform.rotation = playerCam.rotation;
+        if (target != null && transform != null)
+        {
+            transform.position = target.position + offset;
+            transform.rotation = playerCam.rotation;
+        }
     }
 }

@@ -34,7 +34,7 @@ public class EnergyCore : MonoBehaviour
 
             generatedCode += color;
         }
-        Debug.Log("Generated Code:" + generatedCode); 
+        if (DebugGen.Instance.doDebug) { Debug.Log("Generated Code:" + generatedCode); }
     }
     void RandomizeButtons()
     {
@@ -89,14 +89,14 @@ public class EnergyCore : MonoBehaviour
             {
                 if (inputtedCode == generatedCode)
                 {
-                    Debug.Log("Correct Code!"); //maybe play a correct sound effect
+                    if (DebugGen.Instance.doDebug) { Debug.Log("Correct Code!"); } //maybe play a correct sound effect
                     //finish the task here.
                     taskIsDone = true;
                     listeningForCode = false;
                 }
                 else
                 {
-                    Debug.Log("incorrect code."); //maybe play an error sound effect
+                    if (DebugGen.Instance.doDebug) { Debug.Log("incorrect code."); } //maybe play an error sound effect
                     ResetReceivedCode();
                 }
             }

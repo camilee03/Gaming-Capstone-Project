@@ -26,19 +26,17 @@ public class FlashLight : NetworkBehaviour
     private void FlashlightClientRpc()
     {
         Toggle();
-        Debug.Log("Client");
     }
 
     [ServerRpc]
     private void FlashlightServerRpc()
     {
         FlashlightClientRpc();
-        Debug.Log("Server");
     }
 
     private void Toggle()
     {
-        Debug.Log("Toggling FlashLight");
+        if (DebugGen.Instance.doDebug) Debug.Log("Toggling FlashLight");
         flashlightEnabled = !flashlightEnabled;
         flashlight.enabled = flashlightEnabled;
     }

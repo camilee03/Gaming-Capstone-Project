@@ -37,7 +37,6 @@ public class RoomGeneration : NetworkBehaviour
     [Header("Collision Data")]
     bool collided;
     bool coroutineRunning;
-    bool breakGeneration;
 
     private void Start()
     {
@@ -51,15 +50,13 @@ public class RoomGeneration : NetworkBehaviour
 
     // -- ROOM GENERATION -- //
 
-    public void StartGeneration(int numPlayers, bool temp)
+    public void StartGeneration(int numPlayers)
     {
-        breakGeneration = temp;
         numRooms = numPlayers * 2;
         if (seed != -1) { Random.InitState(seed); }
 
         GenerateMultipleRooms();
         RoomManager.Instance.InitializeSpawnPoints();
-        Debug.Log("creating tasks");
         taskManager.CreateTasks();
         taskManager.CreateTasksServerRpc();
         mcam.Setup();
@@ -151,12 +148,12 @@ public class RoomGeneration : NetworkBehaviour
         Quaternion wallRotation = Quaternion.LookRotation(outwardDir, Vector3.up) * Quaternion.Euler(-90, 0, 90);
 
         // find direction based on name
-        string name = wallParent.transform.GetChild(index).gameObject.name;
+        string name = wallTransform.gameObject.name;
         char lastChar = name[name.Length - 1];
         int direction = System.Convert.ToInt16(lastChar);
 
         // replace wall with door
-        wallParent.transform.GetChild(index).GetComponent<NetworkObject>().Despawn(true);
+        if (wallTransform.GetComponent<NetworkObject>().IsSpawned) { wallTransform.GetComponent<NetworkObject>().Despawn(true); }
         GameObject door = doors[Mathf.RoundToInt(Random.Range(0, doors.Length))];
         GameObject newDoor = SpawnNetworkedObject(wallParent.transform, door, wallPosition, wallRotation);
         newDoor.name = "Door" + direction;
@@ -261,8 +258,7 @@ public class RoomGeneration : NetworkBehaviour
         // Create a path in between doors
         List<Vector3> hallwayPath = GeneralFunctions.FindShortestAvoidingTiles(tile1, tile2, scale);
 
-        if (breakGeneration) { Debug.Log("HERE"); return null; }
-        else if (hallwayPath != null) { hallwayPath.Insert(0, tile1); hallwayPath.Insert(hallwayPath.Count - 1, tile2); }
+        if (hallwayPath != null) { hallwayPath.Insert(0, tile1); hallwayPath.Insert(hallwayPath.Count - 1, tile2); }
         else { Debug.Log("A* couldn't find a path"); }
 
         // Spawn hallway

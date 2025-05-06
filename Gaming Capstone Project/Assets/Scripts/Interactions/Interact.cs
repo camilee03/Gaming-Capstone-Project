@@ -29,7 +29,6 @@ public class Interact : NetworkBehaviour
     GameObject chairSittingIn;
     bool sitting;
 
-    bool canChange = true;
     private void Start()
     {
         player = gameObject.GetComponentInParent<PlayerController>();
@@ -204,7 +203,7 @@ public class Interact : NetworkBehaviour
 
     public void EnableHighlight(GameObject newObject)
     {
-        Debug.Log("Enabling highlight on " + newObject.name);
+        if (DebugGen.Instance.doDebug) Debug.Log("Enabling highlight on " + newObject.name);
         // Highlights the raycast object
         materials = newObject.GetComponent<Renderer>().materials.ToList();
 
@@ -219,7 +218,7 @@ public class Interact : NetworkBehaviour
 
     public void DisableHighlight()
     {
-        Debug.Log("Disabling highlight on " + highlightedObject.name);
+        if (DebugGen.Instance.doDebug) Debug.Log("Disabling highlight on " + highlightedObject.name);
         foreach (var material in materials)
         {
             material.DisableKeyword("_EMISSION");
@@ -230,8 +229,10 @@ public class Interact : NetworkBehaviour
 
     public void toggleAnimatedObject(GameObject g)
     {
+        ClientNetworkAnimator animator = g.GetComponent<ClientNetworkAnimator>();
+        if (g == null && DebugGen.Instance.doDebug) { Debug.Log("Add ClientNetworkAnimator to " + g.name); return; }
         g.GetComponent<ClientNetworkAnimator>().AnimToggleServerRpc();
-        Debug.Log("Toggled " + g.name);
+        if (DebugGen.Instance.doDebug) Debug.Log("Toggled " + g.name);
     }
 
 }

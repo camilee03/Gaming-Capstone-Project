@@ -103,7 +103,6 @@ public class RoomFunctions : ScriptableObject
         float maxX = -1000000;
         float maxZ = -1000000;
 
-        float deviation = 100;
         foreach (Room room in RoomManager.Instance.rooms)
         {
             Transform t = room.parent.transform;

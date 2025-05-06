@@ -114,13 +114,11 @@ public class TaskAssigner : NetworkBehaviour
             taskManager = GameObject.Find("RoomGenerationManager").GetComponent<TaskManager>();
             taskList = taskManager.taskList;
             string goalTextResult = "";
-            if(taskList == null)
-            {
-                Debug.Log("task list null");
-            }
+
             for (int i = 0; i < numTasks; i++)
             {
-                if (taskList.Count == 0) { break; }
+                // NOTE: maybe add a try catch here to rerun if tasklist is null
+                if (taskList == null || taskList.Count == 0) { if (DebugGen.Instance.doDebug) { Debug.Log("task list null"); } break; }
 
                 // Add random tasks from total tasks in task manager
                 int newTask = Random.Range(0, taskList.Count);
@@ -293,7 +291,7 @@ public class TaskAssigner : NetworkBehaviour
 
     void CreateCheckboxes(Vector3 position, int number, string description)
     {
-        Debug.Log("Creating Checkbox" + OwnerClientId);
+        if (DebugGen.Instance.doDebug) { Debug.Log("Creating Checkbox" + OwnerClientId); }
 
         // Instantiate toggle
         GameObject newToggleObject = Instantiate(defaultToggle); 
@@ -302,7 +300,7 @@ public class TaskAssigner : NetworkBehaviour
         RectTransform toggleTransform = newToggleObject.GetComponent<RectTransform>();
         toggleTransform.localRotation = Quaternion.identity;
         toggleTransform.localPosition = Vector3.zero;
-        //toggleTransform.SetParent(taskLayoutGroup.transform);
+        toggleTransform.SetParent(taskLayoutGroup.transform);
 
         toggleTransform.localScale = new Vector3(6, 2, 2);
 

@@ -32,7 +32,7 @@ public class ColorManager : MonoBehaviour
             hazmatSuit2.material.SetColor("_Color", colors[index]);
             if (indicator != null)
             {
-                Debug.Log("Changing Color of Indicator");
+                if (DebugGen.Instance.doDebug) Debug.Log("Changing Color of Indicator");
                 indicator.material.SetColor("_BaseColor", colors[index]);
             }
         }
