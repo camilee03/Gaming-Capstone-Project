@@ -1076,19 +1076,7 @@ MonoBehaviour:
   m_CharacterLimit: 0
   m_OnEndEdit:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 3861092862101946727}
-        m_TargetAssemblyTypeName: CustomSessionStuff, Assembly-CSharp
-        m_MethodName: Yell
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_OnSubmit:
     m_PersistentCalls:
       m_Calls: []
@@ -1248,19 +1236,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1056123433}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 116532526}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1056123433
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3039,8 +3015,8 @@ MonoBehaviour:
   m_UseEncryption: 0
   m_MaxPacketQueueSize: 512
   m_MaxPayloadSize: 6144
-  m_HeartbeatTimeoutMS: 1000
-  m_ConnectTimeoutMS: 1000
+  m_HeartbeatTimeoutMS: 10000
+  m_ConnectTimeoutMS: 10000
   m_MaxConnectAttempts: 60
   m_DisconnectTimeoutMS: 30000
   ConnectionData:
@@ -3310,8 +3286,8 @@ CanvasGroup:
   m_GameObject: {fileID: 2010479352}
   m_Enabled: 1
   m_Alpha: 0
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
 --- !u!114 &2010479359
 MonoBehaviour:
@@ -4268,6 +4244,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inputField: {fileID: 928705585}
+  button: {fileID: 1056123432}
   buttons:
   - {fileID: 8558133944708871448}
   - {fileID: 6989527168681492352}

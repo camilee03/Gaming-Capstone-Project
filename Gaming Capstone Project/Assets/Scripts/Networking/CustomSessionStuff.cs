@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class CustomSessionStuff : MonoBehaviour
 {
     public TMP_InputField inputField;
+    public Button button;
     public Button[] buttons;
     public void EnterSession()
     {
@@ -17,6 +18,7 @@ public class CustomSessionStuff : MonoBehaviour
         }
         inputField.text = finalString;
         inputField.onEndEdit.Invoke(finalString);
+        button.onClick.Invoke(); 
         if (DebugGen.Instance.doDebug) { Debug.Log("Creating Session with the name: " + finalString); }
         foreach (Button button in buttons)
         {
